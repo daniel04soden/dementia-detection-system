@@ -137,3 +137,73 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Gradle
+.gradle/
+build/
+*/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Android Studio/IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Misc Android
+local.properties
+*.jks
+*.keystore
+*.apk
+*.ap_
+*.dex
+*.class
+captures/
+output.json
+
+# Python compiled
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Python environments and tooling
+.venv/
+venv/
+.env/
+.envrc
+.python-version
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+.pyre/
+coverage.xml
+htmlcov/
+.tox/
+.eggs/
+*.egg-info/
+pip-selfcheck.json
+
+# TensorFlow, Keras, ML/AI
+*.h5
+*.hdf5
+*.ckpt
+*.pb
+*.tflite
+*.pth
+*.weights
+# Dataset or result folders (customize to match your workflow!)
+data/
+datasets/
+output/
+results/
+
+# CrewAI or generic AI cache/state
+.crewai/
+.abstra/
+
+# VSCode, JetBrains, OS
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
