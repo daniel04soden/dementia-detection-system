@@ -1,0 +1,140 @@
+:root{
+  background-color: #e6d9d2;
+  height: 100%;
+  display: flex;
+  justify-content: center; /* centers horizontally */
+  align-items: center; 
+}
+
+header {
+  --header-height: 60px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-height);
+  color: white;
+  z-index: 1000;
+}
+
+body{
+  height: 100%;
+  display: flex;
+  justify-content: center; /* aligns top */
+  align-items: center;
+  margin: auto;
+}
+
+.LoginScreen {
+  margin-top: 100px;
+}
+
+
+.logo {
+  width: 400px;
+  height: 100px;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+.Navbar {
+      align-items: center;
+      background-color: #ffffff;
+      top: 0%;
+    }
+    
+    .spaced-list {
+      display: flex;
+      justify-content: space-evenly; /* or space-around / space-evenly */
+      list-style: none;
+      height: 100px;
+      margin: 0px;
+    }
+    .Navbar ul li{
+      margin: auto;
+      top: auto;
+    }
+
+    .Navbar a {
+      color: rgb(209, 52, 214);
+      text-decoration: none;
+      font-size: xx-large;
+      transition: color 0.3s ease;
+    }
+
+    .Navbar a:hover {
+      color: #e4a0e8;
+    }
+
+
+/*Gippity*/
+
+.popup-container {
+  margin: 300px auto;
+  padding: 90px;
+  width: 90%; /* or set a fixed width like 900px depending on your layout */
+  border: 1px solid #ccc;
+  border-radius: 24px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.1);
+  font-family: Arial, sans-serif;
+  font-size: 1.5em; /* Increased font size for scaling */
+}
+
+.popup-container h2 {
+  text-align: center;
+  margin-bottom: 60px;
+  font-size: 2em;
+}
+
+.popup-container input[type="text"],
+.popup-container input[type="password"] {
+  width: 100%;
+  padding: 30px;
+  margin: 24px 0;
+  font-size: 1.2em;
+  box-sizing: border-box;
+}
+
+.popup-container input[type="submit"] {
+  width: 100%;
+  padding: 30px;
+  font-size: 1.2em;
+  background-color: #007BFF;
+  border: none;
+  color: white;
+  cursor: pointer;
+  margin-top: 30px;
+}
+
+.popup-container input[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+
+
+
+
+
+
+
+.profile-container {
+  margin: 300px auto;
+  padding: 90px;
+  width: 90%; /* or set a fixed width like 900px depending on your layout */
+  border: 1px solid #ccc;
+  border-radius: 24px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.1);
+  font-family: Arial, sans-serif;
+  font-size: 1.5em; /* Increased font size for scaling */
+}
+
+.profile-container h1, h2, h3 {
+  text-align: left;
+  margin: 20px 0px 20px 0px;
+}
