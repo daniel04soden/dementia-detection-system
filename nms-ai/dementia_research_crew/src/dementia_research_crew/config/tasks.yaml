@@ -1,17 +1,19 @@
 research_task:
   description: >
-    Conduct a thorough research about {topic}
-    Make sure you find any interesting and relevant information given
-    the current year is {current_year}.
+    Conduct a thorough exploration about the latest consumer facing headlines and 
+    news relating to dementia and dementia diagnosis findings.
+    Make sure you find any interesting and relevant information given.
+    The current year is 2025.
   expected_output: >
-    A list with 10 bullet points of the most relevant information about {topic}
-  agent: researcher
+    A json file with 10 values storing a headline,recent information as a description, images relevant to the dementia topic and sources relating to dementia research 
+  agent: dementia_patient_news_reporter
+
 
 reporting_task:
   description: >
     Review the context you got and expand each topic into a full section for a report.
     Make sure the report is detailed and contains any and all relevant information.
   expected_output: >
-    A fully fledged report with the main topics, each with a full section of information.
-    Formatted as markdown without '```'
-  agent: reporting_analyst
+    A json file with 10 values storing a headline from google scholar,recent research as a description, images relevant to the dementia topic such as brain scans, diagrams, images of people with dementia and sources relating to dementia research 
+  agent: dementia_professional_news_reporter
+
