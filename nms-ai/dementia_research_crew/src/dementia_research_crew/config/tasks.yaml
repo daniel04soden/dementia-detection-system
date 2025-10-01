@@ -1,19 +1,23 @@
-research_task:
+patient_news_research_task:
   description: >
-    Conduct a thorough exploration about the latest consumer facing headlines and 
-    news relating to dementia and dementia diagnosis findings.
-    Make sure you find any interesting and relevant information given.
-    The current year is 2025.
+    Research the latest dementia news and developments that would be relevant 
+    and helpful for patients, families, and caregivers. Focus on:
+    - Treatment breakthroughs and new therapies
+    - Lifestyle tips and prevention strategies  
+    - Support resources and community programs
+    - Patient success stories and hope-inspiring developments
   expected_output: >
-    A json file with 10 values storing a headline,recent information as a description, images relevant to the dementia topic and sources relating to dementia research 
+    A json file with 10 values storing a headline,recent information as a description, images relevant to the dementia topic and sources relating to dementia research intended for patients, keeping in mind their sensitivity to harsh topics 
   agent: dementia_patient_news_reporter
 
-
-reporting_task:
+professional_news_research_task:
   description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
+    Research the latest dementia studies, clinical trials, and medical developments 
+    for healthcare professionals. Focus on:
+    - Clinical research and peer-reviewed studies
+    - New diagnostic tools and techniques
+    - Treatment protocols and guidelines
+    - Professional conferences and medical updates
   expected_output: >
-    A json file with 10 values storing a headline from google scholar,recent research as a description, images relevant to the dementia topic such as brain scans, diagrams, images of people with dementia and sources relating to dementia research 
+    A json file with 10 values storing a headline,recent information as a description, images relevant to the dementia topic and sources relating to dementia research 
   agent: dementia_professional_news_reporter
-
