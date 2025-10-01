@@ -1,4 +1,4 @@
-package com.example.logindemo
+package com.example.dementiaDetectorApp
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.logindemo"
+    namespace = "com.example.dementiaDetectorApp"
     compileSdk = 36
 
     defaultConfig {

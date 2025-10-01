@@ -1,4 +1,4 @@
-package com.example.logindemo.ui.theme
+package com.example.dementiaDetectorApp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
