@@ -1,4 +1,4 @@
-package com.example.logindemo
+package com.example.dementiaDetectorApp
 
 import org.junit.Test
 
