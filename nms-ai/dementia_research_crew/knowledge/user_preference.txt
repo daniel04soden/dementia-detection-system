@@ -1,4 +1,3 @@
-User name is John Doe.
-User is an AI Engineer.
-User is interested in AI Agents.
-User is based in San Francisco, California.
+User name is Unkown.
+User is either a medical professional or a patient testing to see if they have dementia.
+User wants to learn about the latest developments in dementia diagnosis
