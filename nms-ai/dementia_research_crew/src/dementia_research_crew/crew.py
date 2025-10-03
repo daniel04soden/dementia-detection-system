@@ -11,30 +11,30 @@ class DementiaResearchCrew():
     tasks: List[Task]
 
     @agent
-    def dementia_patient_news_reporter(self) -> Agent:
+    def dementia_news_reporter(self) -> Agent:
         return Agent(
-            config=self.agents_config['dementia_patient_news_reporter'],
+            config=self.agents_config['dementia_news_reporter'],
             verbose=True
         )
 
     @agent
-    def dementia_professional_news_reporter(self) -> Agent:
+    def dementia_news_analyst(self) -> Agent:
         return Agent(
-            config=self.agents_config['dementia_professional_news_reporter'],
+            config=self.agents_config['dementia_news_analyst'],
             verbose=True
         )
     @task
-    def patient_news_research_task(self) -> Task:
+    def dementia_news_report_task(self) -> Task:
         return Task(
-            config=self.tasks_config['patient_news_research_task'],
-            output_file='output/patient_report.md'
+            config=self.tasks_config['dementia_news_report_task'],
+            output_file='output/report.md'
         )
 
     @task  
-    def professional_news_research_task(self) -> Task:
+    def dementia_news_research_task(self) -> Task:
         return Task(
-            config=self.tasks_config['professional_news_research_task'],
-            output_file='output/professional_report.md'
+            config=self.tasks_config['dementia_news_research_task'],
+            output_file='output/research.md'
         )
 
     @crew

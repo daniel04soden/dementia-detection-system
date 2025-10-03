@@ -1,23 +1,22 @@
-patient_news_research_task:
+dementia_news_research_task:
   description: >
-    Research the latest dementia news and developments that would be relevant 
-    and helpful for patients, families, and caregivers. Focus on:
+    Research the latest dementia news and developments that would be relevant to both patients and professionals alike
+    Focus on:
     - Treatment breakthroughs and new therapies
     - Lifestyle tips and prevention strategies  
     - Support resources and community programs
     - Patient success stories and hope-inspiring developments
   expected_output: >
-    A json file with 10 values storing a headline,recent information as a description, images relevant to the dementia topic and sources relating to dementia research intended for patients, keeping in mind their sensitivity to harsh topics 
-  agent: dementia_patient_news_reporter
+    Two different lists, one with ten articles summarised and prepared for any consumer with very little knowledge to read. And another one which contains a detailed insight into the latest developments for medical professionals in dementia developments.
+  agent: dementia_news_analyst
 
-professional_news_research_task:
+
+dementia_news_report_task:
   description: >
-    Research the latest dementia studies, clinical trials, and medical developments 
-    for healthcare professionals. Focus on:
-    - Clinical research and peer-reviewed studies
-    - New diagnostic tools and techniques
-    - Treatment protocols and guidelines
-    - Professional conferences and medical updates
+    Reformat the two lists of these articles, into json associative arrays
+    Focus on:
+    - Ensuring the articles do not lead to dead links 
+    - Have consise but descriptive snippets 
   expected_output: >
-    A json file with 10 values storing a headline,recent information as a description, images relevant to the dementia topic and sources relating to dementia research 
-  agent: dementia_professional_news_reporter
+    Two json files with ten values storing a headline,a snippet summary of the article that is relevant to professionals, and the url of said article 
+  agent: dementia_news_reporter
