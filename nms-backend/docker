@@ -1,0 +1,4 @@
+docker run --name post -e POSTGRES_PASSWORD=pass -d postgres
+CREATE USER fawaz WITH ENCRYPTED PASSWORD '3516';
+CREATE DATABASE dementia;
+GRANT ALL PRIVILEGES ON DATABASE dementia TO fawaz;
