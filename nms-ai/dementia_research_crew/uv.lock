@@ -660,10 +660,14 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "crewai", extra = ["tools"] },
+    { name = "pyparseit" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "crewai", extras = ["tools"], specifier = ">=0.201.1,<1.0.0" }]
+requires-dist = [
+    { name = "crewai", extras = ["tools"], specifier = ">=0.201.1,<1.0.0" },
+    { name = "pyparseit", specifier = ">=0.2.0" },
+]
 
 [[package]]
 name = "deprecation"
@@ -2942,6 +2946,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/c1/c1/ed50644d7eab5b9a57ba832e8b83d123268860e97df505388985df6ca4bc/pylance-0.37.0-cp39-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:38fdb03a37cc31563287e143662e27973f7b6e4d48f838fde3c7e73150007d0f", size = 42031448, upload-time = "2025-09-23T16:51:35.208Z" },
     { url = "https://files.pythonhosted.org/packages/74/f4/4c0232d8681b9af9dddc4fb7268a59f7f73ff5d3efed6654744d7002c790/pylance-0.37.0-cp39-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:502ff3175610979e48bdd902df0ede7287f9739615ea46a15b6dcce880c78742", size = 45574532, upload-time = "2025-09-23T16:54:37.223Z" },
     { url = "https://files.pythonhosted.org/packages/9e/bd/e54bd61553ab283c2dc10672894ab4937209bd18674f0af7d375e874094c/pylance-0.37.0-cp39-abi3-win_amd64.whl", hash = "sha256:399eed5ce86673d342973c14acff38fad76b3dfaa80be50482953f4e0035685a", size = 46617756, upload-time = "2025-09-23T17:10:59.996Z" },
+]
+
+[[package]]
+name = "pyparseit"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/b7/80/7923682ff249ee2a99cfd1800728e15fe9ecb763c6c5227649e3ef885bb7/pyparseit-0.2.0.tar.gz", hash = "sha256:14cfbac516dfad9cbc71d9b365173d562439500e49fe857860c3de01c3545a3f", size = 6293, upload-time = "2024-08-08T11:54:54.628Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/23/11/96032b5231fb2e0bbd8e5a3a2ca94fd2b55479a3eae0f609ee9152ce9ace/pyparseit-0.2.0-py3-none-any.whl", hash = "sha256:4c7269986b6d4bc1f434f3d336a99f5ee0771ec82559f934e72cb76006b27d76", size = 7742, upload-time = "2024-08-08T11:54:53.405Z" },
 ]
 
 [[package]]
