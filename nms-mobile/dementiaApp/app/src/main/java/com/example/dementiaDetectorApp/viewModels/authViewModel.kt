@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.dementiaDetectorApp.models.Account
 import com.example.dementiaDetectorApp.models.Address
-import com.example.dementiaDetectorApp.models.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
@@ -14,8 +13,6 @@ import kotlinx.coroutines.flow.collect
 class AuthViewModel: ViewModel(){
     var currentAc: Account?= null                   //? means can be null, =null defaults it to null until later changed
     private set                                     //Can be called externally but not altered externally
-    var currentUsr: User?= null
-    private set
 
     //UI Fields
     //Step 1 Email and password
@@ -63,7 +60,6 @@ class AuthViewModel: ViewModel(){
     //----------------------------------------------------------------------------------------------------------------
     //Subject to change when implementing DB integration
     private val registeredAccounts = mutableListOf<Account>()
-    private val registeredUsers = mutableListOf<User>()
     private val loginAttempts: MutableMap<String, Int> = mutableMapOf()
 
     fun authUser(email: String, pswd: String,): Boolean{
@@ -90,11 +86,6 @@ class AuthViewModel: ViewModel(){
                         break
                     }
                 }
-                for(usr in registeredUsers){
-                    if (usr.accountID==currentAc!!.accountID){
-                        currentUsr=usr
-                    }
-                }
                 loginMsg="Login successful"
             }else{
                 loginMsg="Login failed"
@@ -106,7 +97,6 @@ class AuthViewModel: ViewModel(){
 
     fun logout(){
         currentAc=null
-        currentUsr=null
         //Call login screen function here
     }
 
@@ -115,12 +105,9 @@ class AuthViewModel: ViewModel(){
             //Go to step 2 page                      //Step 2 Personal Info
             //Go to step 3 page                      //Step 3 Address
 
-
-            val newAc=Account("acID",_email.value,_pswd.value)
-            registeredAccounts.add(newAc)
             val newAdd=Address(addressOne.value,addressTwo.value,addressThree.value,city.value,county.value,eircode.value)
-            val newUsr=User(newAc.accountID, fName.value,lName.value,phoneNum.value,newAdd)
-            registeredUsers.add(newUsr)
+            val newAc=Account("acID",_email.value,_pswd.value,fName.value,lName.value,phoneNum.value,newAdd)
+            registeredAccounts.add(newAc)
         }
     }
 
