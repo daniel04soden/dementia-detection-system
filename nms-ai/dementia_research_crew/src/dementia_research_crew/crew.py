@@ -46,4 +46,5 @@ class DementiaResearchCrew():
             tasks=self.tasks, 
             process=Process.sequential,
             verbose=True,
+            output_file="out.json"
         )
