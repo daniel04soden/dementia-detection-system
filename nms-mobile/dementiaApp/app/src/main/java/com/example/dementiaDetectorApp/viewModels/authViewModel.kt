@@ -1,5 +1,4 @@
 package com.example.dementiaDetectorApp.viewModels
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,7 +7,6 @@ import com.example.dementiaDetectorApp.models.Account
 import com.example.dementiaDetectorApp.models.Address
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 
 class AuthViewModel: ViewModel(){
     var currentAc: Account?= null                   //? means can be null, =null defaults it to null until later changed
