@@ -1,0 +1,101 @@
+/* General layout */
+.dashContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #e6e6e6;
+  font-family: Arial, sans-serif;
+}
+
+@media (max-width: 900px) {
+  .reviewBtn{
+    font-size: 8px !important;
+  }
+  .mainContent{
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 16px;
+    box-sizing: border-box;
+  }
+}
+
+/* Main Content */
+.mainContent {
+  display: flex;
+  justify-content: space-between;
+  flex: 1;
+  padding: 20px;
+}
+
+.leftSection{
+  flex: 3;
+}
+
+.tableSection {
+  flex: 3;
+  overflow-y: auto;
+  scrollbar-width: none;
+  max-height: 500px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+th,
+td {
+  border: 1px solid #ccc;
+  text-align: center;
+  padding: 15px 15px;
+}
+
+th {
+  background-color: #f5f5f5;
+  font-size: 16px;
+}
+
+.reviewBtn {
+  background-color: #5d70f0;
+  color: white;
+  border-radius: 4px;
+  padding: 10px;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.reviewBtn:hover {
+  background-color: #3a4fd6;
+}
+
+.newTestBtn {
+  background-color: #b38dd9;
+  color: white;
+  border: none;
+  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  margin-top: 15px;
+  cursor: pointer;
+}
+
+.newTestBtn:hover {
+  background-color: #9a67cc;
+}
+
+.newsSection {
+  flex: 1;
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Footer */
+.footer {
+  background-color: #8238a1;
+  height: 40px;
+  width: 100%;
+  margin-top: auto;
+}
