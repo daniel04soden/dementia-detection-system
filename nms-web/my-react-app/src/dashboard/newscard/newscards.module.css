@@ -1,0 +1,12 @@
+/* News Section */
+.newsCard {
+  background-color: #ffffcc;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.newsCard h3 {
+  margin-top: 0;
+  color: #333;
+}
