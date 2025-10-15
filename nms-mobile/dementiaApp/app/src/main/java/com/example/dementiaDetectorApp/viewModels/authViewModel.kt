@@ -99,7 +99,7 @@ class AuthViewModel: ViewModel(){
     }
 
     fun register(){ //Will pull from the fields defined above as they constantly update
-        if((validatePswd())&&(validateEmail())){     //Step 1 Email and password
+        if((isValidPswd())&&(validateLoginEmail())){ //Step 1 Email and password
             //Go to step 2 page                      //Step 2 Personal Info
             //Go to step 3 page                      //Step 3 Address
 
@@ -109,18 +109,31 @@ class AuthViewModel: ViewModel(){
         }
     }
 
-    fun validatePswd(): Boolean{
-        if((_pswd.value==confPswd.value)&&(pswd.value.length>=8)){return true}
+    fun isValidPswd(): Boolean{
+        if((pswd.value.length>=8)){return true}
         return false
     }
 
-    fun validateEmail(): Boolean{
+    fun validateLoginEmail(): Boolean{
         for (ac in registeredAccounts){
             if (ac.email==_email.value){return false
             }
         }
         return true
     }
+
+    fun validateNum (): Boolean{
+        if(phoneNum.value.length == 10){
+            return true
+        }
+        return false
+    }
+
+    private val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\$"
+    fun isValidEmail(): Boolean {
+        return email.value.matches(emailRegex.toRegex())
+    }
+
     //Functions to update values in this file based on view's UI fields
     fun onPswdChange(newPswd: String){_pswd.value = newPswd}
     fun onConfPswdChange(newConfPswd: String){_confPswd.value=newConfPswd}

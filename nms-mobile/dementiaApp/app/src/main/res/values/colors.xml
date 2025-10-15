@@ -7,4 +7,10 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="primary">#FFFFFFFF</color>
+    <color name="secondary">#FF833EA1</color>
+    <color name="secondaryHover">#FF9A67CC</color>
+    <color name="tertiary">#FFE1D021</color>
+    <color name="cards">#FFFFFCC</color>
 </resources>
