@@ -46,7 +46,7 @@ import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.viewModels.AuthViewModel
 
 @Composable
-fun NewRegistrationScreen(navController: NavController, viewModel: AuthViewModel = viewModel()){
+fun RegistrationScreen(navController: NavController, viewModel: AuthViewModel = viewModel()){
     val email by viewModel.email.collectAsState()
     val fName by viewModel.fName.collectAsState()
     val lName by viewModel.lName.collectAsState()
