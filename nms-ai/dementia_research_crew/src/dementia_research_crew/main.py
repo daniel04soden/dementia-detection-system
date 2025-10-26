@@ -16,7 +16,7 @@ deep_api_key = os.getenv("DEEPSEEK_API_KEY")
 my_ai = LLM(
      model="deepseek/deepseek-chat",
      api_key=os.getenv("DEEPSEEK_API_KEY"),
-     temperature=0.7
+     temperature=0.6
  )
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
