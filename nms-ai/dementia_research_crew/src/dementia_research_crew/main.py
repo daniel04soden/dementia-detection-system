@@ -1,17 +1,25 @@
 #!/usr/bin/env python
 import sys
 import warnings
-
 from datetime import datetime
-
 from dementia_research_crew.crew import DementiaResearchCrew
+import os
+from crewai import LLM
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Access the environment variable
+deep_api_key = os.getenv("DEEPSEEK_API_KEY")
+
+# Defining deepseek LLM 
+my_ai = LLM(
+     model="deepseek/deepseek-chat",
+     api_key=os.getenv("DEEPSEEK_API_KEY"),
+     temperature=0.6
+ )
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
-
-# This main file is intended to be a way for you to run your
-# crew locally, so refrain from adding unnecessary logic into this file.
-# Replace with inputs you want to test with, it will automatically
-# interpolate any tasks and agents information
 
 def run():
     """
@@ -21,9 +29,13 @@ def run():
         'topic': 'AI LLMs',
         'current_year': str(datetime.now().year)
     }
-    
+
     try:
-        DementiaResearchCrew().crew().kickoff(inputs=inputs)
+        curr_crew = DementiaResearchCrew().crew()
+        for agents in curr_crew.agents:
+            agents.llm = my_ai
+
+        curr_crew.kickoff(inputs=inputs)
     except Exception as e:
         raise Exception(f"An error occurred while running the crew: {e}")
 

@@ -1,19 +1,22 @@
-research_task:
+dementia_news_research_task:
   description: >
-    Conduct a thorough exploration about the latest consumer facing headlines and 
-    news relating to dementia and dementia diagnosis findings.
-    Make sure you find any interesting and relevant information given.
-    The current year is 2025.
+    Research the latest dementia news and developments that would be relevant to both patients and professionals alike
+    Focus on:
+    - Treatment breakthroughs and new therapies
+    - Lifestyle tips and prevention strategies  
+    - Support resources and community programs
+    - Patient success stories and hope-inspiring developments
   expected_output: >
-    A json file with 10 values storing a headline,recent information as a description, images relevant to the dementia topic and sources relating to dementia research 
-  agent: dementia_patient_news_reporter
+    Two different lists, one with ten articles summarised and prepared for any consumer with very little knowledge to read. And another one which contains a detailed insight into the latest developments for medical professionals in dementia developments.
+  agent: dementia_news_analyst
 
 
-reporting_task:
+dementia_news_report_task:
   description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
+    Reformat the two lists of these articles, into json associative arrays
+    Focus on:
+    - Ensuring the articles do not lead to dead links 
+    - Have consise but descriptive snippets 
   expected_output: >
-    A json file with 10 values storing a headline from google scholar,recent research as a description, images relevant to the dementia topic such as brain scans, diagrams, images of people with dementia and sources relating to dementia research 
-  agent: dementia_professional_news_reporter
-
+    Two json files with ten values storing a headline,a snippet summary of the article that is relevant to professionals, and the url of said article 
+  agent: dementia_news_reporter
