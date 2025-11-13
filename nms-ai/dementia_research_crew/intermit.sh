@@ -5,6 +5,3 @@ crewai run
 .venv/bin/python3 out.py
 
 echo "Done refresh of json for ai news articles"
-
-cat article_1.json
-cat article_2.json
