@@ -1,4 +1,4 @@
-package com.example.dementiaDetectorApp.ui
+package com.example.dementiaDetectorApp.ui.views
 
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -41,12 +41,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.viewModels.AuthViewModel
 
 @Composable
-fun RegistrationScreen(navController: NavController, viewModel: AuthViewModel = viewModel()){
+fun RegistrationScreen(navController: NavController, viewModel: AuthViewModel){
     val email by viewModel.email.collectAsState()
     val fName by viewModel.fName.collectAsState()
     val lName by viewModel.lName.collectAsState()
@@ -86,8 +85,7 @@ fun RegistrationScreen(navController: NavController, viewModel: AuthViewModel = 
         //bottomBar = {}
     ){ innerPadding ->
         Box(modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
+            .fillMaxSize(1F)
             .background(color = Color.White)
             .padding(innerPadding)
         ){

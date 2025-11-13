@@ -1,4 +1,4 @@
-package com.example.dementiaDetectorApp.ui
+package com.example.dementiaDetectorApp.ui.views
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,13 +28,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.R
 import com.example.dementiaDetectorApp.viewModels.AuthViewModel
 
 @Composable
-fun LoginScreen(navController: NavController, viewModel: AuthViewModel = viewModel(), modifier: Modifier = Modifier) {
+fun LoginScreen(navController: NavController, viewModel: AuthViewModel, modifier: Modifier = Modifier) {
     val email by viewModel.email.collectAsState()
     val pswd by viewModel.pswd.collectAsState()
 
