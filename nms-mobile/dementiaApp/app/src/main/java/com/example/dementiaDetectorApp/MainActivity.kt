@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
                     composable("login"){LoginScreen(navController, authViewModel)}
                     composable("registration"){RegistrationScreen(navController, authViewModel)}
                     composable("home"){HomeScreen(navController, authViewModel)}
-                    composable("questionnaire"){QuestionnaireScreen(qViewModel)}
+                    composable("questionnaire"){QuestionnaireScreen(navController, qViewModel)}
                 }
             }
         }

@@ -75,7 +75,7 @@ class QViewModel: ViewModel(){
     private val _edu = MutableStateFlow("")
     val edu: StateFlow<String> = _edu
 
-    //Var update functions
+    //Val update functions
     fun onGenderChange(newGender: Int){_gender.value=newGender}
     fun onAgeChange(newAge: Int) { _age.value = newAge }
     fun onDHandChange(newDHand: Int) { _dHand.value = newDHand }
