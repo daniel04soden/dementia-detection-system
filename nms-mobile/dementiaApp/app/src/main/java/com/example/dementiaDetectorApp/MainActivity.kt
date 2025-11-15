@@ -13,8 +13,10 @@ import com.example.dementiaDetectorApp.ui.views.LoginScreen
 import com.example.dementiaDetectorApp.ui.views.RegistrationScreen
 import com.example.dementiaDetectorApp.ui.theme.appTheme
 import com.example.dementiaDetectorApp.ui.views.QuestionnaireScreen
+import com.example.dementiaDetectorApp.ui.views.TestScreen
 import com.example.dementiaDetectorApp.viewModels.AuthViewModel
 import com.example.dementiaDetectorApp.viewModels.QViewModel
+import com.example.dementiaDetectorApp.viewModels.TestViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,12 +27,14 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val authViewModel: AuthViewModel = viewModel()
                 val qViewModel : QViewModel = viewModel()
+                val tViewModel:  TestViewModel = viewModel()
                         NavHost(navController = navController, startDestination = "login") {
                     composable("login"){LoginScreen(navController, authViewModel)}
                     composable("registration"){RegistrationScreen(navController, authViewModel)}
                     composable("home"){HomeScreen(navController, authViewModel)}
                     composable("questionnaire"){QuestionnaireScreen(navController, qViewModel)}
-                }
+                    composable("test"){ TestScreen(navController, tViewModel)}
+                        }
             }
         }
     }

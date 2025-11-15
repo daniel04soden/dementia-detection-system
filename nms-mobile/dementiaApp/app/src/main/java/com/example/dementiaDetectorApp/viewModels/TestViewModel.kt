@@ -1,9 +1,11 @@
 package com.example.dementiaDetectorApp.viewModels
 
+import android.view.View
+import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class TestViewModel {
+class TestViewModel: ViewModel() {
     // Additional vals for new fields
 
     private val _dateA = MutableStateFlow("")

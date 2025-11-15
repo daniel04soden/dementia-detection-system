@@ -164,9 +164,9 @@ fun HomeScreen(navController: NavController, viewModel: AuthViewModel){
                                 HomePageBox(
                                     header = "GP Cognitive Test ",
                                     description = "A test used by GPs to determine if one is at risk of dementia",
-                                    link = "assessment",
+                                    link = "test",
                                     linkText = "Take Test"
-                                ){navController.navigate("assessment")}
+                                ){navController.navigate("test")}
                             }
                         }
                     }
