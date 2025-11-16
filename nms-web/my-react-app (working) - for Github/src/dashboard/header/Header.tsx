@@ -11,6 +11,10 @@ const Header: React.FC = () => {
     navigate("/dashboard");
   };
 
+  const handleProfilePage = () => {
+    navigate("/patients");
+  };
+
   const handleLogout = () => {
     alert("Logged out successfully!");
     navigate("/login");
@@ -27,7 +31,7 @@ const Header: React.FC = () => {
                 onClick={handleHomePage}>
                 </img></li>
             <li><a className={styles.navBtn} onClick={handleHomePage}>Dashboard</a></li>
-            <li><a className={styles.navBtn} href="">Patients</a></li>
+            <li><a className={styles.navBtn} onClick={handleProfilePage}>Patients</a></li>
             <li><a className={styles.navBtn} href="">About</a></li>
             <li><a className={styles.navBtn} href="">Contact</a></li>
             <li><div className={styles.profileSection}>

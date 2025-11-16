@@ -24,7 +24,7 @@
   display: flex;
   justify-content: space-between;
   flex: 1;
-  padding: 20px;
+  padding: 0px 20px;
 }
 
 .leftSection{
@@ -92,10 +92,21 @@ th {
   gap: 15px;
 }
 
-/* Footer */
-.footer {
-  background-color: #8238a1;
-  height: 40px;
-  width: 100%;
-  margin-top: auto;
+.search{
+  width: 20%;
+  margin: 10px;
+  font-size: medium;
+}
+
+.searchText{
+  display: inline-block;
+  width: 20%;
+  margin: 0px 0px 0px 20px;
+  font-size: medium;
+  width: fit-content;
+}
+
+table thead{
+  position: sticky;
+  top: 0;
 }
