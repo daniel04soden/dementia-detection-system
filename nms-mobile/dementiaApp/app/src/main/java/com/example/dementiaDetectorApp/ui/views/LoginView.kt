@@ -1,5 +1,6 @@
 package com.example.dementiaDetectorApp.ui.views
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,11 +18,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -30,10 +33,29 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.R
+import com.example.dementiaDetectorApp.auth.AuthResult
 import com.example.dementiaDetectorApp.viewModels.AuthViewModel
 
 @Composable
 fun LoginScreen(navController: NavController, viewModel: AuthViewModel, modifier: Modifier = Modifier) {
+
+    val context = LocalContext.current
+    LaunchedEffect(viewModel, context){
+        viewModel.authResults.collect{result ->
+            when(result){
+                is AuthResult.Authorized ->{
+                    navController.navigate("home")
+                }
+                is AuthResult.Unauthorized ->{
+                    Toast.makeText(context, "Not authorized", Toast.LENGTH_LONG).show()
+                }
+                is AuthResult.UnknownError ->{
+                    Toast.makeText(context, "An unknown error occurred", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
     val email by viewModel.email.collectAsState()
     val pswd by viewModel.pswd.collectAsState()
 
@@ -88,7 +110,8 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel, modifier
                 Column(modifier.align(Alignment.CenterHorizontally)){
                     Row(Modifier.weight(1F)) {
                         Button(
-                            onClick = { navController.navigate("home") },
+                            //onClick = { navController.navigate("home") },
+                            onClick = {viewModel.signIn()},
                             modifier = Modifier
                                 .fillMaxWidth(0.9F)
                                 .fillMaxHeight(0.45F)

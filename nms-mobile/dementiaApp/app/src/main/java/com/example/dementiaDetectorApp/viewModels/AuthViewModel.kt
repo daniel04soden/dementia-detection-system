@@ -3,12 +3,31 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.dementiaDetectorApp.auth.AuthRepository
+import com.example.dementiaDetectorApp.auth.AuthResult
 import com.example.dementiaDetectorApp.models.Account
 import com.example.dementiaDetectorApp.models.Address
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlin.text.Typography.dagger
 
-class AuthViewModel: ViewModel() {
+
+@HiltViewModel
+class AuthViewModel @Inject constructor(private val repository: AuthRepository
+): ViewModel() {
+    private val resultChannel = Channel<AuthResult<Unit>>()
+    val authResults = resultChannel.receiveAsFlow()
+
+    init {
+        authenticate()
+    }
+
     var currentAc: Account? =
         null                   //? means can be null, =null defaults it to null until later changed
         private set                                     //Can be called externally but not altered externally
@@ -202,5 +221,40 @@ class AuthViewModel: ViewModel() {
 
     fun onEircodeChange(newEircode: String) {
         _eircode.value = newEircode
+    }
+
+    var isLoading=false
+
+    fun signUp(){
+        viewModelScope.launch{
+            isLoading=true
+            val result = repository.signUp(
+                username =email.value,
+                pswd=pswd.value
+            )
+            resultChannel.send(result)
+            isLoading=false
+        }
+    }
+
+    fun signIn(){
+        viewModelScope.launch{
+            isLoading=true
+            val result = repository.signIn(
+                username =email.value,
+                pswd=pswd.value
+            )
+            resultChannel.send(result)
+            isLoading=false
+        }
+    }
+
+    private fun authenticate(){
+        viewModelScope.launch{
+            isLoading=true
+            val result = repository.authenticate()
+            resultChannel.send(result)
+            isLoading=false
+        }
     }
 }

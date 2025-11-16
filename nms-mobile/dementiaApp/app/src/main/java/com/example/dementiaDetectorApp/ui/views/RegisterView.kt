@@ -254,7 +254,7 @@ fun RegistrationScreen(navController: NavController, viewModel: AuthViewModel){
                                     Spacer(modifier = Modifier.fillMaxWidth(0.025F))
                                     Button(onClick = {
                                         if ((addressOne!="") && (city!="") && (eircode!="")){
-                                            q3Visible = false
+                                            viewModel.signUp()
                                         }else{
                                         }
                                     },

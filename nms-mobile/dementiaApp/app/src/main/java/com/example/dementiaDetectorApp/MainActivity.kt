@@ -17,7 +17,9 @@ import com.example.dementiaDetectorApp.ui.views.TestScreen
 import com.example.dementiaDetectorApp.viewModels.AuthViewModel
 import com.example.dementiaDetectorApp.viewModels.QViewModel
 import com.example.dementiaDetectorApp.viewModels.TestViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,11 +31,11 @@ class MainActivity : ComponentActivity() {
                 val qViewModel : QViewModel = viewModel()
                 val tViewModel:  TestViewModel = viewModel()
                         NavHost(navController = navController, startDestination = "login") {
-                    composable("login"){LoginScreen(navController, authViewModel)}
-                    composable("registration"){RegistrationScreen(navController, authViewModel)}
-                    composable("home"){HomeScreen(navController, authViewModel)}
-                    composable("questionnaire"){QuestionnaireScreen(navController, qViewModel)}
-                    composable("test"){ TestScreen(navController, tViewModel)}
+                        composable("login"){LoginScreen(navController, authViewModel)}
+                        composable("registration"){RegistrationScreen(navController, authViewModel)}
+                        composable("home"){HomeScreen(navController, authViewModel)}
+                        composable("questionnaire"){QuestionnaireScreen(navController, qViewModel)}
+                        composable("test"){ TestScreen(navController, tViewModel)}
                         }
             }
         }
