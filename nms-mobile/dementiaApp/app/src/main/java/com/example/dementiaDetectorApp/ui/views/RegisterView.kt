@@ -1,4 +1,4 @@
-package com.example.dementiaDetectorApp.ui
+package com.example.dementiaDetectorApp.ui.views
 
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -41,12 +41,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.viewModels.AuthViewModel
 
 @Composable
-fun RegistrationScreen(navController: NavController, viewModel: AuthViewModel = viewModel()){
+fun RegistrationScreen(navController: NavController, viewModel: AuthViewModel){
     val email by viewModel.email.collectAsState()
     val fName by viewModel.fName.collectAsState()
     val lName by viewModel.lName.collectAsState()
@@ -86,8 +85,7 @@ fun RegistrationScreen(navController: NavController, viewModel: AuthViewModel = 
         //bottomBar = {}
     ){ innerPadding ->
         Box(modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
+            .fillMaxSize(1F)
             .background(color = Color.White)
             .padding(innerPadding)
         ){
@@ -134,7 +132,6 @@ fun RegistrationScreen(navController: NavController, viewModel: AuthViewModel = 
                                 Row(modifier = Modifier
                                     .fillMaxWidth(0.925F)
                                     .height(Dp(56F))
-                                    //.fillMaxHeight(0.07F)
                                     .background(color = Color.Yellow),
                                     verticalAlignment = Alignment.CenterVertically
                                 ){
@@ -147,7 +144,6 @@ fun RegistrationScreen(navController: NavController, viewModel: AuthViewModel = 
                                         label = { Text(text = "Address Line 1", fontSize = 18.sp) },
                                         textStyle = TextStyle(fontSize = 16.sp),
                                         colors = TextFieldDefaults.colors(
-                                            //focusedContainerColor = Color.LightGray,
                                             unfocusedContainerColor = Color.White
                                         )
                                     )
@@ -258,13 +254,11 @@ fun RegistrationScreen(navController: NavController, viewModel: AuthViewModel = 
                                     Spacer(modifier = Modifier.fillMaxWidth(0.025F))
                                     Button(onClick = {
                                         if ((addressOne!="") && (city!="") && (eircode!="")){
-                                            q3Visible = false
+                                            viewModel.signUp()
                                         }else{
-                                            //popup saying whats wrong
                                         }
                                     },
                                         modifier = Modifier
-                                            //.fillMaxWidth(0.F))
                                             .weight(1F))
                                     {
                                         Text("Submit")
@@ -369,7 +363,6 @@ fun RegistrationScreen(navController: NavController, viewModel: AuthViewModel = 
                                         q1Visible = true
                                     },
                                         modifier = Modifier
-                                            //.fillMaxWidth(0.45F))
                                             .weight(1F))
                                     {
                                         Text("Previous Step")
@@ -381,11 +374,10 @@ fun RegistrationScreen(navController: NavController, viewModel: AuthViewModel = 
                                         if ((viewModel.isValidEmail()) && (viewModel.isValidPswd()) && (pswd == confPswd)){
                                             q2Visible = false
                                         }else{
-                                            //popup saying whats wrong
+
                                         }
                                     },
                                         modifier = Modifier
-                                            //.fillMaxWidth(0.F))
                                             .weight(1F))
                                     {
                                         Text("Next Step")
@@ -491,7 +483,7 @@ fun RegistrationScreen(navController: NavController, viewModel: AuthViewModel = 
                                         q1Visible=false
                                         q2Visible = true
                                     }else{
-                                        //popup saying whats wrong
+
                                     }
                                 },
                                     modifier = Modifier
