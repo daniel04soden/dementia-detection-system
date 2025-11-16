@@ -41,7 +41,7 @@
 .navBtn {
   text-decoration: none;
   color: white;
-  font-style: italic;
+  font-family: Arial, sans-serif;
   font-weight: bold;
   border-radius: 5px;
   padding: 1.5em 3em;

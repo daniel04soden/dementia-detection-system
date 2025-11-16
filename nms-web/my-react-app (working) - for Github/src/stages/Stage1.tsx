@@ -28,6 +28,8 @@ const Stage1: React.FC = () => {
 
     // Convert the form data to an object
     const formJson = Object.fromEntries(formData.entries());
+
+    console.log(formJson)
     
     var count = 0;
     for (const key in formJson) {
@@ -46,6 +48,13 @@ const Stage1: React.FC = () => {
         <div className="main-content">
         <form method="post" onSubmit={handleSubmit}>
             <table className={styles.table}>
+                <label className={styles.inputLabel}>
+                    Choose Patient:
+                    <select id={styles.bottomField} name="patient" className={styles.inputField} value="patient">
+                    <option value="John Doe">John Doe</option>
+                    <option value="Adam Apple">Adam Apple</option>
+                    </select>
+                </label>
                 <thead><tr>
                 <th>Question</th>
                 <th>Passed</th>

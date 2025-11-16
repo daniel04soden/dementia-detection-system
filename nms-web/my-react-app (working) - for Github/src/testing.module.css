@@ -1,0 +1,15 @@
+.table {
+  width: 50%;
+  border-collapse: collapse;
+}
+
+
+.table th, .table td {
+  border: 1px solid #ccc;
+  text-align: left;
+  padding: 15px 15px;
+}
+
+body{
+  margin: 0px
+}

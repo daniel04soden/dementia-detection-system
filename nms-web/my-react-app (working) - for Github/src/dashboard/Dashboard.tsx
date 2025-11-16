@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from './dash.module.css';
 import Header from "./header/Header";
 import NewsCards from "./newscard/NewsCards";
+import Footer from "./footer/Footer";
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -11,22 +12,26 @@ const Dashboard: React.FC = () => {
     navigate("/initial");
   };
 
+  const handleReview = (testId: string) => {
+    navigate(`/review/${testId}`);
+  };
+
   const sampleTestData = [
-    { id: "001", name: "John Smith", stage1: "Done", stage2: "Pending", result: "N/A" },
-    { id: "002", name: "Mary Johnson", stage1: "Done", stage2: "Done", result: "Positive" },
-    { id: "003", name: "Robert Brown", stage1: "Pending", stage2: "-", result: "-" },
-    { id: "004", name: "Patricia Davis", stage1: "Done", stage2: "Pending", result: "N/A" },
-    { id: "005", name: "Michael Miller", stage1: "Done", stage2: "Done", result: "Negative" },
-    { id: "006", name: "Linda Wilson", stage1: "Pending", stage2: "-", result: "-" },
-    { id: "007", name: "William Moore", stage1: "Done", stage2: "Done", result: "Positive" },
-    { id: "008", name: "Barbara Taylor", stage1: "Done", stage2: "Pending", result: "N/A" },
-    { id: "009", name: "James Anderson", stage1: "Pending", stage2: "-", result: "-" },
-    { id: "010", name: "Elizabeth Thomas", stage1: "Done", stage2: "Done", result: "Negative" },
-    { id: "011", name: "David Jackson", stage1: "Done", stage2: "Pending", result: "N/A" },
-    { id: "012", name: "Jennifer White", stage1: "Pending", stage2: "-", result: "-" },
-    { id: "013", name: "Richard Harris", stage1: "Done", stage2: "Done", result: "Positive" },
-    { id: "014", name: "Susan Martin", stage1: "Done", stage2: "Done", result: "Negative" },
-    { id: "015", name: "Joseph Thompson", stage1: "Pending", stage2: "-", result: "-" }
+    { id: "001", firstname: "John",		 lastname: "Smith",		 stage1: "Done",	 stage2: "Pending", result: "N/A" },
+    { id: "002", firstname: "Mary",		 lastname: "Johnson",	 stage1: "Done",	 stage2: "Done",	 result: "Positive" },
+    { id: "003", firstname: "Robert",	 lastname: "Brown",		 stage1: "Pending",	 stage2: "-",		 result: "-" },
+    { id: "004", firstname: "Patricia",	 lastname: "Davis",		 stage1: "Done",	 stage2: "Pending",	 result: "N/A" },
+    { id: "005", firstname: "Michael",	 lastname: "Miller",	 stage1: "Done",	 stage2: "Done",	 result: "Negative" },
+    { id: "006", firstname: "Linda",	 lastname: "Wilson",	 stage1: "Pending",	 stage2: "-",		 result: "-" },
+    { id: "007", firstname: "William",	 lastname: "Moore",		 stage1: "Done",	 stage2: "Done",	 result: "Positive" },
+    { id: "008", firstname: "Barbara",	 lastname: "Taylor",	 stage1: "Done",	 stage2: "Pending",	 result: "N/A" },
+    { id: "009", firstname: "James",	 lastname: "Anderson",	 stage1: "Pending",	 stage2: "-",		 result: "-" },
+    { id: "010", firstname: "Elizabeth", lastname: "Thomas",	 stage1: "Done",	 stage2: "Done",	 result: "Negative" },
+    { id: "011", firstname: "David",	 lastname: "Jackson",	 stage1: "Done",	 stage2: "Pending",	 result: "N/A" },
+    { id: "012", firstname: "Jennifer",	 lastname: "White",		 stage1: "Pending",	 stage2: "-",		 result: "-" },
+    { id: "013", firstname: "Richard",	 lastname: "Harris",	 stage1: "Done",	 stage2: "Done",	 result: "Positive" },
+    { id: "014", firstname: "Susan",	 lastname: "Martin",	 stage1: "Done",	 stage2: "Done",	 result: "Negative" },
+    { id: "015", firstname: "Joseph",	 lastname: "Thompson",	 stage1: "Pending",	 stage2: "-",		 result: "-" }
   ];
 
   const sampleNews = [
@@ -82,9 +87,27 @@ const Dashboard: React.FC = () => {
     }
 ]
 
+const [searchTerm, setSearchTerm] = useState("");
+
+ // Filter patients based on the search term (case-insensitive)
+  const filteredPatients = sampleTestData.filter((p) =>
+    Object.values(p)
+      .join(" ")
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className={styles.dashContainer}>
       <Header />
+      <div>
+      <p className={styles.searchText}>Enter Name or Test ID: </p>
+      <input className={styles.search}
+            type="text"
+            placeholder="Search Patient Name or Test ID"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)} />
+      </div>
       <main className={styles.mainContent}>
         <div className={styles.leftSection}>
         <div className={styles.tableSection}>
@@ -100,18 +123,29 @@ const Dashboard: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {sampleTestData.map((test) => (
-                <tr key={test.id}>
-                  <td>{test.id}</td>
-                  <td>{test.name}</td>
-                  <td>{test.stage1}</td>
-                  <td>{test.stage2}</td>
-                  <td>{test.result}</td>
-                  <td>
-                    <a href="" className={styles.reviewBtn}>Review</a>
-                  </td>
-                </tr>
-              ))}
+               {filteredPatients.length > 0 ? (
+                  filteredPatients.map((test, index) => (
+                    <tr key={test.id}>
+                      <td>{test.id}</td>
+                      <td>{test.firstname} {test.lastname}</td>
+                      <td>{test.stage1}</td>
+                      <td>{test.stage2}</td>
+                      <td>{test.result}</td>
+                      <td>
+                        <button className={styles.reviewBtn} onClick={() => handleReview(test.id)}>
+                          Review
+                        </button>
+                      </td>
+                    </tr>
+                    ))
+                  ) : (
+                  <tr>
+                    <td className={styles.EmptyTable} colSpan={6}>
+                      No matching patients found.
+                    </td>
+                  </tr>
+                  )
+                }
             </tbody>
           </table>
         </div>
@@ -133,7 +167,7 @@ const Dashboard: React.FC = () => {
         </aside>
       </main>
 
-      <footer className={styles.footer} />
+      <Footer />
     </div>
   );
 };
