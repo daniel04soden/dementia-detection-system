@@ -6,4 +6,4 @@ data class Account (val accountID: String,
                     var fName: String,
                     var lName:String,
                     var phoneNum: String,
-                    var address: Address){}
+                    var eicode: String){}

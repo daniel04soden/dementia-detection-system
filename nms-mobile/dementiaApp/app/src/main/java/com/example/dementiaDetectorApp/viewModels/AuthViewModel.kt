@@ -140,7 +140,7 @@ class AuthViewModel @Inject constructor(private val repository: AuthRepository
                 fName.value,
                 lName.value,
                 phoneNum.value,
-                newAdd
+                _eircode.value
             )
             registeredAccounts.add(newAc)
         }
@@ -229,8 +229,12 @@ class AuthViewModel @Inject constructor(private val repository: AuthRepository
         viewModelScope.launch{
             isLoading=true
             val result = repository.signUp(
-                username =email.value,
-                pswd=pswd.value
+                email =email.value,
+                pswd=pswd.value,
+                fName = fName.value,
+                lName = lName.value,
+                phoneNum = phoneNum.value,
+                eircode = eircode.value
             )
             resultChannel.send(result)
             isLoading=false
@@ -241,7 +245,7 @@ class AuthViewModel @Inject constructor(private val repository: AuthRepository
         viewModelScope.launch{
             isLoading=true
             val result = repository.signIn(
-                username =email.value,
+                email = email.value,
                 pswd=pswd.value
             )
             resultChannel.send(result)
