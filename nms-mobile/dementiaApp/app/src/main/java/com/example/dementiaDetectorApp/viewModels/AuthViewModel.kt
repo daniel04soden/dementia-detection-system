@@ -1,4 +1,5 @@
 package com.example.dementiaDetectorApp.viewModels
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -225,7 +226,9 @@ class AuthViewModel @Inject constructor(private val repository: AuthRepository
 
     var isLoading=false
 
-    fun signUp(){
+    fun signUp(
+        onSignIn: () -> Unit
+    ){
         viewModelScope.launch{
             isLoading=true
             val result = repository.signUp(
@@ -236,18 +239,27 @@ class AuthViewModel @Inject constructor(private val repository: AuthRepository
                 phoneNum = phoneNum.value,
                 eircode = eircode.value
             )
+            if (result is AuthResult.Authorized){
+                signIn { onSignIn() }
+            }
             resultChannel.send(result)
             isLoading=false
         }
     }
 
-    fun signIn(){
+    fun signIn(
+        onSignIn: () -> Unit
+    ){
         viewModelScope.launch{
             isLoading=true
             val result = repository.signIn(
                 email = email.value,
                 pswd=pswd.value
             )
+            Log.d("Sign in Result", result.toString())
+            if (result is AuthResult.Authorized){
+                onSignIn()
+            }
             resultChannel.send(result)
             isLoading=false
         }

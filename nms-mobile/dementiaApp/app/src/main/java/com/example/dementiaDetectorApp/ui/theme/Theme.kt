@@ -3,7 +3,11 @@ package com.example.dementiaDetectorApp.ui.theme
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -37,21 +41,40 @@ private val LightColorScheme = lightColorScheme(
     onSurface = Color(0xFF1C1B1F)
     */
 )
+@Composable
+fun outLinedTFColours() = OutlinedTextFieldDefaults.colors(
+        unfocusedBorderColor = DarkPurple,
+        unfocusedLabelColor = DarkPurple,
+        focusedBorderColor = LightPurple,
+        focusedLabelColor = LightPurple,
+        unfocusedContainerColor = Gray,
+        focusedContainerColor = Color.White,
+        focusedTextColor = Color.Black,
+        unfocusedTextColor = DarkPurple
+    )
 
 @Composable
-fun appTheme(
+fun buttonColours() = ButtonDefaults.buttonColors(
+    containerColor = DarkPurple,           // Background color of the button
+    contentColor = Color.White,            // Text/icon color inside the button
+    disabledContainerColor = Gray,         // Background color when disabled
+    disabledContentColor = Color.LightGray // Text/icon color when disabled
+)
+
+@Composable
+fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-      dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-        val context = LocalContext.current
-        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-      }
-      darkTheme -> DarkColorScheme
-      else -> LightColorScheme
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+        darkTheme -> DarkColorScheme
+        else -> LightColorScheme
     }
     val view = LocalView.current
     val win = (view.context as Activity).window
@@ -60,8 +83,8 @@ fun appTheme(
     }
 
     MaterialTheme(
-      colorScheme = colorScheme,
-      typography = Typography,
-      content = content
+        colorScheme = colorScheme,
+        typography = Typography,
+        content = content
     )
 }

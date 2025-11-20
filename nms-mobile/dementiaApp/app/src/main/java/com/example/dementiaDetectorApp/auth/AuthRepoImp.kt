@@ -36,7 +36,7 @@ class AuthRepoImp(
                 Log.d("AuthRepImp","singUp 401 occurred ${e.message()}")
                 AuthResult.Unauthorized()
             }else{
-                Log.d("AuthRepImp","singUp error occurred ${e.message()}")
+                Log.d("AuthRepImp","signUp error occurred ${e.message()}")
                 AuthResult.UnknownError()
             }
         }catch(e: Exception){
@@ -50,7 +50,7 @@ class AuthRepoImp(
             val response = api.signIn(
                 request = LoginRequest(
                     email=email,
-                    pswd=pswd
+                    password=pswd
                 )
             )
             prefs.edit {
