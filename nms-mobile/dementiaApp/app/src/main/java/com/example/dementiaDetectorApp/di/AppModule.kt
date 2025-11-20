@@ -28,7 +28,7 @@ object AppModule {
 
         return Retrofit.Builder()
             //.baseUrl("http://192.168.1.10:8080/")
-            .baseUrl("https://jsonplaceholder.typicode.com/")
+            .baseUrl("http://172.28.32.184:8080")
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
             .create()

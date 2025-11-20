@@ -7,14 +7,14 @@ import retrofit2.http.POST
 
 interface AuthAPI {
 
-    @POST("RegisterUser")
+    @POST("mobile/signup")
     suspend fun signUp(
-        @Body request: AuthRequest
+        @Body request: SignUpRequest
     )
 
-    @POST("LoginUser")
+    @POST("mobile/login")
     suspend fun signIn(
-        @Body request: AuthRequest
+        @Body request: LoginRequest
     ): TokenResponse
 
     @GET("ValidateJWT")
