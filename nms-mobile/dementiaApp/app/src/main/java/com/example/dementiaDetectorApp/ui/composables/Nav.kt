@@ -25,6 +25,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.dementiaDetectorApp.ui.theme.DarkPurple
+import com.example.dementiaDetectorApp.ui.theme.LightPurple
+import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.viewModels.SharedVM
 
 @Composable
@@ -45,9 +48,9 @@ fun NavMenu(
             NavBarItem(
                 item=item,
                 isSelected = index==sharedVM.navIndex.value,
-                activeHighlight = Purple40,//CHANGE
-                activeTextColor = Purple80,//CHANGE
-                inactiveTextColor = Purple40,//CHANGE
+                activeHighlight = LightPurple,
+                activeTextColor = DarkPurple,
+                inactiveTextColor = LightPurple,
                 nc = nc
             ){
                 sharedVM.onNavIndexChange(index)
@@ -60,9 +63,9 @@ fun NavMenu(
 fun NavBarItem(
     item: NavBarContent,
     isSelected: Boolean = false,
-    activeHighlight: Color = Purple40,//CHANGE
-    activeTextColor: Color = Purple80,//CHANGE
-    inactiveTextColor: Color = Purple40,//CHANGE
+    activeHighlight: Color = DarkPurple,//CHANGE
+    activeTextColor: Color = LightPurple,//CHANGE
+    inactiveTextColor: Color = DarkPurple,//CHANGE
     nc: NavController,
     onItemClick: () -> Unit
 ){

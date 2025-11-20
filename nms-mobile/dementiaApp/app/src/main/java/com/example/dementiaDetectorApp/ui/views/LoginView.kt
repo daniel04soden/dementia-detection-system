@@ -1,45 +1,51 @@
 package com.example.dementiaDetectorApp.ui.views
 
-import android.widget.Toast
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeightIn
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.R
-import com.example.dementiaDetectorApp.auth.AuthResult
+import com.example.dementiaDetectorApp.ui.theme.DarkPurple
+import com.example.dementiaDetectorApp.ui.theme.LightPurple
+import com.example.dementiaDetectorApp.ui.theme.MidPurple
+import com.example.dementiaDetectorApp.ui.theme.buttonColours
+import com.example.dementiaDetectorApp.ui.theme.outLinedTFColours
+import com.example.dementiaDetectorApp.ui.util.standardQuadFromTo
 import com.example.dementiaDetectorApp.viewModels.AuthViewModel
+import com.example.dementiaDetectorApp.viewModels.SharedVM
+/* Auth Toast stuff:
 
-@Composable
-fun LoginScreen(navController: NavController, viewModel: AuthViewModel, modifier: Modifier = Modifier) {
-
-    val context = LocalContext.current
+ val context = LocalContext.current
     LaunchedEffect(viewModel, context){
         viewModel.authResults.collect{result ->
             when(result){
@@ -55,87 +61,170 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel, modifier
             }
         }
     }
+*/
 
-    val email by viewModel.email.collectAsState()
-    val pswd by viewModel.pswd.collectAsState()
+@Composable
+fun LoginScreen(authVM: AuthViewModel, sharedVM: SharedVM, nc: NavController){
+    Box(modifier = Modifier
+        .background(Color.White)
+        .fillMaxSize()
+    ){
+        Column{
+            Spacer(Modifier.height(35.dp))
+            LogoSection()
+            Spacer(Modifier.fillMaxHeight(0.3F))
+            LoginInfoSection(authVM,nc)
+            Spacer(Modifier.height(35.dp))
+            RegisterSection(nc)
+        }
+    }
+}
 
-    Scaffold(
-        topBar = {},
-        bottomBar = {}
-    ) { innerPadding ->
-        Box(
+@Composable
+fun LogoSection(){
+    Column(modifier = Modifier
+        .fillMaxWidth(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally){
+        Icon(
+            painterResource(R.drawable.logo),
+            contentDescription = "DA Logo",
+            tint = Color.Unspecified,
             modifier = Modifier
-                .background(color = Color.White)
-                .padding(innerPadding)
-                .padding(Dp(20F))
-                .fillMaxHeight(1F)
-                .fillMaxWidth(1F)
+                .height(200.dp)
+                .fillMaxWidth(0.95F)
+        )
+    }
+}
+
+@Composable
+fun LoginInfoSection(authVM: AuthViewModel, nc: NavController){
+    val email = authVM.email.collectAsState().value
+    val pswd = authVM.pswd.collectAsState().value
+    Column(
+        verticalArrangement = Arrangement.SpaceBetween,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .padding(start = 7.5.dp, end = 7.5.dp)
+            .fillMaxWidth()
+    ){
+        OutlinedTextField(
+            value = email,
+            onValueChange = {newVal: String -> authVM.onEmailChange(newVal)},
+            label = {Text("Email")},
+            placeholder = {Text("YourEmail@exmaple.com")},
+            singleLine = true,
+            shape = RectangleShape,
+            colors = outLinedTFColours(),
+        )
+
+        OutlinedTextField(
+            value = pswd,
+            onValueChange = {newVal: String -> authVM.onPswdChange(newVal)},
+            label = {Text("Password")},
+            placeholder = {Text("********")},
+            singleLine = true,
+            shape = RectangleShape,
+            colors = outLinedTFColours(),
+        )
+        Spacer(Modifier.height(20.dp))
+        Button(
+            //onClick = { navController.navigate("home") },
+            onClick = {authVM.signIn { nc.navigate("home") } },
+            colors = buttonColours(),
+            modifier = Modifier
+                .width(300.dp)
         ) {
-            Column(
-                modifier = Modifier, horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.logo),
-                    contentDescription = "Logo",
-                    modifier = Modifier
-                        .fillMaxWidth(1F)
-                        .fillMaxHeight(0.4F)
+            Text(text = "Login", fontSize = 25.sp, color = Color.White)
+        }
+    }
+}
 
-                )
-                Text(text = "Welcome", fontSize = 25.sp)
+@Composable
+fun RegisterSection(nc: NavController){
+    Column(
+        verticalArrangement = Arrangement.SpaceBetween,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .padding(start = 7.5.dp, end = 7.5.dp)
+            .fillMaxWidth()
+    ){
+       Text(
+           text = "Don't have an account?",
+           fontSize = 20.sp
+       )
+        Spacer(Modifier.height(20.dp))
+        Button(
+            onClick = {nc.navigate("registration")},
+            colors = buttonColours(),
+            modifier = Modifier
+                .width(300.dp)
+        ) {
+            Text(text = "Sign Up", fontSize = 25.sp, color = Color.White)
+        }
+    }
+}
 
-                TextField(
-                    value = email,
-                    onValueChange = { viewModel.onEmailChange(it) },
-                    label = { Text(text = "Email", fontSize = 22.sp) },
-                    placeholder = { Text("YourEmail@example.com", fontSize = 18.sp) },
-                    textStyle = TextStyle(fontSize = 18.sp),
-                    colors = TextFieldDefaults.colors(
-                        //focusedContainerColor = Color.LightGray,
-                        unfocusedContainerColor = Color.White
-                    )
-                )
-                TextField(
-                    value = pswd,
-                    onValueChange = { viewModel.onPswdChange(it) },
-                    label = { Text(text = "Password", fontSize = 22.sp) },
-                    visualTransformation = PasswordVisualTransformation(),
-                    textStyle = TextStyle(fontSize = 18.sp),
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.White
-                    )
-                )
-                Spacer(modifier = Modifier.fillMaxHeight(0.05F))
-                Column(modifier.align(Alignment.CenterHorizontally)){
-                    Row(Modifier.weight(1F)) {
-                        Button(
-                            //onClick = { navController.navigate("home") },
-                            onClick = {viewModel.signIn()},
-                            modifier = Modifier
-                                .fillMaxWidth(0.9F)
-                                .fillMaxHeight(0.45F)
-                                .requiredHeightIn(min=Dp(45F))
-                        ) {
-                            Text(text = "Login", fontSize = 25.sp)
-                        }
-                    }
-                    Spacer(modifier = Modifier.fillMaxHeight(0.05F))
-                    Text("Don't have an account?", fontSize = 25.sp)
-                    Row(modifier.weight(1F)) {
-                        Button(
-                            onClick = { navController.navigate("registration") },
-                            modifier = Modifier
-                                .fillMaxWidth(0.9F)
-                                .fillMaxHeight(0.45F)
-                                .requiredHeightIn(min=Dp(45F))
+@Composable
+fun WaveBGBox(
+    content: @Composable ColumnScope.() -> Unit
+){
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(DarkPurple)
+    ){
+        //Colour waves
+        val width = constraints.maxWidth
+        val height = constraints.maxHeight
 
-                        ) {
-                            Text(text = "Sign up", fontSize = 25.sp, textAlign = TextAlign.Center)
-                        }
-                    }
-                }
-            }
+        //Medium coloured path
+        val mediumColoredPoint1 = Offset(0f, height * 0.3f)
+        val mediumColoredPoint2 = Offset(width * 0.1f, height * 0.35f)
+        val mediumColoredPoint3 = Offset(width * 0.4f, height * 0.05f)
+        val mediumColoredPoint4 = Offset(width * 0.75f, height * 0.7f)
+        val mediumColoredPoint5 = Offset(width * 1.4f, -height.toFloat())
+
+        val mediumColoredPath = Path().apply {
+            moveTo(mediumColoredPoint1.x, mediumColoredPoint1.y)
+            standardQuadFromTo(mediumColoredPoint1, mediumColoredPoint2)
+            standardQuadFromTo(mediumColoredPoint2, mediumColoredPoint3)
+            standardQuadFromTo(mediumColoredPoint3, mediumColoredPoint4)
+            standardQuadFromTo(mediumColoredPoint4, mediumColoredPoint5)
+            lineTo(width.toFloat() + 100f, height.toFloat() + 100f)
+            lineTo(-100f, height.toFloat() + 100f)
+            close()
+        }
+
+        // Light colored path
+        val lightPoint1 = Offset(0f, height * 0.35f)
+        val lightPoint2 = Offset(width * 0.1f, height * 0.4f)
+        val lightPoint3 = Offset(width * 0.3f, height * 0.35f)
+        val lightPoint4 = Offset(width * 0.65f, height.toFloat())
+        val lightPoint5 = Offset(width * 1.4f, -height.toFloat() / 3f)
+
+        val lightColoredPath = Path().apply {
+            moveTo(lightPoint1.x, lightPoint1.y)
+            standardQuadFromTo(lightPoint1, lightPoint2)
+            standardQuadFromTo(lightPoint2, lightPoint3)
+            standardQuadFromTo(lightPoint3, lightPoint4)
+            standardQuadFromTo(lightPoint4, lightPoint5)
+            lineTo(width.toFloat() + 100f, height.toFloat() + 100f)
+            lineTo(-100f, height.toFloat() + 100f)
+            close()
+        }
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            drawPath(
+                path = mediumColoredPath,
+                color = MidPurple
+            )
+            drawPath(
+                path = lightColoredPath,
+                color = LightPurple
+            )
         }
     }
 }
