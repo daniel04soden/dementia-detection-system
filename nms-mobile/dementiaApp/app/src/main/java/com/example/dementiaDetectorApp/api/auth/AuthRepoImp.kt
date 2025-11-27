@@ -1,4 +1,4 @@
-package com.example.dementiaDetectorApp.auth
+package com.example.dementiaDetectorApp.api.auth
 
 import android.content.SharedPreferences
 import android.util.Log
@@ -7,9 +7,9 @@ import java.net.UnknownHostException
 import androidx.core.content.edit
 
 class AuthRepoImp(
-    private val api:AuthAPI,
+    private val api: AuthAPI,
     private val prefs: SharedPreferences
-):AuthRepository{
+): AuthRepository {
 
     override suspend fun signUp(
         email: String,
@@ -18,7 +18,7 @@ class AuthRepoImp(
         lName: String,
         phoneNum: String,
         eircode: String
-    ):AuthResult<Unit>{
+    ): AuthResult<Unit> {
         return try{
             api.signUp(
                 request = SignUpRequest(

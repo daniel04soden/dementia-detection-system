@@ -1,9 +1,7 @@
-package com.example.dementiaDetectorApp.ui.composables
+package com.example.dementiaDetectorApp.ui.util
 
 import com.example.dementiaDetectorApp.R
 import com.example.dementiaDetectorApp.models.NavBarContent
-import com.example.dementiaDetectorApp.ui.theme.Purple40
-import com.example.dementiaDetectorApp.ui.theme.Purple80
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.LightPurple
-import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.viewModels.SharedVM
 
 @Composable

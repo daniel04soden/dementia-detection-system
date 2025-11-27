@@ -2,9 +2,9 @@ package com.example.dementiaDetectorApp.di
 import android.app.Application
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
-import com.example.dementiaDetectorApp.auth.AuthAPI
-import com.example.dementiaDetectorApp.auth.AuthRepoImp
-import com.example.dementiaDetectorApp.auth.AuthRepository
+import com.example.dementiaDetectorApp.api.auth.AuthAPI
+import com.example.dementiaDetectorApp.api.auth.AuthRepoImp
+import com.example.dementiaDetectorApp.api.auth.AuthRepository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -21,7 +21,7 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun provAuthAPI(): AuthAPI{
+    fun provAuthAPI(): AuthAPI {
         val moshi = Moshi.Builder()
             .add(KotlinJsonAdapterFactory()) // This enables Kotlin data class support for (de)serialization
             .build()
@@ -42,7 +42,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provAuthRepo(api: AuthAPI, prefs: SharedPreferences): AuthRepository{
+    fun provAuthRepo(api: AuthAPI, prefs: SharedPreferences): AuthRepository {
         return AuthRepoImp(api, prefs)
     }
 }

@@ -5,10 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dementiaDetectorApp.auth.AuthRepository
-import com.example.dementiaDetectorApp.auth.AuthResult
+import com.example.dementiaDetectorApp.api.auth.AuthRepository
+import com.example.dementiaDetectorApp.api.auth.AuthResult
 import com.example.dementiaDetectorApp.models.Account
-import com.example.dementiaDetectorApp.models.Address
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -126,14 +125,6 @@ class AuthViewModel @Inject constructor(private val repository: AuthRepository
             //Go to step 2 page                      //Step 2 Personal Info
             //Go to step 3 page                      //Step 3 Address
 
-            val newAdd = Address(
-                addressOne.value,
-                addressTwo.value,
-                addressThree.value,
-                city.value,
-                county.value,
-                eircode.value
-            )
             val newAc = Account(
                 "acID",
                 _email.value,

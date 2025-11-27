@@ -44,9 +44,9 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun outLinedTFColours() = OutlinedTextFieldDefaults.colors(
         unfocusedBorderColor = DarkPurple,
-        unfocusedLabelColor = DarkPurple,
+        unfocusedLabelColor = Gray,
         focusedBorderColor = LightPurple,
-        focusedLabelColor = LightPurple,
+        focusedLabelColor = Color.White,
         unfocusedContainerColor = Gray,
         focusedContainerColor = Color.White,
         focusedTextColor = Color.Black,

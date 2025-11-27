@@ -44,12 +44,11 @@ import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.R
 import com.example.dementiaDetectorApp.models.NewsPiece
 import com.example.dementiaDetectorApp.models.Test
-import com.example.dementiaDetectorApp.ui.composables.NavMenu
+import com.example.dementiaDetectorApp.ui.util.NavMenu
 import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.Gray
 import com.example.dementiaDetectorApp.ui.theme.LightPurple
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
-import com.example.dementiaDetectorApp.ui.theme.Purple40
 import com.example.dementiaDetectorApp.ui.util.standardQuadFromTo
 import com.example.dementiaDetectorApp.viewModels.HomeVM
 import com.example.dementiaDetectorApp.viewModels.SharedVM
