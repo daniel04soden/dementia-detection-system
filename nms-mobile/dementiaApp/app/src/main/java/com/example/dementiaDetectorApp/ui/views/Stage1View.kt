@@ -1,13 +1,17 @@
 package com.example.dementiaDetectorApp.ui.views
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,10 +43,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.Gray
-import com.example.dementiaDetectorApp.ui.theme.LightPurple
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.ui.theme.buttonColours
 import com.example.dementiaDetectorApp.ui.theme.outLinedTFColours
+import com.example.dementiaDetectorApp.ui.composables.SubmittedSection
 import com.example.dementiaDetectorApp.viewModels.Stage1VM
 
 @Composable
@@ -54,60 +58,130 @@ fun Stage1Screen(tVM: Stage1VM, nc: NavController){
         Column(
             Modifier.padding(bottom = 50.dp)
         ){
-            Spacer(Modifier.height(35.dp))
-            FormSection(tVM)
+            if(tVM.prefaceVisi.collectAsState().value){
+                Spacer(Modifier.height(200.dp))
+            }
+            else{
+                Spacer(Modifier.height(35.dp))
+            }
+            PrefaceSection(tVM)
+            FormSection(tVM, nc)
         }
-        if(!tVM.timedVisi.collectAsState().value){
+        if(!tVM.timedVisi.collectAsState().value && !tVM.prefaceVisi.collectAsState().value){
             ProgressDots(Modifier.align(Alignment.BottomCenter))
         }
     }
 }
 
 @Composable
-fun FormSection(tVM: Stage1VM){
-    Column{
-        if (tVM.timedVisi.collectAsState().value){
-            Spacer(Modifier.height(60.dp))
-            tVM.visiTimer()
-        }
-        AnimatedVisibility(
-            visible = tVM.timedVisi.collectAsState().value
+private fun PrefaceSection(tVM: Stage1VM){
+    AnimatedVisibility(
+        visible =tVM.prefaceVisi.collectAsState().value,
+        exit = slideOutHorizontally() + fadeOut()
+    ){
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(15.dp),
         ){
-            TimedSection(tVM)
-        }
-        AnimatedVisibility(
-            visible = tVM.q1Visi.collectAsState().value,
-            //enter = slideInHorizontally() + fadeIn(),
-            //exit = slideOutHorizontally() + fadeOut()
-        ){
-            Question1(tVM)
-        }
-        AnimatedVisibility(
-            visible = tVM.q2Visi.collectAsState().value,
-            //enter = slideInHorizontally() + fadeIn(),
-            //exit = slideOutHorizontally() + fadeOut()
-        ){
-            Question2(tVM)
-        }
-        AnimatedVisibility(
-            visible = tVM.q3Visi.collectAsState().value,
-            //enter = slideInHorizontally(),
-            //exit = slideOutHorizontally() + fadeOut()
-        ){
-            Question3(tVM)
-        }
-        AnimatedVisibility(
-            visible = tVM.q4Visi.collectAsState().value,
-            //enter = slideInHorizontally(),
-            //exit = slideOutHorizontally() + fadeOut()
-        ){
-            Question4(tVM)
+            Column(
+                verticalArrangement = Arrangement.spacedBy(5.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                Text(
+                    text="GP Cognitive Test Part 1",
+                    textAlign = TextAlign.Center,
+                    fontSize = 32.5.sp,
+                    lineHeight = 40.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                HorizontalDivider(
+                    thickness = 2.dp,
+                    color = Color.White,
+                )
+                Column(modifier = Modifier
+                    .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(125.dp)
+                ){
+                    Text(
+                        text = "The following is a questionnaire that will ask you 4 questions\n\n" +
+                                "The test will begin by displaying information that will remain on screen for 10 seconds that you must remember for a later question\n\n"+
+                                "If you don't have an answer for a quesiton, leave it blank",
+                        fontSize = 20.sp,
+                        color = Gray,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(top = 35.dp, start = 15.dp, end = 15.dp)
+                    )
+                    Button(
+                        modifier = Modifier.fillMaxWidth(0.75F),
+                        colors = buttonColours(),
+                        onClick = {
+                            tVM.onVisiChange(false)
+                            tVM.onTimedVisiChange(true)}
+                    ){
+                        Text(
+                            text = "Continue"
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
-fun TimedSection(tVM: Stage1VM){
+private fun FormSection(tVM: Stage1VM, nc: NavController){
+    AnimatedVisibility(
+        visible = !(tVM.prefaceVisi.collectAsState().value),
+    ){
+        Column{
+            if (tVM.timedVisi.collectAsState().value){
+                Spacer(Modifier.height(60.dp))
+                tVM.visiTimer()
+            }
+            AnimatedVisibility(
+                visible = tVM.timedVisi.collectAsState().value
+            ){
+                TimedSection(tVM)
+            }
+            AnimatedVisibility(
+                visible = tVM.q1Visi.collectAsState().value,
+            ){
+                Question1(tVM)
+            }
+            AnimatedVisibility(
+                visible = tVM.q2Visi.collectAsState().value,
+            ){
+                Question2(tVM)
+                AnimatedVisibility(
+                    visible = tVM.confirmVisi.collectAsState().value
+                ){
+                    ConfirmationSection(tVM)
+                }
+            }
+            AnimatedVisibility(
+                visible = tVM.q3Visi.collectAsState().value,
+            ){
+                Question3(tVM)
+            }
+            AnimatedVisibility(
+                visible = tVM.q4Visi.collectAsState().value,
+            ){
+                Question4(tVM)
+            }
+            AnimatedVisibility(
+                visible = tVM.successVisi.collectAsState().value,
+            ){
+                SubmittedSection(nc)
+            }
+        }
+    }
+}
+
+@Composable
+private fun TimedSection(tVM: Stage1VM){
     Column(Modifier
         .fillMaxSize()
         .background(MidPurple),
@@ -141,7 +215,7 @@ fun TimedSection(tVM: Stage1VM){
                     .padding(top = 35.dp, start = 15.dp, end = 15.dp)
             )
             Text(
-                text = "First Name: John\nSecond Name: Brown\nNumber: 42\nStreet: West Street\nArea: Kensington",
+                text = "First Name: John\nSecond Name: Brown\nNumber: 42\nStreet: West Street\nCity: Kensington",
                 fontSize = 20.sp,
                 color = Gray,
                 textAlign = TextAlign.Start,
@@ -153,7 +227,7 @@ fun TimedSection(tVM: Stage1VM){
 }
 
 @Composable
-fun Question1(tVM: Stage1VM){
+private fun Question1(tVM: Stage1VM){
     val answer = tVM.date.collectAsState().value
 
     Column(Modifier
@@ -220,9 +294,7 @@ fun Question1(tVM: Stage1VM){
 }
 
 @Composable
-fun Question2(tVM: Stage1VM){
-    val answer = tVM.clock.collectAsState().value
-
+private fun Question2(tVM: Stage1VM){
     Column(Modifier
         .fillMaxSize()
         .background(Color.White)
@@ -261,38 +333,21 @@ fun Question2(tVM: Stage1VM){
             modifier = Modifier
                 .fillMaxHeight(0.9F)
                 //.padding(7.5.dp)
-                .background(LightPurple)
+                .background(Color.White)
         ){
             items(tVM.clocks.size){
                 ClockImage(
-                    drawingName = tVM.clocks[it]
+                    drawingName = tVM.clocks[it],
+                    tVM = tVM,
+                    index = it
                 )
-            }
-        }
-
-        Row(modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.Center
-        ){
-            Button(
-                onClick = {
-                    tVM.onQ2VisiChange(false)
-                    tVM.onQ3VisiChange(true)
-                },
-                colors = buttonColours(),
-                shape = RoundedCornerShape(24.dp),
-                modifier = Modifier
-                    .width(300.dp)
-                    .padding(bottom = 25.dp)
-            ) {
-                Text(text = "Next Question", fontSize = 25.sp, color = Color.White)
             }
         }
     }
 }
 
 @Composable
-fun Question3(tVM:Stage1VM){
+private fun Question3(tVM:Stage1VM){
     val answer = tVM.newsEntry.collectAsState().value
 
     Column(Modifier
@@ -360,7 +415,7 @@ fun Question3(tVM:Stage1VM){
 }
 
 @Composable
-fun Question4(tVM:Stage1VM){
+private fun Question4(tVM:Stage1VM){
     val answer = tVM.newsEntry.collectAsState().value
 
     Column(Modifier
@@ -498,8 +553,7 @@ fun Question4(tVM:Stage1VM){
         ){
             Button(
                 onClick = {
-                    tVM.onQ4VisiChange(false)
-                    //submission function
+                    tVM.submitAnswers()
                 },
                 colors = buttonColours(),
                 shape = RoundedCornerShape(24.dp),
@@ -514,7 +568,7 @@ fun Question4(tVM:Stage1VM){
 }
 
 @Composable
-fun ClockImage(drawingName: String){
+private fun ClockImage(drawingName: String, tVM: Stage1VM, index: Int){
     val context = LocalContext.current
     // Get drawable resource ID from the resource name string
     val drawableId = remember(drawingName) {
@@ -523,6 +577,10 @@ fun ClockImage(drawingName: String){
     Box(modifier = Modifier
         .fillMaxSize()
         .padding(15.dp)
+        .clickable {
+            tVM.onConfChange(true)
+            tVM.onClockChange(index)
+        }
     ){
         Icon(
             painter = painterResource(id = drawableId),
@@ -530,5 +588,79 @@ fun ClockImage(drawingName: String){
             tint = Color.Unspecified,
             modifier = Modifier.fillMaxSize()
         )
+    }
+}
+
+@Composable
+fun ConfirmationSection(tVM: Stage1VM){
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(Color.White)
+    ){
+        Column(
+            verticalArrangement = Arrangement.spacedBy(35.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(0.dp)
+        ){
+            Text(
+                text = "Confirm Choice",
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+                color = DarkPurple
+            )
+            Text(
+                text = "Are you sure you want to select clock ${tVM.clock.collectAsState().value+1}?",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = MidPurple
+            )
+
+            val context = LocalContext.current
+            val drawingName = tVM.clocks[tVM.clock.collectAsState().value]
+            val drawableId = remember(drawingName) {
+                context.resources.getIdentifier(drawingName, "drawable", context.packageName)
+            }
+
+            Icon(
+                painter = painterResource(id = drawableId),
+                contentDescription = "Clock image",
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .height(300.dp)
+                    .aspectRatio(1F)
+            )
+
+            Row(modifier = Modifier.fillMaxSize(),
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.Center
+            ){
+                Button(
+                    onClick = {
+                        tVM.onConfChange(false)
+                    },
+                    colors = buttonColours(),
+                    shape = RoundedCornerShape(24.dp),
+                    modifier = Modifier
+                        .width(200.dp)
+                        .padding(bottom = 25.dp)
+                ) {
+                    Text(text = "Cancel", fontSize = 25.sp, color = Color.White)
+                }
+                Spacer(Modifier.width(10.dp))
+                Button(
+                    onClick = {
+                        tVM.onQ2VisiChange(false)
+                        tVM.onQ3VisiChange(true)
+                    },
+                    colors = buttonColours(),
+                    shape = RoundedCornerShape(24.dp),
+                    modifier = Modifier
+                        .width(200.dp)
+                        .padding(bottom = 25.dp)
+                ) {
+                    Text(text = "Confirm", fontSize = 25.sp, color = Color.White)
+                }
+            }
+        }
     }
 }

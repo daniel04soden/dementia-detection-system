@@ -65,7 +65,7 @@ class SharedVM: ViewModel(){
 
             Test(
                 name = "GP Cognitive Test part 1",
-                route = "test",
+                route = "test1",
                 step = 2
             ),
 

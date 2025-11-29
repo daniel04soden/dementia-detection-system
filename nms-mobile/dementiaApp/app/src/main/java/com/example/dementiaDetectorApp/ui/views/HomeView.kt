@@ -44,7 +44,7 @@ import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.R
 import com.example.dementiaDetectorApp.models.NewsPiece
 import com.example.dementiaDetectorApp.models.Test
-import com.example.dementiaDetectorApp.ui.util.NavMenu
+import com.example.dementiaDetectorApp.ui.composables.NavMenu
 import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.Gray
 import com.example.dementiaDetectorApp.ui.theme.LightPurple
@@ -136,7 +136,7 @@ fun TestPrompt(
             contentAlignment = Alignment.Center
         ){
             Icon(
-                painter = painterResource(R.drawable.search),
+                painter = painterResource(R.drawable.logo),
                 contentDescription = "Class Icon",
                 Modifier.size(30.dp)
             )

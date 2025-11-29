@@ -1,4 +1,4 @@
-package com.example.dementiaDetectorApp.ui.util
+package com.example.dementiaDetectorApp.ui.composables
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Path
 import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.LightPurple
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
+import com.example.dementiaDetectorApp.ui.util.standardQuadFromTo
 
 @Composable
 fun WaveBGBox(

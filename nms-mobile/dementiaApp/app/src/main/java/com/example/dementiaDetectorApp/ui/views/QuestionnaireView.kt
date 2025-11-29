@@ -31,6 +31,7 @@ import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.ui.theme.Gray
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.ui.theme.buttonColours
+import com.example.dementiaDetectorApp.ui.composables.SubmittedSection
 import com.example.dementiaDetectorApp.viewModels.QViewModel
 import com.zekierciyas.library.view.SurveyScreen
 
@@ -40,12 +41,17 @@ fun QuestionnaireScreen(qVM: QViewModel, nc: NavController){
         .fillMaxSize()
         .background(MidPurple)
     ){
-        Column{
+        Column(
+            Modifier.padding(bottom = 50.dp)
+        ){
             if(qVM.prefaceVisi.collectAsState().value){
                 Spacer(Modifier.height(200.dp))
             }
+            else{
+                Spacer(Modifier.height(35.dp))
+            }
             PrefaceSection(qVM)
-            FormSection(qVM)
+            FormSection(qVM,nc)
         }
         if(!(qVM.prefaceVisi.collectAsState().value)){
             ProgressDots(Modifier.align(Alignment.BottomCenter))
@@ -54,7 +60,7 @@ fun QuestionnaireScreen(qVM: QViewModel, nc: NavController){
 }
 
 @Composable
-fun PrefaceSection(qVM: QViewModel){
+private fun PrefaceSection(qVM: QViewModel){
     AnimatedVisibility(
         visible =qVM.prefaceVisi.collectAsState().value,
         exit = slideOutHorizontally() + fadeOut()
@@ -111,7 +117,7 @@ fun PrefaceSection(qVM: QViewModel){
 }
 
 @Composable
-fun FormSection(qVM: QViewModel){
+private fun FormSection(qVM: QViewModel, nc: NavController){
     AnimatedVisibility(
         visible = !(qVM.prefaceVisi.collectAsState().value),
     ){
@@ -137,14 +143,23 @@ fun FormSection(qVM: QViewModel){
             ){
                 S3Section(qVM)
             }
+            AnimatedVisibility(
+                visible = qVM.successVisi.collectAsState().value,
+                //enter = slideInHorizontally() + fadeIn(),
+                //exit = slideOutHorizontally() + fadeOut(),
+            ){
+                SubmittedSection(nc)
+            }
         }
     }
 }
 
 @Composable
-fun S1Section(qVM: QViewModel){
+private fun S1Section(qVM: QViewModel){
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
@@ -158,13 +173,20 @@ fun S1Section(qVM: QViewModel){
             Text( "General Questions", fontSize = 35.sp, fontWeight = FontWeight.Bold, color = MidPurple)
         }
         Row(Modifier.fillMaxHeight(0.9F)){
-            SurveyScreen(survey = qVM.s1Survey)
-                //backgroundColor = LightPurple,)
+            SurveyScreen(
+                survey = qVM.s1Survey,
+                callbackAnswers = {answers ->
+                    qVM.onSurveyAnswerChange(answers)
+                }
+            )
+            //backgroundColor = LightPurple,)
         }
         Button(
             onClick = {
-                qVM.onS1Change(false)
-                qVM.onS2Change(true)},
+                if(qVM.isS1Complete()){
+                    qVM.onS1Change(false)
+                    qVM.onS2Change(true)}
+            },
             colors = buttonColours(),
             shape = RoundedCornerShape(24.dp),
             modifier = Modifier
@@ -180,9 +202,11 @@ fun S1Section(qVM: QViewModel){
 }
 
 @Composable
-fun S2Section(qVM: QViewModel){
+private fun S2Section(qVM: QViewModel){
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
@@ -197,12 +221,19 @@ fun S2Section(qVM: QViewModel){
         }
 
         Row(Modifier.fillMaxHeight(0.9F)){
-            SurveyScreen(survey = qVM.s2Survey)
+            SurveyScreen(
+                survey = qVM.s2Survey,
+                callbackAnswers = {answers ->
+                    qVM.onSurveyAnswerChange(answers)
+                }
+            )
         }
         Button(
             onClick = {
-                qVM.onS2Change(false)
-                qVM.onS3Change(true)},
+                if (qVM.isS2Complete()){
+                    qVM.onS2Change(false)
+                    qVM.onS3Change(true)}
+            },
             colors = buttonColours(),
             shape = RoundedCornerShape(24.dp),
             modifier = Modifier
@@ -218,9 +249,11 @@ fun S2Section(qVM: QViewModel){
 }
 
 @Composable
-fun S3Section(qVM: QViewModel){
+private fun S3Section(qVM: QViewModel){
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
@@ -234,12 +267,18 @@ fun S3Section(qVM: QViewModel){
             Text( "Habbit Questions", fontSize = 35.sp, fontWeight = FontWeight.Bold, color = MidPurple)
         }
         Row(Modifier.fillMaxHeight(0.9F)){
-            SurveyScreen(survey = qVM.s3Survey)
+            SurveyScreen(
+                survey = qVM.s3Survey,
+                callbackAnswers = {answers ->
+                    qVM.onSurveyAnswerChange(answers)
+                }
+            )
         }
         Button(
             onClick = {
-                qVM.onS3Change(false)
-                //Api call to send off a POST request
+                if(qVM.isS3Complete()){
+                    qVM.submitAnswers()
+                }
             },
             colors = buttonColours(),
             shape = RoundedCornerShape(24.dp),
@@ -254,7 +293,6 @@ fun S3Section(qVM: QViewModel){
         }
     }
 }
-
 
 @Composable
 fun ProgressDots(

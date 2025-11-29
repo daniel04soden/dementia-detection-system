@@ -1,4 +1,4 @@
-package com.example.dementiaDetectorApp.ui.util
+package com.example.dementiaDetectorApp.ui.composables
 
 import com.example.dementiaDetectorApp.R
 import com.example.dementiaDetectorApp.models.NavBarContent
@@ -81,7 +81,7 @@ fun NavBarItem(
             contentAlignment = Alignment.Center
         ){
             Icon(
-                painter = painterResource(R.drawable.search),
+                painter = painterResource(R.drawable.logo),
                 contentDescription = item.title,
                 tint = (if(isSelected) activeTextColor else inactiveTextColor),
                 modifier = Modifier.size(20.dp)

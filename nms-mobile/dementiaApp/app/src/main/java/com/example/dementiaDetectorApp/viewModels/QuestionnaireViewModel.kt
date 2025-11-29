@@ -1,12 +1,31 @@
 package com.example.dementiaDetectorApp.viewModels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.dementiaDetectorApp.api.tests.TestRepository
+import com.example.dementiaDetectorApp.api.tests.TestResult
 import com.zekierciyas.library.model.QuestionType
 import com.zekierciyas.library.model.SurveyModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
-class QViewModel: ViewModel(){
+@HiltViewModel
+class QViewModel @Inject constructor(
+    private val repository: TestRepository
+): ViewModel() {
+
+    private val resultChannel = Channel<TestResult<Unit>>()
+    val testResults = resultChannel.receiveAsFlow()
+
+    var isLoading = false
+        private set
+
     //Preface visibility
     private val _prefaceVisi = MutableStateFlow(true)
     val prefaceVisi: StateFlow<Boolean> = _prefaceVisi
@@ -17,23 +36,23 @@ class QViewModel: ViewModel(){
     val s1visi: StateFlow<Boolean> = _s1visi
     fun onS1Change(newVisi: Boolean){_s1visi.value = newVisi}
 
-    private val _gender = MutableStateFlow(0) //0 = Female 1 = Male
+    private val _gender = MutableStateFlow(-1) //0 = Female 1 = Male
     val gender: StateFlow<Int> = _gender
     val genderOptions = listOf("Male", "Female")
-    fun onGenderChange(newGender: Int){_gender.value=newGender}
+    private fun onGenderChange(newGender: Int){_gender.value=newGender}
 
     private val _age = MutableStateFlow(0)
     val age: StateFlow<Int> = _age
-    fun onAgeChange(newAge: Int) { _age.value = newAge }
+    private fun onAgeChange(newAge: Int) { _age.value = newAge }
 
-    private val _dHand = MutableStateFlow(0) // Left = 0 Right = 1
+    private val _dHand = MutableStateFlow(-1) // Left = 0 Right = 1
     val dHand: StateFlow<Int> = _dHand
     val dHandOptions= listOf("Left Handed", "Right Handed")
-    fun onDHandChange(newDHand: Int) { _dHand.value = newDHand }
+    private fun onDHandChange(newDHand: Int) { _dHand.value = newDHand }
 
     private val _edu = MutableStateFlow("")
     val edu: StateFlow<String> = _edu
-    fun onEduChange(newEdu: String) { _edu.value = newEdu }
+    private fun onEduChange(newEdu: String) { _edu.value = newEdu }
     val eduOptions = listOf(
         "No formal education", "Some primary education", "Completed primary education",
         "Some secondary education", "Completed secondary education", "Some college/university",
@@ -78,24 +97,31 @@ class QViewModel: ViewModel(){
         ),
     )
 
+    fun isS1Complete(): Boolean {
+        return gender.value != -1 &&
+                age.value > 0 &&
+                dHand.value != -1 &&
+                edu.value.isNotEmpty()
+    }
+
     //Section 2
     private val _s2visi = MutableStateFlow(false)
     val s2visi: StateFlow<Boolean> = _s2visi
     fun onS2Change(newVisi: Boolean){_s2visi.value = newVisi}
 
-    private val _weight = MutableStateFlow(0.0F)
+    private val _weight = MutableStateFlow(-1.0F)
     val weight: StateFlow<Float> = _weight
     fun onWeightChange(newWeight: Float){_weight.value = newWeight}
 
-    private val _avgTemp = MutableStateFlow(0.0F)
+    private val _avgTemp = MutableStateFlow(-1.0F)
     val avgTemp: StateFlow<Float> = _avgTemp
     fun onAvgTempChange(newAvgTemp: Float) { _avgTemp.value = newAvgTemp }
 
-    private val _restingHR = MutableStateFlow(0)
+    private val _restingHR = MutableStateFlow(-1)
     val restingHR: MutableStateFlow<Int> = _restingHR
     fun onRestingHRChange(newHR: Int) { _restingHR.value = newHR }
 
-    private val _oxLv = MutableStateFlow(0)
+    private val _oxLv = MutableStateFlow(-1)
     val oxLv: StateFlow<Int> = _oxLv
     fun onOxLvChange(newOxLv: Int) { _oxLv.value = newOxLv }
 
@@ -148,6 +174,15 @@ class QViewModel: ViewModel(){
         )
     )
 
+    fun isS2Complete(): Boolean {
+        return history.value != null &&
+                weight.value > -1f &&
+                avgTemp.value > -1f &&
+                restingHR.value > -1 &&
+                oxLv.value > -1 &&
+                apoe.value != null
+    }
+
     //Section 3
     private val _s3visi = MutableStateFlow(false)
     val s3visi: StateFlow<Boolean> = _s3visi
@@ -189,7 +224,7 @@ class QViewModel: ViewModel(){
             questionType = QuestionType.SINGLE_CHOICE,
             questionId = "sleep",
             questionTitle = "2) Sleep Quality",
-            questionDescription = "Do you usally get good (8+ hours) of sleep",
+            questionDescription = "Do you usually get good (8+ hours) of sleep",
             answers = listOf("Yes", "No")
         ),
         SurveyModel(
@@ -214,4 +249,94 @@ class QViewModel: ViewModel(){
             answers = dietOptions
         ),
     )
+
+    fun isS3Complete(): Boolean {
+        return smoke.value != null &&
+                goodSleep.value != null &&
+                depressed.value != null &&
+                activityLv.value.isNotEmpty() &&
+                diet.value.isNotEmpty()
+    }
+
+    fun onSurveyAnswerChange(answers: Map<String, Set<String>>) {
+        answers.forEach { (questionId, answerSet) ->
+            val answer = answerSet.firstOrNull() ?: return@forEach
+            val yesNoToBoolean = answer.equals("Yes", ignoreCase = true)
+
+            when (questionId) {
+                // Section 1
+                "gender" -> {
+                    val newValue = if (answer == "Male") 1 else 0
+                    onGenderChange(newValue)
+                }
+                "dHand" -> {
+                    val newValue = if (answer == "Right Handed") 1 else 0
+                    onDHandChange(newValue)
+                }
+                "edu" -> onEduChange(answer)
+                "age" -> onAgeChange(answer.toIntOrNull() ?: 0)
+
+                // Section 2
+                "history" -> onHistoryChange(yesNoToBoolean)
+                "apoe" -> onApoeChange(yesNoToBoolean)
+                "weight" -> onWeightChange(answer.toFloatOrNull() ?: 0f)
+                "avgTemp" -> onAvgTempChange(answer.toFloatOrNull() ?: 0f)
+                "hr" -> onRestingHRChange(answer.toIntOrNull() ?: 0)
+                "oxLv" -> onOxLvChange(answer.toIntOrNull() ?: 0)
+
+                // Section 3
+                "smoker" -> onSmokeChange(yesNoToBoolean)
+                "sleep" -> onGoodSleepChange(yesNoToBoolean)
+                "depressed" -> onDepressedChange(yesNoToBoolean)
+                "actLv" -> onActivityLvChange(answer)
+                "diet" -> onDietChange(answer)
+            }
+        }
+    }
+
+
+    fun submitAnswers(){
+        viewModelScope.launch {
+            isLoading = true
+
+            val result = repository.reportQuestionnaire(
+                patientID = 1,
+                gender = _gender.value,
+                age = _age.value,
+                dHand = _dHand.value,
+                weight = _weight.value,
+                avgTemp = _avgTemp.value,
+                restingHR = _restingHR.value,
+                oxLv = _oxLv.value,
+                history = _history.value,
+                smoke = _smoke.value,
+                apoe = _apoe.value,
+                activityLv = _activityLv.value,
+                depressed = _depressed.value,
+                diet = _diet.value,
+                goodSleep = _goodSleep.value,
+                edu = _edu.value,
+            )
+            when (result) {
+                is TestResult.Success -> {
+                    Log.d("Stage1VM", "Submit success: $result")
+                    onS3Change(false)
+                    onSuccessChange(true)
+                }
+                is TestResult.Unauthorized -> {
+                    Log.d("Stage1VM", "Submit unauthorized: $result")
+                }
+                is TestResult.UnknownError -> {
+                    Log.d("Stage1VM", "Submit unknown error: $result")
+                }
+            }
+
+            resultChannel.trySend(result)
+            isLoading = false
+        }
+    }
+
+    private val _successVisi = MutableStateFlow(false)
+    val successVisi: StateFlow<Boolean> = _successVisi
+    private fun onSuccessChange(newVisi: Boolean){_successVisi.value = newVisi}
 }

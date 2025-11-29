@@ -15,7 +15,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlin.text.Typography.dagger
 
 
 @HiltViewModel
@@ -75,83 +74,11 @@ class AuthViewModel @Inject constructor(private val repository: AuthRepository
 
     var loginMsg by mutableStateOf("")
 
-    //----------------------------------------------------------------------------------------------------------------
-    //Subject to change when implementing DB integration
-    private val registeredAccounts = mutableListOf<Account>()
-    private val loginAttempts: MutableMap<String, Int> = mutableMapOf()
-
-    fun authUser(email: String, pswd: String): Boolean {
-        var authenticated: Boolean = false
-        for (ac in registeredAccounts) {
-            if ((ac.email == email) && (ac.password == pswd)) {
-                authenticated = true
-                break
-            } else if ((ac.email == email) && (ac.password != pswd)) {
-                val attempts = loginAttempts[email]
-                    ?: 0            //"Elvis operator" If null assign 0, if not null assign value to the variable
-                loginAttempts[email] = attempts + 1
-            }
-        }
-        return authenticated                                        //Apparently "}return x\n}" causes an error so I need to use an entire line for 1 return. Great.
-    }
-    //---------------------------------------------------------------------------------------------------------------------
-
-    fun login(email: String, pswd: String) {
-        if ((loginAttempts[email] ?: 0) <= 5) {
-            if (authUser(email, pswd)) {
-                for (ac in registeredAccounts) {
-                    if (ac.email == email) {
-                        currentAc = ac
-                        break
-                    }
-                }
-                loginMsg = "Login successful"
-            } else {
-                loginMsg = "Login failed"
-            }
-        } else {
-            loginMsg =
-                "There were too many failed attempts to login\nThe account is currently locked"
-        }
-    }
-
-    fun logout() {
-        currentAc = null
-        //Call login screen function here
-    }
-
-    fun register() { //Will pull from the fields defined above as they constantly update
-        if ((isValidPswd()) && (validateLoginEmail())) { //Step 1 Email and password
-            //Go to step 2 page                      //Step 2 Personal Info
-            //Go to step 3 page                      //Step 3 Address
-
-            val newAc = Account(
-                "acID",
-                _email.value,
-                _pswd.value,
-                fName.value,
-                lName.value,
-                phoneNum.value,
-                _eircode.value
-            )
-            registeredAccounts.add(newAc)
-        }
-    }
-
     fun isValidPswd(): Boolean {
         if ((pswd.value.length >= 8)) {
             return true
         }
         return false
-    }
-
-    fun validateLoginEmail(): Boolean {
-        for (ac in registeredAccounts) {
-            if (ac.email == _email.value) {
-                return false
-            }
-        }
-        return true
     }
 
     fun validateNum(): Boolean {
@@ -205,10 +132,6 @@ class AuthViewModel @Inject constructor(private val repository: AuthRepository
 
     fun onCityChange(newCity: String) {
         _city.value = newCity
-    }
-
-    fun onCountyChange(newCounty: String) {
-        _county.value = newCounty
     }
 
     fun onEircodeChange(newEircode: String) {
