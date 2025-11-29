@@ -149,7 +149,7 @@ class Stage2VM @Inject constructor(
     val errorMessage: StateFlow<String?> = _errorMessage
     private fun clearError() { _errorMessage.value = null}
 
-    fun submitAnswers(){
+    fun submitAnswers(patientID: Int){
         clearError()
         if(!allQuestionsAnswered()){
             _errorMessage.value= "Please answer all questions before submitting"
@@ -160,12 +160,13 @@ class Stage2VM @Inject constructor(
                 isLoading = true
 
                 val result = repository.reportStage2(
-                    memory = _memory.value,
-                    conversation = _conversation.value,
-                    speaking = _speaking.value,
-                    financial = _financial.value,
-                    medication = _medication.value,
-                    transport = _transport.value
+                    patientID = patientID,
+                    memoryScore = _memory.value,
+                    recallRes = _conversation.value,
+                    speakingScore = _speaking.value,
+                    financialScore = _financial.value,
+                    medicineScore = _medication.value,
+                    transportScore = _transport.value
                 )
 
                 when (result) {

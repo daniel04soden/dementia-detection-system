@@ -1,4 +1,5 @@
 package com.example.dementiaDetectorApp.viewModels
+import android.accounts.Account
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -7,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dementiaDetectorApp.api.auth.AuthRepository
 import com.example.dementiaDetectorApp.api.auth.AuthResult
-import com.example.dementiaDetectorApp.models.Account
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -30,10 +30,6 @@ class AuthViewModel @Inject constructor(private val repository: AuthRepository
     init {
         authenticate() //does nothing rn, need fawaz to give me a start up login hook
     }
-
-    var currentAc: Account? =
-        null                   //? means can be null, =null defaults it to null until later changed
-        private set                                     //Can be called externally but not altered externally
 
     //Login + Register vals
     private val _email = MutableStateFlow("")

@@ -33,11 +33,12 @@ import com.example.dementiaDetectorApp.ui.theme.Gray
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.ui.theme.buttonColours
 import com.example.dementiaDetectorApp.ui.composables.SubmittedSection
+import com.example.dementiaDetectorApp.viewModels.SharedVM
 import com.example.dementiaDetectorApp.viewModels.Stage2VM
 import com.zekierciyas.library.view.SurveyScreen
 
 @Composable
-fun Stage2Screen(tVM: Stage2VM, nc: NavController){
+fun Stage2Screen(tVM: Stage2VM, sVM: SharedVM, nc: NavController){
     Box(modifier = Modifier
         .fillMaxSize()
         .background(MidPurple)
@@ -52,7 +53,7 @@ fun Stage2Screen(tVM: Stage2VM, nc: NavController){
                 Spacer(Modifier.height(35.dp))
             }
             PrefaceSection(tVM)
-            FormSection(tVM,nc)
+            FormSection(tVM,sVM,nc)
         }
         if(!(tVM.prefaceVisi.collectAsState().value)){
             ProgressDots(Modifier.align(Alignment.BottomCenter))
@@ -118,15 +119,13 @@ private fun PrefaceSection(tVM: Stage2VM){
 }
 
 @Composable
-private fun FormSection(tVM: Stage2VM, nc: NavController){
+private fun FormSection(tVM: Stage2VM, sVM: SharedVM, nc: NavController){
     AnimatedVisibility(
         visible = !(tVM.prefaceVisi.collectAsState().value),
     ){
         Column{
             AnimatedVisibility(
                 visible = tVM.formVisi.collectAsState().value,
-                //enter = slideInHorizontally() + fadeIn(),
-                //exit = slideOutHorizontally() + fadeOut(),
             ){
                 Column(
                     modifier = Modifier
@@ -155,7 +154,7 @@ private fun FormSection(tVM: Stage2VM, nc: NavController){
                     Button(
                         onClick = {
                             if(tVM.allQuestionsAnswered()){
-                                tVM.submitAnswers()
+                                tVM.submitAnswers(sVM.id.value)
                             }
                         },
                         colors = buttonColours(),

@@ -1,24 +1,27 @@
 package com.example.dementiaDetectorApp.api.tests
 
-import com.example.dementiaDetectorApp.models.results.RecallRes
 
 interface TestRepository {
     suspend fun reportStage1(
-        testDate: String,
+        patientID: Int,
         dateQuestion: String,
-        clockNumber: String,
-        clockHands: String,
+        clockID: Int,
         news: String,
-        recall: RecallRes
+        recallName: String,
+        recallSurname: String,
+        recallNumber: String,
+        recallStreet: String,
+        recallCity: String
     ): TestResult<Unit>
 
     suspend fun reportStage2(
-        memory: Int,
-        conversation: Int,
-        speaking: Int,
-        financial: Int,
-        medication: Int,
-        transport: Int
+        patientID: Int,
+        memoryScore: Int,
+        recallRes: Int,
+        speakingScore: Int,
+        financialScore: Int,
+        medicineScore: Int,
+        transportScore: Int
     ): TestResult<Unit>
 
     suspend fun reportQuestionnaire(

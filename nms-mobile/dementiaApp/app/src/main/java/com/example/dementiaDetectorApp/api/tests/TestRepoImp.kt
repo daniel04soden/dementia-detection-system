@@ -2,7 +2,6 @@ package com.example.dementiaDetectorApp.api.tests
 
 import android.content.SharedPreferences
 import android.util.Log
-import com.example.dementiaDetectorApp.models.results.RecallRes
 import org.json.JSONObject
 import retrofit2.HttpException
 import java.net.UnknownHostException
@@ -15,35 +14,33 @@ class TestRepoImp(
     private val TAG = "TestRepoImp"
 
     override suspend fun reportStage1(
-        testDate: String,
+        patientID: Int,
         dateQuestion: String,
-        clockNumber: String,
-        clockHands: String,
+        clockID: Int,
         news: String,
-        recall: RecallRes
+        recallName: String,
+        recallSurname: String,
+        recallNumber: String,
+        recallStreet: String,
+        recallCity: String
     ): TestResult<Unit> {
         return try {
             val token = prefs.getString("jwt", null)
                 ?: return TestResult.Unauthorized()
 
-            val body = JSONObject().apply {
-                put("patientID", 1)
-                put("doctorID", 1)
-                put("testDate", testDate)
-                put("dateQuestion", dateQuestion)
-                put("clockNumber", clockNumber)
-                put("clockHands", clockHands)
-                put("news", news)
-                put("recall", JSONObject().apply {
-                    put("name", recall.name)
-                    put("surname", recall.surname)
-                    put("number", recall.number)
-                    put("street", recall.street)
-                    put("city", recall.city)
-                })
-            }
-
-            val response = api.reportStage1("Bearer $token", body)
+            val response = api.reportStage1("Bearer $token",
+                body = Stage1Request(
+                    patientID = patientID,
+                    dateQuestion = dateQuestion,
+                    clockID = clockID,
+                    news = news,
+                    recallName = recallName,
+                    recallSurname = recallSurname,
+                    recallNumber = recallNumber,
+                    recallStreet = recallStreet,
+                    recallCity =recallCity
+                )
+            )
 
             if (response.isSuccessful) {
                 Log.d(TAG, "Stage 1 submitted successfully")
@@ -77,27 +74,29 @@ class TestRepoImp(
     }
 
     override suspend fun reportStage2(
-        memory: Int,
-        conversation: Int,
-        speaking: Int,
-        financial: Int,
-        medication: Int,
-        transport: Int
+        patientID: Int,
+        memoryScore: Int,
+        recallRes: Int,
+        speakingScore: Int,
+        financialScore: Int,
+        medicineScore: Int,
+        transportScore: Int
     ): TestResult<Unit> {
         return try {
             val token = prefs.getString("jwt", null)
                 ?: return TestResult.Unauthorized()
 
-            val body = JSONObject().apply {
-                put("memory", memory)
-                put("conversation", conversation)
-                put("speaking", speaking)
-                put("financial", financial)
-                put("medication", medication)
-                put("transport", transport)
-            }
-
-            val response = api.reportStage2("Bearer $token", body)
+            val response = api.reportStage2("Bearer $token",
+                body = Stage2Request(
+                    patientID = patientID,
+                    memoryScore = memoryScore,
+                    recallRes = recallRes,
+                    speakingScore = speakingScore,
+                    financialScore = financialScore,
+                    medicineScore = medicineScore,
+                    transportScore = transportScore
+                )
+            )
 
             if (response.isSuccessful) {
                 Log.d(TAG, "Stage 1 submitted successfully")

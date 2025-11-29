@@ -1,17 +1,18 @@
 package com.example.dementiaDetectorApp.viewModels
 
+import android.accounts.Account
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.dementiaDetectorApp.models.Account
 import com.example.dementiaDetectorApp.models.NavBarContent
 import com.example.dementiaDetectorApp.models.Test
 
 class SharedVM: ViewModel(){
     //User
-    private val _account = mutableStateOf<Account>(Account("","","","","","",""))
-    val account: State<Account> = _account
+    private val _id = mutableIntStateOf(-1)
+    val id: State<Int> = _id
+    fun onIdChange(newID: Int){_id.intValue = newID}
 
     //NavBar
     private val _navItems = mutableStateOf<List<NavBarContent>>(navList())
@@ -60,22 +61,30 @@ class SharedVM: ViewModel(){
             Test(
                 name = "Lifestyle questionnaire",
                 route = "questionnaire",
-                step = 1
+                state = 0,
             ),
 
             Test(
                 name = "GP Cognitive Test part 1",
                 route = "test1",
-                step = 2
+                state = 0,
             ),
 
             Test(
                 name = "GP Cognitive Test part 2",
                 route = "test2",
-                step = 3
+                state = 0,
             ),
+
+            Test(
+                name = "Speech Test",
+                route = "test2",
+                state = 0,
+            )
         )
         return testList
     }
+
+
 
 }

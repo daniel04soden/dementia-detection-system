@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dementiaDetectorApp.api.tests.TestRepository
 import com.example.dementiaDetectorApp.api.tests.TestResult
-import com.example.dementiaDetectorApp.models.results.RecallRes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.channels.Channel
@@ -57,9 +56,6 @@ class Stage1VM @Inject constructor(
     private val _clock = MutableStateFlow(-1)
     val clock: StateFlow<Int> = _clock
     fun onClockChange(newClock: Int){_clock.value = newClock}
-    
-    private val _clockHand = MutableStateFlow("")
-    fun onHandChange(index: Int){_clockHand.value = clockHands[index]}
 
     val clocks = listOf(
         "clock1",
@@ -68,15 +64,6 @@ class Stage1VM @Inject constructor(
         "clock4",
         "clock5",
         "clock6",
-    )
-
-    val clockHands = listOf(
-        "12:10",
-        "11:21",
-        "11:10",
-        "11:10",
-        "7:58",
-        "10:50"
     )
 
     val _confirmVisi = MutableStateFlow(false)
@@ -116,25 +103,20 @@ class Stage1VM @Inject constructor(
     fun onAreaChange(newCity: String){_city.value = newCity}
 
     // Submit function - matches AuthViewModel pattern with Channel results and loading state
-    fun submitAnswers() {
+    fun submitAnswers(patientID: Int) {
         viewModelScope.launch {
             isLoading = true
 
-            val recall = RecallRes(
-                name = fName.value,
-                surname = lName.value,
-                number = number.value,
-                street = street.value,
-                city = city.value
-            )
-
             val result = repository.reportStage1(
-                testDate = date.value,
-                dateQuestion = date.value,
-                clockNumber = clocks[clock.value],
-                clockHands = _clockHand.value,
-                news = newsEntry.value,
-                recall = recall
+                patientID = patientID,
+                dateQuestion = _date.value,
+                clockID = _clock.value,
+                news = _newsEntry.value,
+                recallName = _fName.value,
+                recallSurname = _lName.value,
+                recallNumber = _number.value,
+                recallStreet = _street.value,
+                recallCity = _city.value
             )
 
             when (result) {
