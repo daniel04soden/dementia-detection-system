@@ -417,8 +417,6 @@ private fun Question3(tVM:Stage1VM){
 
 @Composable
 private fun Question4(tVM:Stage1VM){
-    val answer = tVM.newsEntry.collectAsState().value
-
     Column(Modifier
         .fillMaxSize()
         .background(Color.White)
@@ -449,7 +447,9 @@ private fun Question4(tVM:Stage1VM){
                 color = MidPurple,
                 modifier = Modifier.padding(start = 15.dp, end = 15.dp)
             )}
+
         Spacer(Modifier.height(5.dp))
+        val fName = tVM.fName.collectAsState().value
         Text(
             text = "First Name",
             color = MidPurple,
@@ -461,7 +461,7 @@ private fun Question4(tVM:Stage1VM){
             horizontalArrangement = Arrangement.Center
         ){
             OutlinedTextField(
-                value = answer,
+                value = fName,
                 onValueChange = {tVM.onFNChange(it)},
                 placeholder = {Text(text = "First name")},
                 colors = outLinedTFColours(),
@@ -469,6 +469,7 @@ private fun Question4(tVM:Stage1VM){
             )
         }
         Spacer(Modifier.height(5.dp))
+        val lName = tVM.lName.collectAsState().value
         Text(
             text = "Last Name",
             color = MidPurple,
@@ -480,7 +481,7 @@ private fun Question4(tVM:Stage1VM){
             horizontalArrangement = Arrangement.Center
         ){
             OutlinedTextField(
-                value = answer,
+                value = lName,
                 onValueChange = {tVM.onLNChange(it)},
                 placeholder = {Text(text = "Last name")},
                 colors = outLinedTFColours(),
@@ -489,6 +490,7 @@ private fun Question4(tVM:Stage1VM){
         }
 
         Spacer(Modifier.height(5.dp))
+        val num = tVM.number.collectAsState().value
         Text(
             text = "Number",
             color = MidPurple,
@@ -500,7 +502,7 @@ private fun Question4(tVM:Stage1VM){
             horizontalArrangement = Arrangement.Center
         ){
             OutlinedTextField(
-                value = answer,
+                value = num,
                 onValueChange = {tVM.onNumberChange(it)},
                 placeholder = {Text(text = "House number")},
                 colors = outLinedTFColours(),
@@ -509,6 +511,7 @@ private fun Question4(tVM:Stage1VM){
         }
 
         Spacer(Modifier.height(5.dp))
+        val street = tVM.street.collectAsState().value
         Text(
             text = "Street",
             color = MidPurple,
@@ -520,7 +523,7 @@ private fun Question4(tVM:Stage1VM){
             horizontalArrangement = Arrangement.Center
         ){
             OutlinedTextField(
-                value = answer,
+                value = street,
                 onValueChange = {tVM.onStreetChange(it)},
                 placeholder = {Text(text = "House street")},
                 colors = outLinedTFColours(),
@@ -529,8 +532,9 @@ private fun Question4(tVM:Stage1VM){
         }
 
         Spacer(Modifier.height(5.dp))
+        val city = tVM.city.collectAsState().value
         Text(
-            text = "Area",
+            text = "City",
             color = MidPurple,
             fontSize = 20.sp,
             modifier = Modifier.padding(start = 50.dp)
@@ -540,7 +544,7 @@ private fun Question4(tVM:Stage1VM){
             horizontalArrangement = Arrangement.Center
         ){
             OutlinedTextField(
-                value = answer,
+                value = city,
                 onValueChange = {tVM.onAreaChange(it)},
                 placeholder = {Text(text = "House area")},
                 colors = outLinedTFColours(),
