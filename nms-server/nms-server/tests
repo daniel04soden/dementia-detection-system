@@ -1,0 +1,35 @@
+sudo docker system prune -a
+
+curl -X GET http://localhost:8080/api/fetchallclinics
+
+curl -X POST http://localhost:8080/api/web/signup \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "real@email.true",
+    "doctorNO": 1,
+    "password": "secret",
+    "firstName": "jane",
+    "lastName": "burke",
+    "phone": "09764323457",
+    "clinicID": 1
+  }'
+
+
+INSERT INTO Clinic (name, phone, eircode)
+VALUES
+    ('Northside Clinic', '0871234567', 'D01 F5P2'),
+    ('Westfield Medical', '0867654321', 'K36 YP92'),
+    ('City Health Center', '0859876543', 'A65 B2CD')
+RETURNING clinicID;
+
+
+DO
+$$
+DECLARE
+    r RECORD;
+BEGIN
+    FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
+        EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE';
+    END LOOP;
+END;
+$$;
