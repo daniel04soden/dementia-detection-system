@@ -20,126 +20,111 @@ import kotlinx.coroutines.flow.receiveAsFlow
 @HiltViewModel
 class AuthViewModel @Inject constructor(private val repository: AuthRepository
 ): ViewModel() {
+    //Api related vars
     private val resultChannel = Channel<AuthResult<Unit>>()
     val authResults = resultChannel.receiveAsFlow()
 
+    var loginMsg by mutableStateOf("")
+    private var isLoading = false
+
     init {
-        authenticate()
+        authenticate() //does nothing rn, need fawaz to give me a start up login hook
     }
 
     var currentAc: Account? =
         null                   //? means can be null, =null defaults it to null until later changed
         private set                                     //Can be called externally but not altered externally
 
-    //UI Fields
-    //Step 1 Email and password
+    //Login + Register vals
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email
-
-    private val _pswd = MutableStateFlow("")
-    val pswd: StateFlow<String> = _pswd
-
-    private val _confPswd = MutableStateFlow("")
-    val confPswd: StateFlow<String> = _confPswd
-
-    // Step 2: Personal Info
-    private val _fName = MutableStateFlow("")
-    val fName: StateFlow<String> = _fName
-
-    private val _lName = MutableStateFlow("")
-    val lName: StateFlow<String> = _lName
-
-    private val _phoneNum = MutableStateFlow("")
-    val phoneNum: StateFlow<String> = _phoneNum
-
-    // Step 3: Address Info
-    private val _addressOne = MutableStateFlow("")
-    val addressOne: StateFlow<String> = _addressOne
-
-    private val _addressTwo = MutableStateFlow("")
-    val addressTwo: StateFlow<String> = _addressTwo
-
-    private val _addressThree = MutableStateFlow("")
-    val addressThree: StateFlow<String> = _addressThree
-
-    private val _city = MutableStateFlow("")
-    val city: StateFlow<String> = _city
-
-    private val _county = MutableStateFlow("")
-    val county: StateFlow<String> = _county
-
-    private val _eircode = MutableStateFlow("")
-    val eircode: StateFlow<String> = _eircode
-
-
-    var loginMsg by mutableStateOf("")
-
-    fun isValidPswd(): Boolean {
-        if ((pswd.value.length >= 8)) {
-            return true
-        }
-        return false
-    }
-
-    fun validateNum(): Boolean {
-        if (phoneNum.value.length == 10) {
-            return true
-        }
-        return false
-    }
+    fun onEmailChange(newEmail: String){_email.value = newEmail}
 
     private val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\$"
     fun isValidEmail(): Boolean {
         return email.value.matches(emailRegex.toRegex())
     }
 
-    //Functions to update values in this file based on view's UI fields
-    fun onPswdChange(newPswd: String) {
-        _pswd.value = newPswd
+    private val _pswd = MutableStateFlow("")
+    val pswd: StateFlow<String> = _pswd
+    fun onPswdChange(newPswd: String){_pswd.value = newPswd}
+
+    private fun validatePassword(): Boolean {
+        val password = pswd.value
+        return password.length >= 8 &&                    // Minimum 8 characters required
+                password.any { it.isUpperCase() } &&       // At least one uppercase letter
+                password.any { it.isLowerCase() } &&       // At least one lowercase letter
+                password.any { it.isDigit() } &&           // At least one digit (0-9)
+                password.any { !it.isLetterOrDigit() } &&  // At least one special character
+                password.none { it.isWhitespace() }        // No spaces or whitespace allowed
     }
 
-    fun onConfPswdChange(newConfPswd: String) {
-        _confPswd.value = newConfPswd
+    private val _confPswd = MutableStateFlow("")
+    val confPswd: StateFlow<String> = _confPswd
+    fun onConfPswdChange(newConfPswd: String){_confPswd.value = newConfPswd}
+
+    private val _fName = MutableStateFlow("")
+    val fName: StateFlow<String> = _fName
+    fun onFNameChange(newFName: String){_fName.value = newFName}
+
+    private val _lName = MutableStateFlow("")
+    val lName: StateFlow<String> = _lName
+    fun onLNameChange(newLname: String){_lName.value = newLname}
+
+    private val _phoneNum = MutableStateFlow("")
+    val phoneNum: StateFlow<String> = _phoneNum
+    fun onPhoneNumChange(newNum: String){_phoneNum.value = newNum}
+
+   private fun validateNum(): Boolean {
+        val number = phoneNum.value
+        return number.length == 10 && number.all { it.isDigit() }
     }
 
-    fun onEmailChange(newEmail: String) {
-        _email.value = newEmail
+    private val _eircode = MutableStateFlow("")
+    val eircode: StateFlow<String> = _eircode
+    fun onEircodeChange(newEircode: String){_eircode.value = newEircode}
+
+    private fun validateEircode(): Boolean {
+        val eircode = eircode.value.uppercase().replace(" ", "")  // Normalize: uppercase, remove spaces
+        return eircode.length == 7 &&                             // Exactly 7 characters total
+                eircode.matches("^(?:[AC-FHKNPRTV-Y][0-9]{2}|D6W)[0-9AC-FHKNPRTV-Y]{4}$".toRegex())  // Official Eircode pattern
     }
 
-    fun onFNameChange(newFName: String) {
-        _fName.value = newFName
+
+    private val _clinic = MutableStateFlow(-1)
+    val clinic: StateFlow<Int> = _clinic
+    fun onClinicChange(newID: Int){_clinic.value = newID}
+
+    //UI vals
+    private val _s1Visi = MutableStateFlow(false)
+    val s1Visi: StateFlow<Boolean> = _s1Visi
+    fun onS1VisiChange(newVisi:Boolean){_s1Visi.value=newVisi}
+
+    fun validateS1(): Boolean{
+        return _fName.value!="" &&
+        _lName.value!="" &&
+        validateNum() &&
+        validateEircode()
     }
 
-    fun onLNameChange(newLname: String) {
-        _lName.value = newLname
+    private val _s2Visi = MutableStateFlow(false)
+    val s2Visi: StateFlow<Boolean> = _s2Visi
+    fun onS2VisiChange(newVisi:Boolean){_s2Visi.value=newVisi}
+
+    fun validateS2(): Boolean{
+        return _email.value!="" &&
+                validatePassword() &&
+                _pswd.value == confPswd.value
     }
 
-    fun onPhoneNumChange(newNum: String) {
-        _phoneNum.value = newNum
-    }
+    private val _s3Visi = MutableStateFlow(true)
+    val s3Visi: StateFlow<Boolean> = _s3Visi
+    fun onS3VisiChange(newVisi:Boolean){_s3Visi.value=newVisi}
 
-    fun onAddressOneChange(newAddressOne: String) {
-        _addressOne.value = newAddressOne
-    }
+    private val _registered = MutableStateFlow(false)
+    val registered: StateFlow<Boolean> = _registered
 
-    fun onAddressTwoChange(newAddressTwo: String) {
-        _addressTwo.value = newAddressTwo
-    }
-
-    fun onAddressThreeChange(newAddressThree: String) {
-        _addressThree.value = newAddressThree
-    }
-
-    fun onCityChange(newCity: String) {
-        _city.value = newCity
-    }
-
-    fun onEircodeChange(newEircode: String) {
-        _eircode.value = newEircode
-    }
-
-    var isLoading=false
-
+    //API calls
     fun signUp(
         onSignIn: () -> Unit
     ){
@@ -154,6 +139,7 @@ class AuthViewModel @Inject constructor(private val repository: AuthRepository
                 eircode = eircode.value
             )
             if (result is AuthResult.Authorized){
+                _registered.value=true
                 signIn { onSignIn() }
             }
             resultChannel.send(result)

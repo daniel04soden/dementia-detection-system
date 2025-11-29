@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.dementiaDetectorApp.ui.composables.ProgressDots
 import com.example.dementiaDetectorApp.ui.theme.Gray
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.ui.theme.buttonColours

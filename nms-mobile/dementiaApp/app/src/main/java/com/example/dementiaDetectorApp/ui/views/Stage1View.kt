@@ -41,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.dementiaDetectorApp.ui.composables.ProgressDots
 import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.Gray
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
@@ -580,6 +581,7 @@ private fun ClockImage(drawingName: String, tVM: Stage1VM, index: Int){
         .clickable {
             tVM.onConfChange(true)
             tVM.onClockChange(index)
+            tVM.onHandChange(index)
         }
     ){
         Icon(

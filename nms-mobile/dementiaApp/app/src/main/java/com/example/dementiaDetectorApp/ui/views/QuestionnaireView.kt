@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.dementiaDetectorApp.ui.composables.ProgressDots
 import com.example.dementiaDetectorApp.ui.theme.Gray
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.ui.theme.buttonColours
@@ -124,29 +125,21 @@ private fun FormSection(qVM: QViewModel, nc: NavController){
         Column{
             AnimatedVisibility(
                 visible = qVM.s1visi.collectAsState().value,
-                //enter = slideInHorizontally() + fadeIn(),
-                //exit = slideOutHorizontally() + fadeOut(),
             ){
                 S1Section(qVM)
             }
             AnimatedVisibility(
                 visible = qVM.s2visi.collectAsState().value,
-                //enter = slideInHorizontally() + fadeIn(),
-                //exit = slideOutHorizontally() + fadeOut(),
             ){
                 S2Section(qVM)
             }
             AnimatedVisibility(
                 visible = qVM.s3visi.collectAsState().value,
-                //enter = slideInHorizontally() + fadeIn(),
-                //exit = slideOutHorizontally() + fadeOut(),
             ){
                 S3Section(qVM)
             }
             AnimatedVisibility(
                 visible = qVM.successVisi.collectAsState().value,
-                //enter = slideInHorizontally() + fadeIn(),
-                //exit = slideOutHorizontally() + fadeOut(),
             ){
                 SubmittedSection(nc)
             }
@@ -291,20 +284,5 @@ private fun S3Section(qVM: QViewModel){
                 color = Color.White
             )
         }
-    }
-}
-
-@Composable
-fun ProgressDots(
-    modifier: Modifier
-){
-    Row(modifier = modifier
-        .fillMaxWidth()
-        .padding(15.dp)
-        .background(MidPurple),
-        horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.CenterVertically
-    ){
-        Text("Progress dots here")
     }
 }

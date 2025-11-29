@@ -57,6 +57,9 @@ class Stage1VM @Inject constructor(
     private val _clock = MutableStateFlow(-1)
     val clock: StateFlow<Int> = _clock
     fun onClockChange(newClock: Int){_clock.value = newClock}
+    
+    private val _clockHand = MutableStateFlow("")
+    fun onHandChange(index: Int){_clockHand.value = clockHands[index]}
 
     val clocks = listOf(
         "clock1",
@@ -108,9 +111,9 @@ class Stage1VM @Inject constructor(
     val street: StateFlow<String> = _street
     fun onStreetChange(newStreet: String){_street.value = newStreet}
 
-    private val _area = MutableStateFlow("")
-    val area: StateFlow<String> = _area
-    fun onAreaChange(newArea: String){_area.value = newArea}
+    private val _city = MutableStateFlow("")
+    val city: StateFlow<String> = _city
+    fun onAreaChange(newCity: String){_city.value = newCity}
 
     // Submit function - matches AuthViewModel pattern with Channel results and loading state
     fun submitAnswers() {
@@ -122,14 +125,14 @@ class Stage1VM @Inject constructor(
                 surname = lName.value,
                 number = number.value,
                 street = street.value,
-                city = area.value
+                city = city.value
             )
 
             val result = repository.reportStage1(
                 testDate = date.value,
                 dateQuestion = date.value,
                 clockNumber = clocks[clock.value],
-                clockHands = "10 past 11",
+                clockHands = _clockHand.value,
                 news = newsEntry.value,
                 recall = recall
             )

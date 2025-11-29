@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -23,6 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -101,10 +105,22 @@ fun LoginInfoSection(authVM: AuthViewModel, nc: NavController){
             .padding(start = 7.5.dp, end = 7.5.dp)
             .fillMaxWidth()
     ){
+        Row(modifier = Modifier
+            .padding(start = 85.dp)
+            .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start
+        ){
+            Text(
+                text = "Email",
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                fontSize = 20.sp
+            )
+        }
         OutlinedTextField(
             value = email,
             onValueChange = {newVal: String -> authVM.onEmailChange(newVal)},
-            label = {Text("Email")},
+            //label = {Text("Email")},
             placeholder = {Text("YourEmail@exmaple.com")},
             singleLine = true,
             shape = RoundedCornerShape(24.dp),
@@ -112,15 +128,29 @@ fun LoginInfoSection(authVM: AuthViewModel, nc: NavController){
             modifier = Modifier.width(300.dp)
         )
 
+        Row(modifier = Modifier
+            .padding(start = 85.dp)
+            .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start
+        ){
+            Text(
+                text = "Password",
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                fontSize = 20.sp
+            )
+        }
         OutlinedTextField(
             value = pswd,
             onValueChange = {newVal: String -> authVM.onPswdChange(newVal)},
-            label = {Text("Password")},
+            //label = {Text("Password")},
             placeholder = {Text("********")},
             singleLine = true,
             shape = RoundedCornerShape(24.dp),
             colors = outLinedTFColours(),
-            modifier = Modifier.width(300.dp)
+            modifier = Modifier.width(300.dp),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            visualTransformation = PasswordVisualTransformation()
         )
         Spacer(Modifier.height(20.dp))
         Button(
