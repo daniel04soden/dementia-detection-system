@@ -1,5 +1,5 @@
 
-from golang:1.23-alpine as builder
+from golang:1.25-alpine as builder
 
 workdir /app
 
@@ -7,7 +7,8 @@ copy go.mod go.sum ./
 run go mod download
 
 copy server/ ./server/
-workdir /app/server
+
+WORKDIR /app/server/cmd/app
 
 run go build -o /main .
 

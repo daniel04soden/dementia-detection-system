@@ -1,3 +1,0 @@
-ben-murphy.dev.com {
-	reverse_proxy go_server:8080
-}
