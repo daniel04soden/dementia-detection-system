@@ -1,4 +1,4 @@
-package com.example.dementiaDetectorApp.auth
+package com.example.dementiaDetectorApp.api.auth
 
 import retrofit2.http.Body
 import retrofit2.http.GET

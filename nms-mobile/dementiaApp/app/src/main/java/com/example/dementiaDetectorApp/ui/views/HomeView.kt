@@ -49,7 +49,6 @@ import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.Gray
 import com.example.dementiaDetectorApp.ui.theme.LightPurple
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
-import com.example.dementiaDetectorApp.ui.theme.Purple40
 import com.example.dementiaDetectorApp.ui.util.standardQuadFromTo
 import com.example.dementiaDetectorApp.viewModels.HomeVM
 import com.example.dementiaDetectorApp.viewModels.SharedVM
@@ -137,7 +136,7 @@ fun TestPrompt(
             contentAlignment = Alignment.Center
         ){
             Icon(
-                painter = painterResource(R.drawable.search),
+                painter = painterResource(R.drawable.logo),
                 contentDescription = "Class Icon",
                 Modifier.size(30.dp)
             )

@@ -13,12 +13,14 @@ import com.example.dementiaDetectorApp.ui.views.HomeScreen
 import com.example.dementiaDetectorApp.ui.views.LoginScreen
 import com.example.dementiaDetectorApp.ui.views.QuestionnaireScreen
 import com.example.dementiaDetectorApp.ui.views.RegistrationScreen
-import com.example.dementiaDetectorApp.ui.views.TestScreen
+import com.example.dementiaDetectorApp.ui.views.Stage1Screen
+import com.example.dementiaDetectorApp.ui.views.Stage2Screen
 import com.example.dementiaDetectorApp.viewModels.AuthViewModel
 import com.example.dementiaDetectorApp.viewModels.HomeVM
 import com.example.dementiaDetectorApp.viewModels.QViewModel
+import com.example.dementiaDetectorApp.viewModels.Stage1VM
 import com.example.dementiaDetectorApp.viewModels.SharedVM
-import com.example.dementiaDetectorApp.viewModels.TestViewModel
+import com.example.dementiaDetectorApp.viewModels.Stage2VM
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -37,14 +39,16 @@ class LaunchPoint : ComponentActivity() {
                 val homeVM: HomeVM = viewModel()
                 val authVM: AuthViewModel = viewModel()
                 val qVM : QViewModel = viewModel()
-                val tVM:  TestViewModel = viewModel()
+                val t1VM:  Stage1VM = viewModel()
+                val t2VM: Stage2VM = viewModel()
 
                 NavHost(navController = nc, startDestination = "login") {
                     composable("login"){LoginScreen(authVM,sharedVM, nc)}
-                    composable("registration"){RegistrationScreen(nc, authVM)}
+                    composable("registration"){ RegistrationScreen(authVM,nc) }
                     composable("home"){ HomeScreen(homeVM, sharedVM, nc) }
-                    composable("questionnaire"){QuestionnaireScreen(nc, qVM)}
-                    composable("test"){ TestScreen(nc, tVM)}
+                    composable("questionnaire"){QuestionnaireScreen(qVM, nc)}
+                    composable("test1"){ Stage1Screen(t1VM, nc)}
+                    composable("test2"){ Stage2Screen(t2VM, nc)}
                 }
             }
         }

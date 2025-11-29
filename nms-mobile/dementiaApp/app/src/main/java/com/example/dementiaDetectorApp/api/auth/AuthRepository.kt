@@ -1,4 +1,4 @@
-package com.example.dementiaDetectorApp.auth
+package com.example.dementiaDetectorApp.api.auth
 
 import com.example.dementiaDetectorApp.models.Account
 

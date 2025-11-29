@@ -1,4 +1,4 @@
-package com.example.dementiaDetectorApp.auth
+package com.example.dementiaDetectorApp.api.auth
 
 data class SignUpRequest(
     val email: String,
