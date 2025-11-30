@@ -374,6 +374,10 @@ class QViewModel @Inject constructor(
                     cumulativePrimary = _cumulativePrimary.value,
                     cumulativeSecondary = _cumulativeSecondary.value,
                     cumulativeDegree = _cumulativeDegree.value,
+                    diabetic = _diabetic.value,
+                    alcoholLevel = alcoholLevel.value,
+                    bloodPressure = bloodPressure.value,
+                    hearingLoss = hearingLoss.value,
                 )
             )
 
