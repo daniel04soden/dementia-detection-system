@@ -27,10 +27,12 @@ class QViewModel @Inject constructor(
     var isLoading = false
         private set
 
+    // Preface
     private val _prefaceVisi = MutableStateFlow(true)
     val prefaceVisi: StateFlow<Boolean> = _prefaceVisi
     fun onVisiChange(newVisi: Boolean){_prefaceVisi.value = newVisi}
 
+    // ---------------------- S1: General Questions ----------------------
     private val _s1visi = MutableStateFlow(false)
     val s1visi: StateFlow<Boolean> = _s1visi
     fun onS1Change(newVisi: Boolean){_s1visi.value = newVisi}
@@ -59,7 +61,7 @@ class QViewModel @Inject constructor(
         }
         else if (newEdu == "Secondary Level"){
             onPrimaryChange(true)
-            onSecondaryChange(false)
+            onSecondaryChange(true)
             onDegreeChange(false)
         }
         else if (newEdu == "Tertiary Level"){
@@ -82,6 +84,10 @@ class QViewModel @Inject constructor(
 
     private val _cumulativeDegree = MutableStateFlow("")
     private fun onDegreeChange(change:Boolean){_cumulativeDegree.value = change.toString().uppercase()}
+
+    private val _familyHistory = MutableStateFlow(-1)
+    val familyHistory: StateFlow<Int> = _familyHistory
+    fun onFamilyHistoryChange(v: Int) { _familyHistory.value = v }
 
     val eduOptions = listOf("Primary Level", "Secondary Level", "Tertiary Level")
 
@@ -113,15 +119,24 @@ class QViewModel @Inject constructor(
             questionDescription = "What is your highest level of education",
             answers = eduOptions
         ),
+        SurveyModel(
+            questionType = QuestionType.SINGLE_CHOICE,
+            questionId = "familyHistory",
+            questionTitle = "5) Family History",
+            questionDescription = "Does your family have a history of dementia?",
+            answers = listOf("Yes", "No")
+        )
     )
 
     fun isS1Complete(): Boolean {
         return gender.value != -1 &&
                 age.value > 0 &&
                 dominantHand.value != -1 &&
-                education.value.isNotEmpty()
+                education.value.isNotEmpty() &&
+                familyHistory.value != -1
     }
 
+    // ---------------------- S2: Medical / Measurements ----------------------
     private val _s2visi = MutableStateFlow(false)
     val s2visi: StateFlow<Boolean> = _s2visi
     fun onS2Change(newVisi: Boolean){_s2visi.value = newVisi}
@@ -146,10 +161,6 @@ class QViewModel @Inject constructor(
     val apoeE4: StateFlow<Int> = _apoeE4
     fun onApoeE4Change(v: Int) { _apoeE4.value = v }
 
-    private val _familyHistory = MutableStateFlow(-1)
-    val familyHistory: StateFlow<Int> = _familyHistory
-    fun onFamilyHistoryChange(v: Int) { _familyHistory.value = v }
-
     private val _diabetic = MutableStateFlow(-1)
     val diabetic: StateFlow<Int> = _diabetic
     fun onDiabeticChange(value: Int) { _diabetic.value = value }
@@ -166,76 +177,109 @@ class QViewModel @Inject constructor(
     val hearingLoss: StateFlow<Int> = _hearingLoss
     fun onHearingLossChange(value: Int) { _hearingLoss.value = value }
 
+    private val _mriDelay = MutableStateFlow(-1.0f)
+    val mriDelay: StateFlow<Float> = _mriDelay
+    fun onMRIDelayChange(value: Float){ _mriDelay.value = value }
+
+    private val _cognitiveTestScores = MutableStateFlow(-1)
+    val cognitiveTestScores: StateFlow<Int> = _cognitiveTestScores
+    fun onCognitiveTestScoresChange(v: Int){ _cognitiveTestScores.value = v }
+
+    private val _medicationHistory = MutableStateFlow(-1)
+    val medicationHistory: StateFlow<Int> = _medicationHistory
+    fun onMedicationHistoryChange(v: Int){ _medicationHistory.value = v }
+
+    private val _chronicHealthConditions = MutableStateFlow("")
+    val chronicHealthConditions: StateFlow<String> = _chronicHealthConditions
+    fun onChronicHealthConditionsChange(v: String){ _chronicHealthConditions.value = v }
+
     val s2Survey = listOf(
-        SurveyModel(
-            questionType = QuestionType.SINGLE_CHOICE,
-            questionId = "familyHistory",
-            questionDescription = "Does your family have a history of dementia?",
-            questionTitle = "1) Family History",
-            answers = listOf("Yes", "No")
-        ),
         SurveyModel(
             questionType = QuestionType.TEXT,
             questionId = "weight",
-            questionDescription = "Enter your current body weight in Kg",
-            questionTitle = "2) Weight",
+            questionTitle = "1) Weight",
+            questionDescription = "Enter your current body weight in Kg"
         ),
         SurveyModel(
             questionType = QuestionType.TEXT,
             questionId = "bodyTemperature",
-            questionDescription = "What is your usual average temperature?",
-            questionTitle = "3) Average Temperature",
+            questionTitle = "2) Average Body Temperature",
+            questionDescription = "Enter your average body temperature"
         ),
         SurveyModel(
             questionType = QuestionType.TEXT,
             questionId = "heartRate",
-            questionDescription = "What is your average resting heart-rate?",
-            questionTitle = "4) Average Resting Heart-Rate",
+            questionTitle = "3) Resting Heart Rate",
+            questionDescription = "Enter your average resting heart rate"
         ),
         SurveyModel(
             questionType = QuestionType.TEXT,
             questionId = "bloodOxygen",
-            questionDescription = "What is your average Blood Oxygen Level?",
-            questionTitle = "5) Blood Oxygen Level",
+            questionTitle = "4) Blood Oxygen Level",
+            questionDescription = "Enter your average blood oxygen level"
         ),
         SurveyModel(
             questionType = QuestionType.SINGLE_CHOICE,
             questionId = "apoeE4",
+            questionTitle = "5) APOE Gene",
             questionDescription = "Do you possess the APOE gene?",
-            questionTitle = "6) APOE",
             answers = listOf("Yes", "No")
         ),
         SurveyModel(
             questionType = QuestionType.SINGLE_CHOICE,
             questionId = "diabetic",
+            questionTitle = "6) Diabetes",
             questionDescription = "Have you been diagnosed with diabetes?",
-            questionTitle = "7) Diabetes",
             answers = listOf("Yes", "No")
         ),
         SurveyModel(
             questionType = QuestionType.TEXT,
             questionId = "alcoholLevel",
-            questionDescription = "Enter your average weekly alcohol consumption in units",
-            questionTitle = "8) Alcohol Level",
+            questionTitle = "7) Alcohol Consumption",
+            questionDescription = "Enter your average weekly alcohol consumption in units"
         ),
         SurveyModel(
             questionType = QuestionType.TEXT,
             questionId = "bloodPressure",
-            questionDescription = "Enter your average blood pressure (systolic)",
-            questionTitle = "9) Blood Pressure",
+            questionTitle = "8) Blood Pressure",
+            questionDescription = "Enter your average blood pressure (systolic)"
         ),
         SurveyModel(
             questionType = QuestionType.SINGLE_CHOICE,
             questionId = "hearingLoss",
+            questionTitle = "9) Hearing Loss",
             questionDescription = "Have you experienced hearing loss?",
-            questionTitle = "10) Hearing Loss",
             answers = listOf("Yes", "No")
+        ),
+        SurveyModel(
+            questionType = QuestionType.TEXT,
+            questionId = "mriDelay",
+            questionTitle = "10) MRI Delay",
+            questionDescription = "Enter average delay between MRI scans (months)"
+        ),
+        SurveyModel(
+            questionType = QuestionType.TEXT,
+            questionId = "cognitiveTestScores",
+            questionTitle = "11) Cognitive Test Score",
+            questionDescription = "Enter latest cognitive test score (e.g., MMSE)"
+        ),
+        SurveyModel(
+            questionType = QuestionType.TEXT,
+            questionId = "medicationHistory",
+            questionTitle = "12) Medication History",
+            questionDescription = "Enter the number of current medications"
+        ),
+        SurveyModel(
+            questionType = QuestionType.SINGLE_CHOICE,
+            questionId = "chronicHealthConditions",
+            questionTitle = "13) Chronic Health Conditions",
+            questionDescription = "Do you have any of the following chronic health conditions",
+            answers = listOf("Hypertension", "Heart disease", "Diabetes", "N/A")
         )
     )
 
     fun isS2Complete(): Boolean {
-        return familyHistory.value != -1 &&
-                weight.value > -1f &&
+        return weight.value > -1f &&
                 bodyTemperature.value > -1f &&
                 heartRate.value > -1 &&
                 bloodOxygen.value > -1f &&
@@ -243,9 +287,14 @@ class QViewModel @Inject constructor(
                 diabetic.value != -1 &&
                 alcoholLevel.value > -1f &&
                 bloodPressure.value != -1 &&
-                hearingLoss.value != -1
+                hearingLoss.value != -1 &&
+                mriDelay.value > -1f &&
+                cognitiveTestScores.value > -1 &&
+                medicationHistory.value > -1 &&
+                chronicHealthConditions.value != ""
     }
 
+    // ---------------------- S3: Hobbies / Lifestyle ----------------------
     private val _s3visi = MutableStateFlow(false)
     val s3visi: StateFlow<Boolean> = _s3visi
     fun onS3Change(newVisi: Boolean){_s3visi.value = newVisi}
@@ -270,8 +319,13 @@ class QViewModel @Inject constructor(
     val sleepQuality: StateFlow<Int> =_sleepQuality
     fun onSleepQualityChange(v: Int) { _sleepQuality.value = v }
 
+    private val _dementiaStatus = MutableStateFlow("")
+    val dementiaStatus: StateFlow<String> = _dementiaStatus
+    fun onDementiaStatusChange(v: String){ _dementiaStatus.value = v }
+
     val activityOptions = listOf("Sedentary", "Lightly Active", "Moderately Active")
     val dietOptions = listOf("Balanced", "Low Carb", "Mediterranean")
+    val dementiaOptions = listOf("No Dementia", "Mild", "Moderate", "Severe")
 
     val s3Survey = listOf(
         SurveyModel(
@@ -309,6 +363,13 @@ class QViewModel @Inject constructor(
             questionDescription = "Choose what best describes your usual diet",
             answers = dietOptions
         ),
+        SurveyModel(
+            questionType = QuestionType.SINGLE_CHOICE,
+            questionId = "dementiaStatus",
+            questionTitle = "6) Dementia Status",
+            questionDescription = "Select your current dementia status",
+            answers = dementiaOptions
+        )
     )
 
     fun isS3Complete(): Boolean {
@@ -316,9 +377,11 @@ class QViewModel @Inject constructor(
                 sleepQuality.value != -1 &&
                 depressionStatus.value != -1 &&
                 physicalActivity.value.isNotEmpty() &&
-                nutritionDiet.value.isNotEmpty()
+                nutritionDiet.value.isNotEmpty() &&
+                dementiaStatus.value.isNotEmpty()
     }
 
+    // ---------------------- Survey Answer Handling ----------------------
     fun onSurveyAnswerChange(answers: Map<String, Set<String>>) {
         answers.forEach { (questionId, answerSet) ->
             val answer = answerSet.firstOrNull() ?: return@forEach
@@ -329,73 +392,81 @@ class QViewModel @Inject constructor(
                 "dominantHand" -> onDominantHandChange(if (answer == "Right Handed") 1 else 0)
                 "education" -> onEducationChange(answer)
                 "age" -> onAgeChange(answer.toIntOrNull() ?: 0)
-
                 "familyHistory" -> onFamilyHistoryChange(yesNoToInt)
-                "apoeE4" -> onApoeE4Change(yesNoToInt)
+
                 "weight" -> onWeightChange(answer.toFloatOrNull() ?: 0f)
                 "bodyTemperature" -> onBodyTemperatureChange(answer.toFloatOrNull() ?: 0f)
                 "heartRate" -> onHeartRateChange(answer.toIntOrNull() ?: 0)
                 "bloodOxygen" -> onBloodOxygenChange(answer.toFloatOrNull() ?: 0f)
+                "apoeE4" -> onApoeE4Change(yesNoToInt)
                 "diabetic" -> onDiabeticChange(yesNoToInt)
                 "alcoholLevel" -> onAlcoholLevelChange(answer.toFloatOrNull() ?: 0f)
                 "bloodPressure" -> onBloodPressureChange(answer.toIntOrNull() ?: 0)
                 "hearingLoss" -> onHearingLossChange(yesNoToInt)
+                "mriDelay" -> onMRIDelayChange(answer.toFloatOrNull() ?: 0f)
+                "cognitiveTestScores" -> onCognitiveTestScoresChange(answer.toIntOrNull() ?: 0)
+                "medicationHistory" -> onMedicationHistoryChange(answer.toIntOrNull() ?: 0)
+                "chronicHealthConditions" -> onChronicHealthConditionsChange(answer)
 
                 "smoked" -> onSmokedChange(yesNoToInt)
                 "sleepQuality" -> onSleepQualityChange(yesNoToInt)
                 "depressionStatus" -> onDepressionStatusChange(yesNoToInt)
                 "physicalActivity" -> onPhysicalActivityChange(answer)
                 "nutritionDiet" -> onNutritionDietChange(answer)
+                "dementiaStatus" -> onDementiaStatusChange(answer)
             }
-        }
-    }
-
-    fun submitAnswers(id: Int){
-        viewModelScope.launch {
-            isLoading = true
-
-            val result = repository.reportQuestionnaire(
-                LifestyleRequest(
-                    patientID = id,
-                    gender = _gender.value,
-                    age = _age.value,
-                    dominantHand = _dominantHand.value,
-                    weight = _weight.value,
-                    bodyTemperature = _bodyTemperature.value,
-                    heartRate = _heartRate.value,
-                    bloodOxygen = _bloodOxygen.value,
-                    familyHistory = _familyHistory.value,
-                    smoked = _smoked.value,
-                    apoeE4 = _apoeE4.value,
-                    physicalActivity = _physicalActivity.value,
-                    depressionStatus = _depressionStatus.value,
-                    nutritionDiet = _nutritionDiet.value,
-                    sleepQuality = _sleepQuality.value,
-                    cumulativePrimary = _cumulativePrimary.value,
-                    cumulativeSecondary = _cumulativeSecondary.value,
-                    cumulativeDegree = _cumulativeDegree.value,
-                    diabetic = _diabetic.value,
-                    alcoholLevel = alcoholLevel.value,
-                    bloodPressure = bloodPressure.value,
-                    hearingLoss = hearingLoss.value,
-                )
-            )
-
-            when (result) {
-                is TestResult.Success -> {
-                    onS3Change(false)
-                    onSuccessChange(true)
-                }
-                is TestResult.Unauthorized -> {}
-                is TestResult.UnknownError -> {}
-            }
-
-            resultChannel.trySend(result)
-            isLoading = false
         }
     }
 
     private val _successVisi = MutableStateFlow(false)
     val successVisi: StateFlow<Boolean> = _successVisi
     private fun onSuccessChange(newVisi: Boolean){_successVisi.value = newVisi}
+
+
+    fun submitAnswers(id: Int){
+        val request = LifestyleRequest(
+            patientID = id,
+
+            age = age.value,
+            gender = gender.value,
+            dominantHand = dominantHand.value,
+            familyHistory = familyHistory.value,
+
+            weight = weight.value,
+            bodyTemperature = bodyTemperature.value,
+            heartRate = heartRate.value,
+            bloodOxygen = bloodOxygen.value,
+            apoeE4 = apoeE4.value,
+            diabetic = diabetic.value,
+            alcoholLevel = alcoholLevel.value,
+            bloodPressure = bloodPressure.value,
+            hearingLoss = hearingLoss.value,
+            mriDelay = mriDelay.value,
+            cognitiveTestScores = cognitiveTestScores.value,
+            medicationHistory = medicationHistory.value,
+            chronicHealthConditions = chronicHealthConditions.value,
+
+            smoked = smoked.value,
+            sleepQuality = sleepQuality.value,
+            depressionStatus = depressionStatus.value,
+            physicalActivity = physicalActivity.value,
+            nutritionDiet = nutritionDiet.value,
+            dementiaStatus = dementiaStatus.value,
+
+            cumulativePrimary = _cumulativePrimary.value,
+            cumulativeSecondary = _cumulativeSecondary.value,
+            cumulativeDegree = _cumulativeDegree.value
+        )
+
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val result = repository.reportQuestionnaire(request)
+                resultChannel.send(result)
+            } catch (e: Exception) {
+                Log.e("QViewModel", "submitAnswers: ", e)
+            }
+            isLoading = false
+        }
+    }
 }

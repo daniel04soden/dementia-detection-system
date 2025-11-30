@@ -52,7 +52,7 @@ fun ContactScreen(cVM: ContactVM, sharedVM: SharedVM, nc: NavController){
             Spacer(Modifier.height(35.dp))
             HeaderSection()
             InfoSection(cVM)
-            Spacer(Modifier.height(150.dp))
+            Spacer(Modifier.height(85.dp))
             ClinicMap(cVM)
             Spacer(Modifier.height(35.dp))
         }
@@ -119,17 +119,17 @@ fun ClinicMap(cVM: ContactVM) {
     val clinic = cVM.clinic.collectAsState().value
     val context = LocalContext.current
 
-    coords.value?.let { (lat, lon) ->
-        AndroidView(factory = { ctx ->
-            Configuration.getInstance().load(ctx, ctx.getSharedPreferences("osmdroid", 0))
-            MapView(ctx).apply {
-                setTileSource(TileSourceFactory.MAPNIK)
-                setMultiTouchControls(true)
-                controller.setZoom(16.0)
-                controller.setCenter(GeoPoint(lat, lon))
+    coords.value?.let { (lat, lon) -> //If coordinates are available (not null)
+        AndroidView(factory = { ctx -> //Use traditional AndroidView to embed an AndroidMapView
+            Configuration.getInstance().load(ctx, ctx.getSharedPreferences("osmdroid", 0)) //Load osmdroid config
+            MapView(ctx).apply { //The map is created
+                setTileSource(TileSourceFactory.MAPNIK) //Use OpenStreetMap standard tiles
+                setMultiTouchControls(true) //Allow for pinch zoom and etc
+                controller.setZoom(16.0) //Default zoom
+                controller.setCenter(GeoPoint(lat, lon)) //Centre on the clinic's coordinates
 
                 val marker = Marker(this)
-                marker.position = GeoPoint(lat, lon)
+                marker.position = GeoPoint(lat, lon) //Add marker above clinic
                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                 marker.title = clinic.name
                 overlays.add(marker)
@@ -141,7 +141,7 @@ fun ClinicMap(cVM: ContactVM) {
                 .padding(horizontal = 16.dp)
         )
     } ?: Text(
-        text = "Map loading...",
+        text = "Map loading...", //Fallback if waiting for response
         modifier = Modifier.padding(16.dp),
         color = DarkPurple
     )
