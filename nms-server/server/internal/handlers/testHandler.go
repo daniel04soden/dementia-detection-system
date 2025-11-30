@@ -190,13 +190,29 @@ func HandleInsertStageOne(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tx, err := db.Begin()
-	//
+	if err != nil {
+		http.Error(w, "Failed to start transaction: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p)
+		}
+	}()
+
 	var DoctorID int
 	err = db.QueryRow(`
         SELECT DoctorID
 		FROM Patient
 		WHERE PatientID = $1
     `, req.PatientID).Scan(&DoctorID)
+
+	if err != nil {
+		tx.Rollback()
+		http.Error(w, "Could not find doctor for patient: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	// 1. Create Test row
 	var testID int
@@ -206,13 +222,13 @@ func HandleInsertStageOne(w http.ResponseWriter, r *http.Request) {
     `, 1, req.PatientID, DoctorID).Scan(&testID)
 
 	if err != nil {
+		tx.Rollback()
 		http.Error(w, "Could not create test: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// 2. Grade clock
-	var clockNumberRes bool
-	var clockHandsRes bool
+	// Grade clock (your existing grading logic here)
+	var clockNumberRes, clockHandsRes bool
 
 	switch req.ClockID {
 	case 1:
@@ -224,19 +240,13 @@ func HandleInsertStageOne(w http.ResponseWriter, r *http.Request) {
 	case 3:
 		clockNumberRes = true
 		clockHandsRes = true
-	case 4:
-		clockNumberRes = false
-		clockHandsRes = false
-	case 5:
+	case 4, 5:
 		clockNumberRes = false
 		clockHandsRes = false
 	case 6:
 		clockNumberRes = false
 		clockHandsRes = true
-	case 7:
-		clockNumberRes = true
-		clockHandsRes = false
-	case 8:
+	case 7, 8:
 		clockNumberRes = true
 		clockHandsRes = false
 	default:
@@ -244,7 +254,7 @@ func HandleInsertStageOne(w http.ResponseWriter, r *http.Request) {
 		clockHandsRes = false
 	}
 
-	// 2. Grade recall
+	// Grade recall (your existing recall grading logic here)
 	expectedRecall := struct {
 		Name    string
 		Surname string
@@ -276,52 +286,36 @@ func HandleInsertStageOne(w http.ResponseWriter, r *http.Request) {
 		recallRes--
 	}
 
-	// 3. Grade date question
+	// Grade date question
 	dateQuestionRes := 0
 	currentDate := time.Now().Format("02/01/2006")
 	if req.DateQuestion == currentDate {
 		dateQuestionRes = 1
 	}
 
-	// 4. Insert into TestStageOne — store only recallRes, not full recall
+	// Insert into TestStageOne table
 	_, err = tx.Exec(`
-    INSERT INTO TestStageOne (
-        testid, testdate, clockID, datequestion, news, recallName, recallSurname, recallNumber, recallStreet, recallCity,
-		clockNumberRes, clockHandsRes, dateQuestionRes, newsRes, recallRes
-    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
-	`,
-		testID,           // $1
-		currentDate,      // $2
-		req.ClockID,      // $3
-		req.DateQuestion, // $4 → clocknumberres
-		req.News,
-		req.RecallName,
-		req.RecallSurname,
-		req.RecallNumber,
-		req.RecallStreet,
-		req.RecallCity,
-		clockNumberRes,
-		clockHandsRes,
-		dateQuestionRes,
-		false,
-		recallRes,
-	)
+		INSERT INTO TestStageOne 
+		(testID, clockNumberRes, clockHandsRes, dateQuestionRes, news, recallName, recallSurname, recallNumber, recallStreet, recallCity, recallRes)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+	`, testID, clockNumberRes, clockHandsRes, dateQuestionRes, req.News,
+		req.RecallName, req.RecallSurname, req.RecallNumber, req.RecallStreet, req.RecallCity, recallRes)
 
-	if err := tx.Commit(); err != nil {
-		http.Error(w, "Failed to commit transaction", http.StatusInternalServerError)
+	if err != nil {
+		tx.Rollback()
+		http.Error(w, "Could not insert TestStageOne: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if err != nil {
-		http.Error(w, "Could not create stage one: "+err.Error(), http.StatusInternalServerError)
+	// Commit transaction
+	if err := tx.Commit(); err != nil {
+		http.Error(w, "Failed to commit transaction: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	json.NewEncoder(w).Encode(map[string]any{
-		"message":   "Stage One Created",
-		"testID":    testID,
-		"recallRes": recallRes,
-		"dateScore": dateQuestionRes,
+		"message": "Stage One inserted",
+		"testID":  testID,
 	})
 }
 
@@ -338,13 +332,24 @@ type TestStageTwoInsert struct {
 func HandleInsertStageTwo(w http.ResponseWriter, r *http.Request) {
 	var req TestStageTwoInsert
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid JSON", 400)
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 
+	tx, err := db.Begin()
+	if err != nil {
+		http.Error(w, "Failed to start transaction: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p)
+		}
+	}()
+
 	// Identify the correct test automatically
 	var testID int
-	tx, err := db.Begin()
 	err = tx.QueryRow(`
         SELECT testID
         FROM Test
@@ -352,7 +357,8 @@ func HandleInsertStageTwo(w http.ResponseWriter, r *http.Request) {
     `, req.PatientID).Scan(&testID)
 
 	if err != nil {
-		http.Error(w, "No active test found for Stage Two", 404)
+		tx.Rollback()
+		http.Error(w, "No active test found for Stage Two", http.StatusNotFound)
 		return
 	}
 
@@ -367,7 +373,8 @@ func HandleInsertStageTwo(w http.ResponseWriter, r *http.Request) {
 		testID)
 
 	if err != nil {
-		http.Error(w, "DB error: "+err.Error(), 500)
+		tx.Rollback()
+		http.Error(w, "DB error: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -376,6 +383,12 @@ func HandleInsertStageTwo(w http.ResponseWriter, r *http.Request) {
         UPDATE Test SET stageTwoStatus=$1
         WHERE testID=$2
     `, 1, testID)
+
+	if err != nil {
+		tx.Rollback()
+		http.Error(w, "DB error: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	if err := tx.Commit(); err != nil {
 		http.Error(w, "Failed to commit transaction", http.StatusInternalServerError)
