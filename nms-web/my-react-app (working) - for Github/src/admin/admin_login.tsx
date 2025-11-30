@@ -1,44 +1,42 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
-import styles from "./pop.module.css";
+import styles from "../popups/pop.module.css";
 
-const LoginPopUp: React.FC = () => {
+const AdminLogin: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const form = e.target as HTMLFormElement;
-    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
-    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
+  const form = e.target as HTMLFormElement;
+  const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+  const password = (form.elements.namedItem("password") as HTMLInputElement).value;
 
-    try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
+  try {
+    const response = await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ email, password }),
+    });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Logged in:", data);
-        navigate("/dashboard");
-      } else {
-        const txt = await response.text();
-        alert(txt);
-      }
-    } catch (error) {
-      console.error("Login failed:", error);
-      alert("Network error");
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Logged in:", data);
     }
-  };
+  } catch (error) {
+    console.error("Login failed:", error);
+    alert("Network error");
+  }
+  navigate("/admin/dashboard")
+};
+
 
   const handleSignUp = () => {
-    navigate("/signup");
+    navigate("/admin/signup"); // Navigate to the admin sign-up page
   };
 
   return (
@@ -71,4 +69,4 @@ const LoginPopUp: React.FC = () => {
   );
 };
 
-export default LoginPopUp;
+export default AdminLogin;

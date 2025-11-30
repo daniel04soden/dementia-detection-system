@@ -1,43 +1,16 @@
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from '../assets/logo.png';
-import styles from './pop.module.css';
+import styles from "../popups/pop.module.css";
 
-// TypeScript interface for Clinic
-export interface Clinic {
-  clinicID: number;
-  name: string;
-  phone: string;
-  eircode: string;
-}
-
-const SignUpPopUp: React.FC = () => {
+const AdminSignUp: React.FC = () => {
   const navigate = useNavigate();
 
-  const [clinics, setClinics] = useState<Clinic[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const goToLogin = () => {
-    navigate("/login");
+    navigate("/admin/login");
   };
-
-  useEffect(() => {
-    // Fetch clinics on component mount
-    fetch("/api/fetchallclinics")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch clinics");
-        return res.json();
-      })
-      .then((data: Clinic[]) => {
-        setClinics(data);
-        setLoading(false);
-      })
-      .catch((err: Error) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
 
   const handleSignUp = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,11 +19,11 @@ const SignUpPopUp: React.FC = () => {
     const formData = new FormData(form);
     const formJson: Record<string, any> = Object.fromEntries(formData.entries());
 
-    // Ensure clinicID is a number
-    formJson.clinicID = Number(formJson.clinicID);
+    // Set the user as an admin
+    formJson.isAdmin = true;
 
     try {
-      const response = await fetch("/api/web/signup", {
+      const response = await fetch("/api/web/admin/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formJson),
@@ -58,13 +31,15 @@ const SignUpPopUp: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("User created:", data);
-        goToLogin();
+        console.log("Admin created:", data);
+        goToLogin(); // Redirect to login page after successful sign-up
       } else {
-        console.error("Error:", await response.text());
+        const errorText = await response.text();
+        setError(errorText);
       }
     } catch (err) {
       console.error("Request failed:", err);
+      setError("Network error");
     }
   };
 
@@ -82,10 +57,6 @@ const SignUpPopUp: React.FC = () => {
             <input type="tel" name="phone" placeholder="Phone Number" className={styles.inputField} required />
           </label>
           <label className={styles.inputLabel}>
-            Doctor Number:
-            <input type="text" name="doctorNO" placeholder="Doctor Number" className={styles.inputField} required />
-          </label>
-          <label className={styles.inputLabel}>
             First Name:
             <input type="text" name="firstName" placeholder="First Name" className={styles.inputField} />
           </label>
@@ -95,32 +66,21 @@ const SignUpPopUp: React.FC = () => {
           </label>
           <label className={styles.inputLabel}>
             Password:
-            <input type="password" name="password" placeholder="Password" className={styles.inputField} />
+            <input type="password" name="password" placeholder="Password" className={styles.inputField} required />
           </label>
           <label className={styles.inputLabel}>
             Confirm Password:
-            <input type="password" placeholder="Confirm Password" className={styles.inputField} />
+            <input type="password" name="confirmPassword" placeholder="Confirm Password" className={styles.inputField} required />
           </label>
 
-          <label className={styles.inputLabel}>
-            Primary Clinic:
-            {loading ? (
-              <p>Loading clinics...</p>
-            ) : error ? (
-              <p>Error: {error}</p>
-            ) : (
-              <select id={styles.bottomField} name="clinicID" className={styles.inputField}>
-                {clinics.map((clinic) => (
-                  <option key={clinic.clinicID} value={clinic.clinicID}>
-                    {clinic.name}
-                  </option>
-                ))}
-              </select>
-            )}
-          </label>
+          {/* Hidden input to mark the user as admin */}
+          <input type="hidden" name="isAdmin" value="true" />
 
           <button type="submit" className={styles.accountBtn}>Sign up</button>
-          <p className={styles.accountText}>Have an account?</p>
+
+          {error && <p className={styles.error}>{error}</p>}
+
+          <p className={styles.accountText}>Already have an account?</p>
           <button type="button" className={styles.accountBtn} onClick={goToLogin}>Login</button>
         </form>
       </div>
@@ -128,4 +88,4 @@ const SignUpPopUp: React.FC = () => {
   );
 };
 
-export default SignUpPopUp;
+export default AdminSignUp;

@@ -2,6 +2,7 @@ import React, { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../dashboard/header/Header";
 import styles from './stage.module.css';
+import { withAuth } from "../../utils/withAuth";
 
 const Stage1: React.FC = () => {
   const navigate = useNavigate();
@@ -47,14 +48,13 @@ const Stage1: React.FC = () => {
             <Header/>
         <div className="main-content">
         <form method="post" onSubmit={handleSubmit}>
+            <p className={styles.inputLabel}>Choose Patient:</p>
+            <select id={styles.bottomField} name="patient" className={styles.inputField} value="patient">
+            <option value="John Doe">John Doe</option>
+            <option value="Adam Apple">Adam Apple</option>
+            </select>
+                
             <table className={styles.table}>
-                <label className={styles.inputLabel}>
-                    Choose Patient:
-                    <select id={styles.bottomField} name="patient" className={styles.inputField} value="patient">
-                    <option value="John Doe">John Doe</option>
-                    <option value="Adam Apple">Adam Apple</option>
-                    </select>
-                </label>
                 <thead><tr>
                 <th>Question</th>
                 <th>Passed</th>
@@ -129,4 +129,4 @@ const Stage1: React.FC = () => {
     );
 };
 
-export default Stage1;
+export default withAuth(Stage1, ["doctor", "admin"]);
