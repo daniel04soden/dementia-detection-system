@@ -105,7 +105,7 @@ func HandleGetDoctorTests(w http.ResponseWriter, r *http.Request) {
 	}
 
 	query := `
-        SELECT t.testID, t.patientID, u.firstName, u.lastName, t.stageOneStatus, t.stageTwoStatus, tso.testDate,
+        SELECT t.testID, t.patientID, u.firstName, u.lastName, t.stageOneStatus, t.stageTwoStatus, tso.testDate
         FROM Test t
         JOIN Patient p ON t.patientID = p.patientID
         JOIN Users u ON p.patientID = u.userID
@@ -126,22 +126,20 @@ func HandleGetDoctorTests(w http.ResponseWriter, r *http.Request) {
 		var t TestOverview
 		var firstName, lastName sql.NullString
 		var testDate sql.NullString
-		var result sql.NullString
 
 		if err := rows.Scan(
 			&t.TestID,
 			&t.PatientID,
 			&firstName,
 			&lastName,
-			&testDate,
 			&t.StageOneStatus,
-			&result,
 			&t.StageTwoStatus,
+			&testDate,
 		); err != nil {
+			log.Println("[DEBUG] rows.Scan error:", err)
 			continue
 		}
 
-		// Combine firstName + lastName safely
 		t.PatientName = ""
 		if firstName.Valid {
 			t.PatientName += firstName.String
