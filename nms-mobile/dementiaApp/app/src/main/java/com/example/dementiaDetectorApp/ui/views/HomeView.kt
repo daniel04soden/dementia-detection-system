@@ -75,7 +75,7 @@ fun HomeScreen(homeVM: HomeVM, sharedVM: SharedVM, nc: NavController){
 }
 
 @Composable
-fun Header(homeVM: HomeVM){
+private fun Header(homeVM: HomeVM){
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(15.dp),
@@ -96,7 +96,7 @@ fun Header(homeVM: HomeVM){
 }
 
 @Composable
-fun HeaderPrompts(
+private fun HeaderPrompts(
     sharedVM: SharedVM,
     nc: NavController
 ){
@@ -115,7 +115,7 @@ fun HeaderPrompts(
 }
 
 @Composable
-fun NewsSection(homeVM: HomeVM){
+private fun NewsSection(homeVM: HomeVM){
     val news = homeVM.news.value
     Column(modifier = Modifier.fillMaxWidth())
     {
@@ -139,7 +139,7 @@ fun NewsSection(homeVM: HomeVM){
 }
 
 @Composable
-fun NewsBox(
+private fun NewsBox(
     news: NewsPiece
 ){
     val ctx = LocalContext.current

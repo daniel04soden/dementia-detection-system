@@ -34,7 +34,7 @@ class SharedVM: ViewModel(){
             NavBarContent(
                 title = "Test Status",
                 iconId = 0,
-                "home"
+                "status"
             ),
 
             NavBarContent(
@@ -46,7 +46,7 @@ class SharedVM: ViewModel(){
             NavBarContent(
                 title = "Contact",
                 iconId = 0,
-                "home"
+                "contact"
             )
         )
         return testNav
