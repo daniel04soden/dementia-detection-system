@@ -11,11 +11,13 @@ load_dotenv()
 
 # Access the environment variable
 deep_api_key = os.getenv("DEEPSEEK_API_KEY")
+ollama_base_url = "http://localhost:11434"
 
 # Defining deepseek LLM 
 my_ai = LLM(
-     model="deepseek/deepseek-chat",
-     api_key=os.getenv("DEEPSEEK_API_KEY"),
+    model="ollama/llama3:8b",
+    base_url=ollama_base_url,
+     # api_key=os.getenv("DEEPSEEK_API_KEY"),
      temperature=0.6
  )
 

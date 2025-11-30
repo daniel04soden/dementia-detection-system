@@ -9,7 +9,7 @@ def read_ai_articles(file_name:str):
     for i,snippet in enumerate(my_snippets):
         json_data = json.loads(snippet.content)
         json_str = json.dumps(json_data,indent=4)
-        with open(f"article_{i+1}.json","w") as new_json:
+        with open(f"../openAISpeech/data/article_{i+1}.json","w") as new_json:
             new_json.write(json_str)
 
 
