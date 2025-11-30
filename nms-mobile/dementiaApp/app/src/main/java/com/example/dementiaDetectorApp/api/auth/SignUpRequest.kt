@@ -7,5 +7,5 @@ data class SignUpRequest(
     val lastName: String,
     val phone: String,
     val eircode: String,
-    val clinicID: Int = 1
+    val clinicID: Int
 )

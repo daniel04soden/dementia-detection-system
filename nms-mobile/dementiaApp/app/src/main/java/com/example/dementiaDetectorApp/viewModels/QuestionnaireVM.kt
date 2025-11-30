@@ -3,6 +3,7 @@ package com.example.dementiaDetectorApp.viewModels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.dementiaDetectorApp.api.tests.LifestyleRequest
 import com.example.dementiaDetectorApp.api.tests.TestRepository
 import com.example.dementiaDetectorApp.api.tests.TestResult
 import com.zekierciyas.library.model.QuestionType
@@ -26,73 +27,90 @@ class QViewModel @Inject constructor(
     var isLoading = false
         private set
 
-    //Preface visibility
     private val _prefaceVisi = MutableStateFlow(true)
     val prefaceVisi: StateFlow<Boolean> = _prefaceVisi
     fun onVisiChange(newVisi: Boolean){_prefaceVisi.value = newVisi}
 
-    //Section 1
     private val _s1visi = MutableStateFlow(false)
     val s1visi: StateFlow<Boolean> = _s1visi
     fun onS1Change(newVisi: Boolean){_s1visi.value = newVisi}
 
-    private val _gender = MutableStateFlow(-1) //0 = Female 1 = Male
+    private val _gender = MutableStateFlow(-1)
     val gender: StateFlow<Int> = _gender
-    val genderOptions = listOf("Male", "Female")
     private fun onGenderChange(newGender: Int){_gender.value=newGender}
 
     private val _age = MutableStateFlow(0)
     val age: StateFlow<Int> = _age
     private fun onAgeChange(newAge: Int) { _age.value = newAge }
 
-    private val _dHand = MutableStateFlow(-1) // Left = 0 Right = 1
-    val dHand: StateFlow<Int> = _dHand
-    val dHandOptions= listOf("Left Handed", "Right Handed")
-    private fun onDHandChange(newDHand: Int) { _dHand.value = newDHand }
+    private val _dominantHand = MutableStateFlow(-1)
+    val dominantHand: StateFlow<Int> = _dominantHand
+    private fun onDominantHandChange(newValue: Int) { _dominantHand.value = newValue }
 
-    private val _edu = MutableStateFlow("")
-    val edu: StateFlow<String> = _edu
-    private fun onEduChange(newEdu: String) { _edu.value = newEdu }
-    val eduOptions = listOf(
-        "No formal education", "Some primary education", "Completed primary education",
-        "Some secondary education", "Completed secondary education", "Some college/university",
-        "Associate degree", "Bachelor's degree", "Some postgraduate education",
-        "Master's degree", "Professional degree", "Doctorate"
-    )
+    private val _education = MutableStateFlow("")
+    val education: StateFlow<String> = _education
+    private fun onEducationChange(newEdu: String)
+    {
+        _education.value = newEdu
+        if (newEdu == "Primary Level"){
+            onPrimaryChange(true)
+            onSecondaryChange(false)
+            onDegreeChange(false)
+        }
+        else if (newEdu == "Secondary Level"){
+            onPrimaryChange(true)
+            onSecondaryChange(false)
+            onDegreeChange(false)
+        }
+        else if (newEdu == "Tertiary Level"){
+            onPrimaryChange(true)
+            onSecondaryChange(true)
+            onDegreeChange(true)
+        }
+        else{
+            onPrimaryChange(false)
+            onSecondaryChange(false)
+            onDegreeChange(false)
+        }
+    }
+
+    private val _cumulativePrimary = MutableStateFlow("")
+    private fun onPrimaryChange(change:Boolean){_cumulativePrimary.value = change.toString().uppercase()}
+
+    private val _cumulativeSecondary = MutableStateFlow("")
+    private fun onSecondaryChange(change:Boolean){_cumulativeSecondary.value = change.toString().uppercase()}
+
+    private val _cumulativeDegree = MutableStateFlow("")
+    private fun onDegreeChange(change:Boolean){_cumulativeDegree.value = change.toString().uppercase()}
+
+    val eduOptions = listOf("Primary Level", "Secondary Level", "Tertiary Level")
 
     val s1Survey = listOf(
-        //Gender
         SurveyModel(
             questionType = QuestionType.SINGLE_CHOICE,
             questionId = "gender",
             questionTitle = "1) Gender",
-            answers = genderOptions,
+            answers = listOf("Female", "Male"),
             questionDescription = "Select your gender"
         ),
-
-        //Age
         SurveyModel(
             questionType = QuestionType.TEXT,
             questionId = "age",
             questionTitle = "2) Age",
             questionDescription = "Enter your age"
         ),
-
-        //Dominant Hand
         SurveyModel(
             questionType = QuestionType.SINGLE_CHOICE,
-            questionId = "dHand",
+            questionId = "dominantHand",
             questionTitle = "3) Dominant Hand",
             questionDescription = "Select whether you are left or right handed",
-            answers = dHandOptions
+            answers = listOf("Left Handed", "Right Handed")
         ),
-
-        //Education Level
         SurveyModel(
             questionType = QuestionType.SINGLE_CHOICE,
-            questionId = "edu",
+            questionId = "education",
             questionTitle = "4) Education Level",
-            questionDescription = "Classify your level of education",
+            questionDescription = "What is your highest level of education",
             answers = eduOptions
         ),
     )
@@ -100,11 +118,10 @@ class QViewModel @Inject constructor(
     fun isS1Complete(): Boolean {
         return gender.value != -1 &&
                 age.value > 0 &&
-                dHand.value != -1 &&
-                edu.value.isNotEmpty()
+                dominantHand.value != -1 &&
+                education.value.isNotEmpty()
     }
 
-    //Section 2
     private val _s2visi = MutableStateFlow(false)
     val s2visi: StateFlow<Boolean> = _s2visi
     fun onS2Change(newVisi: Boolean){_s2visi.value = newVisi}
@@ -113,137 +130,181 @@ class QViewModel @Inject constructor(
     val weight: StateFlow<Float> = _weight
     fun onWeightChange(newWeight: Float){_weight.value = newWeight}
 
-    private val _avgTemp = MutableStateFlow(-1.0F)
-    val avgTemp: StateFlow<Float> = _avgTemp
-    fun onAvgTempChange(newAvgTemp: Float) { _avgTemp.value = newAvgTemp }
+    private val _bodyTemperature = MutableStateFlow(-1.0F)
+    val bodyTemperature: StateFlow<Float> = _bodyTemperature
+    fun onBodyTemperatureChange(v: Float) { _bodyTemperature.value = v }
 
-    private val _restingHR = MutableStateFlow(-1)
-    val restingHR: MutableStateFlow<Int> = _restingHR
-    fun onRestingHRChange(newHR: Int) { _restingHR.value = newHR }
+    private val _heartRate = MutableStateFlow(-1)
+    val heartRate: MutableStateFlow<Int> = _heartRate
+    fun onHeartRateChange(v: Int) { _heartRate.value = v }
 
-    private val _oxLv = MutableStateFlow(-1)
-    val oxLv: StateFlow<Int> = _oxLv
-    fun onOxLvChange(newOxLv: Int) { _oxLv.value = newOxLv }
+    private val _bloodOxygen = MutableStateFlow(-1.0F)
+    val bloodOxygen: StateFlow<Float> = _bloodOxygen
+    fun onBloodOxygenChange(v: Float) { _bloodOxygen.value = v }
 
-    private val _apoe = MutableStateFlow(false)
-    val apoe: StateFlow<Boolean> = _apoe
-    fun onApoeChange(hasApoe: Boolean) { _apoe.value = hasApoe }
+    private val _apoeE4 = MutableStateFlow(-1)
+    val apoeE4: StateFlow<Int> = _apoeE4
+    fun onApoeE4Change(v: Int) { _apoeE4.value = v }
 
-    private val _history = MutableStateFlow(false)
-    val history: StateFlow<Boolean> = _history
-    fun onHistoryChange(hasHistory: Boolean) { _history.value = hasHistory }
+    private val _familyHistory = MutableStateFlow(-1)
+    val familyHistory: StateFlow<Int> = _familyHistory
+    fun onFamilyHistoryChange(v: Int) { _familyHistory.value = v }
+
+    private val _diabetic = MutableStateFlow(-1)
+    val diabetic: StateFlow<Int> = _diabetic
+    fun onDiabeticChange(value: Int) { _diabetic.value = value }
+
+    private val _alcoholLevel = MutableStateFlow(-1.0f)
+    val alcoholLevel: StateFlow<Float> = _alcoholLevel
+    fun onAlcoholLevelChange(value: Float) { _alcoholLevel.value = value }
+
+    private val _bloodPressure = MutableStateFlow(-1)
+    val bloodPressure: StateFlow<Int> = _bloodPressure
+    fun onBloodPressureChange(value: Int) { _bloodPressure.value = value }
+
+    private val _hearingLoss = MutableStateFlow(-1)
+    val hearingLoss: StateFlow<Int> = _hearingLoss
+    fun onHearingLossChange(value: Int) { _hearingLoss.value = value }
 
     val s2Survey = listOf(
         SurveyModel(
             questionType = QuestionType.SINGLE_CHOICE,
-            questionId = "history",
-            questionDescription = "Does your family have a history of getting dementia",
-            questionTitle = "1) History",
+            questionId = "familyHistory",
+            questionDescription = "Does your family have a history of dementia?",
+            questionTitle = "1) Family History",
             answers = listOf("Yes", "No")
         ),
         SurveyModel(
             questionType = QuestionType.TEXT,
             questionId = "weight",
-            questionDescription = "Enter you current body weight in Kg",
+            questionDescription = "Enter your current body weight in Kg",
             questionTitle = "2) Weight",
         ),
         SurveyModel(
             questionType = QuestionType.TEXT,
-            questionId = "avgTemp",
-            questionDescription = "What is your usual average temperature",
+            questionId = "bodyTemperature",
+            questionDescription = "What is your usual average temperature?",
             questionTitle = "3) Average Temperature",
         ),
         SurveyModel(
             questionType = QuestionType.TEXT,
-            questionId = "hr",
-            questionDescription = "What is your average resting heart-rate",
+            questionId = "heartRate",
+            questionDescription = "What is your average resting heart-rate?",
             questionTitle = "4) Average Resting Heart-Rate",
         ),
         SurveyModel(
             questionType = QuestionType.TEXT,
-            questionId = "oxLv",
-            questionDescription = "What is your average Blood Oxygen Level",
+            questionId = "bloodOxygen",
+            questionDescription = "What is your average Blood Oxygen Level?",
             questionTitle = "5) Blood Oxygen Level",
         ),
         SurveyModel(
             questionType = QuestionType.SINGLE_CHOICE,
-            questionId = "apoe",
-            questionDescription = "Do you possess the APOE gene",
+            questionId = "apoeE4",
+            questionDescription = "Do you possess the APOE gene?",
             questionTitle = "6) APOE",
+            answers = listOf("Yes", "No")
+        ),
+        SurveyModel(
+            questionType = QuestionType.SINGLE_CHOICE,
+            questionId = "diabetic",
+            questionDescription = "Have you been diagnosed with diabetes?",
+            questionTitle = "7) Diabetes",
+            answers = listOf("Yes", "No")
+        ),
+        SurveyModel(
+            questionType = QuestionType.TEXT,
+            questionId = "alcoholLevel",
+            questionDescription = "Enter your average weekly alcohol consumption in units",
+            questionTitle = "8) Alcohol Level",
+        ),
+        SurveyModel(
+            questionType = QuestionType.TEXT,
+            questionId = "bloodPressure",
+            questionDescription = "Enter your average blood pressure (systolic)",
+            questionTitle = "9) Blood Pressure",
+        ),
+        SurveyModel(
+            questionType = QuestionType.SINGLE_CHOICE,
+            questionId = "hearingLoss",
+            questionDescription = "Have you experienced hearing loss?",
+            questionTitle = "10) Hearing Loss",
             answers = listOf("Yes", "No")
         )
     )
 
     fun isS2Complete(): Boolean {
-        return history.value != null &&
+        return familyHistory.value != -1 &&
                 weight.value > -1f &&
-                avgTemp.value > -1f &&
-                restingHR.value > -1 &&
-                oxLv.value > -1 &&
-                apoe.value != null
+                bodyTemperature.value > -1f &&
+                heartRate.value > -1 &&
+                bloodOxygen.value > -1f &&
+                apoeE4.value != -1 &&
+                diabetic.value != -1 &&
+                alcoholLevel.value > -1f &&
+                bloodPressure.value != -1 &&
+                hearingLoss.value != -1
     }
 
-    //Section 3
     private val _s3visi = MutableStateFlow(false)
     val s3visi: StateFlow<Boolean> = _s3visi
     fun onS3Change(newVisi: Boolean){_s3visi.value = newVisi}
 
-    private val _smoke = MutableStateFlow(false)
-    val smoke: MutableStateFlow<Boolean> = _smoke
-    fun onSmokeChange(isSmoker: Boolean) { _smoke.value = isSmoker }
+    private val _smoked = MutableStateFlow(-1)
+    val smoked: MutableStateFlow<Int> = _smoked
+    fun onSmokedChange(v: Int) { _smoked.value = v }
 
-    private val _activityLv = MutableStateFlow("")
-    val activityLv: StateFlow<String> = _activityLv
-    fun onActivityLvChange(newActivityLv: String) { _activityLv.value = newActivityLv }
+    private val _physicalActivity = MutableStateFlow("")
+    val physicalActivity: StateFlow<String> = _physicalActivity
+    fun onPhysicalActivityChange(v: String) { _physicalActivity.value = v }
 
-    private val _depressed = MutableStateFlow(false)
-    val depressed: StateFlow<Boolean> = _depressed
-    fun onDepressedChange(isDepressed: Boolean) { _depressed.value = isDepressed }
+    private val _depressionStatus = MutableStateFlow(-1)
+    val depressionStatus: StateFlow<Int> = _depressionStatus
+    fun onDepressionStatusChange(v: Int) { _depressionStatus.value = v }
 
-    private val _diet = MutableStateFlow("")
-    val diet: StateFlow<String> = _diet
-    fun onDietChange(newDiet: String) { _diet.value = newDiet }
+    private val _nutritionDiet = MutableStateFlow("")
+    val nutritionDiet: StateFlow<String> = _nutritionDiet
+    fun onNutritionDietChange(v: String) { _nutritionDiet.value = v }
 
-    private val _goodSleep = MutableStateFlow(false)
-    val goodSleep: StateFlow<Boolean> =_goodSleep
-    fun onGoodSleepChange(hasGoodSleep: Boolean) { _goodSleep.value = hasGoodSleep }
+    private val _sleepQuality = MutableStateFlow(-1)
+    val sleepQuality: StateFlow<Int> =_sleepQuality
+    fun onSleepQualityChange(v: Int) { _sleepQuality.value = v }
 
-
-    val activityOptions = listOf("Sedentary", "Lightly Active", "Moderately Active", "Very Active", "Extra Active")
-    val dietOptions = listOf("Standard", "Vegetarian", "Vegan", "Low Carb", "Mediterranean", "Other")
+    val activityOptions = listOf("Sedentary", "Lightly Active", "Moderately Active")
+    val dietOptions = listOf("Balanced", "Low Carb", "Mediterranean")
 
     val s3Survey = listOf(
         SurveyModel(
             questionType = QuestionType.SINGLE_CHOICE,
-            questionId = "smoker",
+            questionId = "smoked",
             questionTitle = "1) Do you smoke",
             questionDescription = "Are you, or have you previously been a regular smoker",
             answers = listOf("Yes", "No")
         ),
         SurveyModel(
             questionType = QuestionType.SINGLE_CHOICE,
-            questionId = "sleep",
+            questionId = "sleepQuality",
             questionTitle = "2) Sleep Quality",
-            questionDescription = "Do you usually get good (8+ hours) of sleep",
+            questionDescription = "Do you usually get good sleep",
             answers = listOf("Yes", "No")
         ),
         SurveyModel(
             questionType = QuestionType.SINGLE_CHOICE,
-            questionId = "depressed",
+            questionId = "depressionStatus",
             questionTitle = "3) Depression",
-            questionDescription = "Are you, or have you previously been diagnosed with depression",
+            questionDescription = "Have you been diagnosed with depression",
             answers = listOf("Yes", "No")
         ),
         SurveyModel(
             questionType = QuestionType.SINGLE_CHOICE,
-            questionId = "actLv",
+            questionId = "physicalActivity",
             questionTitle = "4) Activity Level",
-            questionDescription = "Choose what best describes your usual level of physical activity",
+            questionDescription = "Choose your level of physical activity",
             answers = activityOptions
         ),
         SurveyModel(
             questionType = QuestionType.SINGLE_CHOICE,
-            questionId = "diet",
+            questionId = "nutritionDiet",
             questionTitle = "5) Diet",
             questionDescription = "Choose what best describes your usual diet",
             answers = dietOptions
@@ -251,84 +312,78 @@ class QViewModel @Inject constructor(
     )
 
     fun isS3Complete(): Boolean {
-        return smoke.value != null &&
-                goodSleep.value != null &&
-                depressed.value != null &&
-                activityLv.value.isNotEmpty() &&
-                diet.value.isNotEmpty()
+        return smoked.value != -1 &&
+                sleepQuality.value != -1 &&
+                depressionStatus.value != -1 &&
+                physicalActivity.value.isNotEmpty() &&
+                nutritionDiet.value.isNotEmpty()
     }
 
     fun onSurveyAnswerChange(answers: Map<String, Set<String>>) {
         answers.forEach { (questionId, answerSet) ->
             val answer = answerSet.firstOrNull() ?: return@forEach
-            val yesNoToBoolean = answer.equals("Yes", ignoreCase = true)
+            val yesNoToInt = if (answer.equals("Yes", ignoreCase = true)) 1 else 0
 
             when (questionId) {
-                // Section 1
-                "gender" -> {
-                    val newValue = if (answer == "Male") 1 else 0
-                    onGenderChange(newValue)
-                }
-                "dHand" -> {
-                    val newValue = if (answer == "Right Handed") 1 else 0
-                    onDHandChange(newValue)
-                }
-                "edu" -> onEduChange(answer)
+                "gender" -> onGenderChange(if (answer == "Male") 1 else 0)
+                "dominantHand" -> onDominantHandChange(if (answer == "Right Handed") 1 else 0)
+                "education" -> onEducationChange(answer)
                 "age" -> onAgeChange(answer.toIntOrNull() ?: 0)
 
-                // Section 2
-                "history" -> onHistoryChange(yesNoToBoolean)
-                "apoe" -> onApoeChange(yesNoToBoolean)
+                "familyHistory" -> onFamilyHistoryChange(yesNoToInt)
+                "apoeE4" -> onApoeE4Change(yesNoToInt)
                 "weight" -> onWeightChange(answer.toFloatOrNull() ?: 0f)
-                "avgTemp" -> onAvgTempChange(answer.toFloatOrNull() ?: 0f)
-                "hr" -> onRestingHRChange(answer.toIntOrNull() ?: 0)
-                "oxLv" -> onOxLvChange(answer.toIntOrNull() ?: 0)
+                "bodyTemperature" -> onBodyTemperatureChange(answer.toFloatOrNull() ?: 0f)
+                "heartRate" -> onHeartRateChange(answer.toIntOrNull() ?: 0)
+                "bloodOxygen" -> onBloodOxygenChange(answer.toFloatOrNull() ?: 0f)
+                "diabetic" -> onDiabeticChange(yesNoToInt)
+                "alcoholLevel" -> onAlcoholLevelChange(answer.toFloatOrNull() ?: 0f)
+                "bloodPressure" -> onBloodPressureChange(answer.toIntOrNull() ?: 0)
+                "hearingLoss" -> onHearingLossChange(yesNoToInt)
 
-                // Section 3
-                "smoker" -> onSmokeChange(yesNoToBoolean)
-                "sleep" -> onGoodSleepChange(yesNoToBoolean)
-                "depressed" -> onDepressedChange(yesNoToBoolean)
-                "actLv" -> onActivityLvChange(answer)
-                "diet" -> onDietChange(answer)
+                "smoked" -> onSmokedChange(yesNoToInt)
+                "sleepQuality" -> onSleepQualityChange(yesNoToInt)
+                "depressionStatus" -> onDepressionStatusChange(yesNoToInt)
+                "physicalActivity" -> onPhysicalActivityChange(answer)
+                "nutritionDiet" -> onNutritionDietChange(answer)
             }
         }
     }
 
-
-    fun submitAnswers(){
+    fun submitAnswers(id: Int){
         viewModelScope.launch {
             isLoading = true
 
             val result = repository.reportQuestionnaire(
-                patientID = 1,
-                gender = _gender.value,
-                age = _age.value,
-                dHand = _dHand.value,
-                weight = _weight.value,
-                avgTemp = _avgTemp.value,
-                restingHR = _restingHR.value,
-                oxLv = _oxLv.value,
-                history = _history.value,
-                smoke = _smoke.value,
-                apoe = _apoe.value,
-                activityLv = _activityLv.value,
-                depressed = _depressed.value,
-                diet = _diet.value,
-                goodSleep = _goodSleep.value,
-                edu = _edu.value,
+                LifestyleRequest(
+                    patientID = id,
+                    gender = _gender.value,
+                    age = _age.value,
+                    dominantHand = _dominantHand.value,
+                    weight = _weight.value,
+                    bodyTemperature = _bodyTemperature.value,
+                    heartRate = _heartRate.value,
+                    bloodOxygen = _bloodOxygen.value,
+                    familyHistory = _familyHistory.value,
+                    smoked = _smoked.value,
+                    apoeE4 = _apoeE4.value,
+                    physicalActivity = _physicalActivity.value,
+                    depressionStatus = _depressionStatus.value,
+                    nutritionDiet = _nutritionDiet.value,
+                    sleepQuality = _sleepQuality.value,
+                    cumulativePrimary = _cumulativePrimary.value,
+                    cumulativeSecondary = _cumulativeSecondary.value,
+                    cumulativeDegree = _cumulativeDegree.value,
+                )
             )
+
             when (result) {
                 is TestResult.Success -> {
-                    Log.d("Stage1VM", "Submit success: $result")
                     onS3Change(false)
                     onSuccessChange(true)
                 }
-                is TestResult.Unauthorized -> {
-                    Log.d("Stage1VM", "Submit unauthorized: $result")
-                }
-                is TestResult.UnknownError -> {
-                    Log.d("Stage1VM", "Submit unknown error: $result")
-                }
+                is TestResult.Unauthorized -> {}
+                is TestResult.UnknownError -> {}
             }
 
             resultChannel.trySend(result)

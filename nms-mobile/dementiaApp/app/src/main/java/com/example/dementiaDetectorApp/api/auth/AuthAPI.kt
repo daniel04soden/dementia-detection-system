@@ -15,10 +15,5 @@ interface AuthAPI {
     @POST("mobile/login")
     suspend fun signIn(
         @Body request: LoginRequest
-    ): TokenResponse
-
-    @GET("ValidateJWT")
-    suspend fun authenticate(
-        @Header("Authorization")token: String
-    )
+    ): LoginResponse
 }

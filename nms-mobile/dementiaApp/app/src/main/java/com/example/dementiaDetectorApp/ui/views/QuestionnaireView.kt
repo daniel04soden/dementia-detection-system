@@ -210,7 +210,7 @@ private fun S2Section(qVM: QViewModel){
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ){
-            Text( "GP Reading Questions", fontSize = 35.sp, fontWeight = FontWeight.Bold, color = MidPurple)
+            Text( "GP + Medication", fontSize = 35.sp, fontWeight = FontWeight.Bold, color = MidPurple)
         }
 
         Row(Modifier.fillMaxHeight(0.9F)){
@@ -270,7 +270,7 @@ private fun S3Section(qVM: QViewModel){
         Button(
             onClick = {
                 if(qVM.isS3Complete()){
-                    qVM.submitAnswers()
+
                 }
             },
             colors = buttonColours(),

@@ -1,5 +1,6 @@
 package com.example.dementiaDetectorApp.ui.views
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +27,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.normalizedAngleCos
 import androidx.navigation.NavController
+import com.example.dementiaDetectorApp.ui.composables.ClinicDropdown
+import com.example.dementiaDetectorApp.ui.composables.CountyDropdown
 import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.ui.theme.buttonColours
@@ -68,7 +72,7 @@ private fun FormSection(aVM: AuthViewModel, nc: NavController){
             AnimatedVisibility(
                 visible = aVM.s3Visi.collectAsState().value
             ){
-                Section3(aVM)
+                Section3(aVM, nc)
             }
         }
     }
@@ -347,7 +351,7 @@ private fun Section2(aVM: AuthViewModel){
 }
 
 @Composable
-private fun Section3(aVM: AuthViewModel){
+private fun Section3(aVM: AuthViewModel, nc: NavController){
     Column(Modifier
         .fillMaxSize()
         .background(Color.White)
@@ -379,6 +383,34 @@ private fun Section3(aVM: AuthViewModel){
                 modifier = Modifier.padding(start = 15.dp, end = 15.dp)
             )
         }
+        Spacer(Modifier.height(20.dp))
+        Text(
+            text = "County",
+            color = MidPurple,
+            fontSize = 20.sp,
+            modifier = Modifier.padding(start = 50.dp)
+        )
+        val selectedCounty = aVM.county.collectAsState(initial = "Antrim").value
+        CountyDropdown(
+            selectedCounty = selectedCounty,
+            onCountySelected = { county -> aVM.onCountyChange(county)},
+            modifier = Modifier.padding(horizontal = 50.dp)
+        )
+
+        Spacer(Modifier.height(35.dp))
+        Text(
+            text = "Clinic",
+            color = MidPurple,
+            fontSize = 20.sp,
+            modifier = Modifier.padding(start = 50.dp)
+        )
+        val selectedClinic = aVM.clinic.collectAsState().value
+        ClinicDropdown(
+            clinics = aVM.clinics.collectAsState().value,
+            selectedClinicId = selectedClinic,
+            onClinicSelected = {clinic -> aVM.onClinicChange(clinic)},
+            modifier = Modifier.padding(horizontal = 50.dp)
+            )
 
         Spacer(Modifier.height(10.dp))
 
@@ -389,7 +421,7 @@ private fun Section3(aVM: AuthViewModel){
         ){
             Button(
                 onClick = {
-
+                    aVM.signUp{nc.navigate("login")}
                 },
                 colors = buttonColours(),
                 shape = RoundedCornerShape(24.dp),

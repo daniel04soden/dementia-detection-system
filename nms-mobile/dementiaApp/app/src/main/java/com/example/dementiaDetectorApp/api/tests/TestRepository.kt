@@ -24,22 +24,5 @@ interface TestRepository {
         transportScore: Int
     ): TestResult<Unit>
 
-    suspend fun reportQuestionnaire(
-        patientID: Int,
-        gender: Int,
-        age: Int,
-        dHand: Int,
-        weight:Float,
-        avgTemp:Float,
-        restingHR:Int,
-        oxLv: Int,
-        history: Boolean,
-        smoke: Boolean,
-        apoe: Boolean,
-        activityLv: String,
-        depressed:Boolean,
-        diet: String,
-        goodSleep: Boolean,
-        edu: String
-    ): TestResult<Unit>
+    suspend fun reportQuestionnaire(request: LifestyleRequest): TestResult<Unit>
 }

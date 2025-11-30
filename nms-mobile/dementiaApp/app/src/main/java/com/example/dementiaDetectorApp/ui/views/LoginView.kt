@@ -68,7 +68,7 @@ fun LoginScreen(authVM: AuthViewModel, sharedVM: SharedVM, nc: NavController){
                     Spacer(Modifier.height(35.dp))
                     LogoSection()
                     Spacer(Modifier.fillMaxHeight(0.3F))
-                    LoginInfoSection(authVM, nc)
+                    LoginInfoSection(authVM, sharedVM, nc)
                     Spacer(Modifier.height(35.dp))
                     RegisterSection(nc)
                 }
@@ -95,7 +95,7 @@ fun LogoSection(){
 }
 
 @Composable
-fun LoginInfoSection(authVM: AuthViewModel, nc: NavController){
+fun LoginInfoSection(authVM: AuthViewModel, sharedVM: SharedVM, nc: NavController){
     val email = authVM.email.collectAsState().value
     val pswd = authVM.pswd.collectAsState().value
     Column(
@@ -154,8 +154,9 @@ fun LoginInfoSection(authVM: AuthViewModel, nc: NavController){
         )
         Spacer(Modifier.height(20.dp))
         Button(
-            //onClick = { navController.navigate("home") },
-            onClick = {authVM.signIn { nc.navigate("home") } },
+            onClick = {
+                sharedVM.onIdChange(authVM.signIn { nc.navigate("home")})
+                      },
             colors = buttonColours(),
             shape = RoundedCornerShape(24.dp),
             modifier = Modifier
