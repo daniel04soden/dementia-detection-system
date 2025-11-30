@@ -69,6 +69,12 @@ dependencies {
     //Survey Compose
     implementation("com.github.zekierciyas:survey-compose:1.0.0")
 
+    //Coil
+    implementation("io.coil-kt:coil-compose:2.4.0")
+
+    //osmdroid
+    implementation("org.osmdroid:osmdroid-android:6.1.15")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

@@ -46,7 +46,7 @@ class SharedVM: ViewModel(){
             NavBarContent(
                 title = "Contact",
                 iconId = 0,
-                "home"
+                "contact"
             )
         )
         return testNav
