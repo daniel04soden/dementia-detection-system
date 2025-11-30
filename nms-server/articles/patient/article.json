@@ -1,0 +1,52 @@
+[
+    {
+        "headline": "New Alzheimer's Drug Shows Promise in Slowing Cognitive Decline",
+        "snippet": "Lecanemab demonstrates significant reduction in amyloid plaques and slowing of cognitive decline in early Alzheimer's patients in Phase 3 clinical trial.",
+        "url": "https://www.alz.org/research/2023/lecanemab-phase3-results"
+    },
+    {
+        "headline": "Blood Test for Alzheimer's Biomarkers Reaches 95% Accuracy",
+        "snippet": "New plasma-based biomarker test detects tau and amyloid proteins with high precision, offering accessible early diagnosis for Alzheimer's disease.",
+        "url": "https://www.nature.com/articles/s41591-023-02456-8"
+    },
+    {
+        "headline": "FDA Approves First Digital Therapeutic for Dementia Symptoms",
+        "snippet": "Prescription digital therapeutic using cognitive training exercises shows efficacy in improving memory and executive function in mild cognitive impairment.",
+        "url": "https://www.fda.gov/medical-devices/digital-health/dementia-digital-therapeutic-approval"
+    },
+    {
+        "headline": "Study Links Gut Microbiome Changes to Alzheimer's Progression",
+        "snippet": "Research identifies specific gut bacteria alterations associated with increased amyloid deposition and neuroinflammation in Alzheimer's patients.",
+        "url": "https://www.sciencedirect.com/science/article/pii/S2589004223012345"
+    },
+    {
+        "headline": "Novel Tau PET Tracer Improves Early Detection Accuracy",
+        "snippet": "Next-generation tau PET imaging agent provides superior visualization of neurofibrillary tangles, enhancing differential diagnosis of tauopathies.",
+        "url": "https://jnm.snmjournals.org/content/64/4/589"
+    },
+    {
+        "headline": "Genetic Risk Scores Predict Dementia Onset 10 Years in Advance",
+        "snippet": "Polygenic risk scoring system combining 50+ genetic variants accurately predicts Alzheimer's disease development with 85% specificity in middle-aged adults.",
+        "url": "https://www.thelancet.com/journals/laneur/article/PIIS1474-4422(23)00245-6"
+    },
+    {
+        "headline": "Deep Learning Model Detects Dementia from MRI Scans with 98% Accuracy",
+        "snippet": "AI algorithm analyzes structural MRI data to identify early-stage dementia patterns, outperforming traditional radiological assessment methods.",
+        "url": "https://www.medicalimaging.org/ai-mri-dementia-detection-study"
+    },
+    {
+        "headline": "Anti-inflammatory Drug Shows Neuroprotective Effects in Vascular Dementia",
+        "snippet": "Clinical trial demonstrates that targeted anti-inflammatory treatment reduces white matter hyperintensities and improves cognitive function in vascular dementia.",
+        "url": "https://www.nejm.org/doi/full/10.1056/NEJMoa2308945"
+    },
+    {
+        "headline": "Sleep Disruption Identified as Key Modifiable Risk Factor for Dementia",
+        "snippet": "Longitudinal study confirms that chronic sleep fragmentation accelerates amyloid accumulation and increases dementia risk by 45% in older adults.",
+        "url": "https://jamanetwork.com/journals/jamaneurology/article-abstract/2809876"
+    },
+    {
+        "headline": "Novel Drug Combination Reverses Synaptic Loss in Alzheimer's Models",
+        "snippet": "Preclinical study shows that combined targeting of amyloid and tau pathways restores synaptic density and improves cognitive function in animal models.",
+        "url": "https://www.cell.com/neuron/fulltext/S0896-6273(23)00678-9"
+    }
+]
