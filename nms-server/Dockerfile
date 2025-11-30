@@ -17,6 +17,7 @@ from alpine:3.20
 workdir /root/
 
 copy --from=builder /main .
+COPY articles ./articles/
 
 
 expose 8080
