@@ -10,13 +10,13 @@ interface TestAPI {
     @POST("mobile/stage1")
     suspend fun reportStage1(
         @Header("Authorization") token: String,
-        @Body body: JSONObject
+        @Body body: Stage1Request
     ): Response<Unit>
 
     @POST("mobile/stage2")
     suspend fun reportStage2(
         @Header("Authorization") token: String,
-        @Body body: JSONObject
+        @Body body: Stage2Request
     ): Response<Unit>
 
     @POST("mobile/lifestyle")

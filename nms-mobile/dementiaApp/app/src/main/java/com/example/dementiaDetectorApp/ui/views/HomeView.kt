@@ -45,6 +45,7 @@ import com.example.dementiaDetectorApp.R
 import com.example.dementiaDetectorApp.models.NewsPiece
 import com.example.dementiaDetectorApp.models.Test
 import com.example.dementiaDetectorApp.ui.composables.NavMenu
+import com.example.dementiaDetectorApp.ui.composables.TestPrompt
 import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.Gray
 import com.example.dementiaDetectorApp.ui.theme.LightPurple
@@ -61,7 +62,7 @@ fun HomeScreen(homeVM: HomeVM, sharedVM: SharedVM, nc: NavController){
     ){
         Column{
             Spacer(Modifier.height(35.dp))
-            Header(sharedVM)
+            Header(homeVM)
             HeaderPrompts(sharedVM, nc)
             NewsSection(homeVM)
         }
@@ -74,7 +75,7 @@ fun HomeScreen(homeVM: HomeVM, sharedVM: SharedVM, nc: NavController){
 }
 
 @Composable
-fun Header(sharedVM: SharedVM){
+fun Header(homeVM: HomeVM){
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(15.dp),
@@ -88,7 +89,7 @@ fun Header(sharedVM: SharedVM){
             modifier = Modifier.height(45.dp)
         )
         Column {
-            Text("Hello ${sharedVM.account.value.fName}", color = DarkPurple, fontSize = 25.sp)
+            Text("Hello ${homeVM.fName.value}", color = DarkPurple, fontSize = 25.sp)
             Text("What can we do for you today", color = MidPurple, fontSize = 18.sp)
         }
     }
@@ -109,46 +110,6 @@ fun HeaderPrompts(
                     TestPrompt(test=prompts[it], nc)
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun TestPrompt(
-    test: Test,
-    nc: NavController
-){
-    Row(modifier = Modifier
-        .padding(15.dp)
-        .clip(RoundedCornerShape(10.dp))
-        .background(MidPurple)//CHANGE
-        .padding(horizontal = 15.dp , vertical = 20.dp)
-        .fillMaxWidth()
-        .clickable {nc.navigate(test.route)},
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ){
-        Box(
-            modifier = Modifier
-                .size(50.dp)
-                .background(LightPurple)//CHANGE
-                .padding(5.dp),
-            contentAlignment = Alignment.Center
-        ){
-            Icon(
-                painter = painterResource(R.drawable.logo),
-                contentDescription = "Class Icon",
-                Modifier.size(30.dp)
-            )
-        }
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(5.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ){
-            Text("Test ${test.step}", color = Color.White)
-            Text(test.name, color = Color.White)
         }
     }
 }

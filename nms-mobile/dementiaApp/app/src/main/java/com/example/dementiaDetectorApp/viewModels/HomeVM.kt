@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModel
 import com.example.dementiaDetectorApp.models.NewsPiece
 
 class HomeVM: ViewModel(){
+    private val _fName = mutableStateOf("")
+    val fName: State<String> = _fName
+
     //News Pieces
     private val _news = mutableStateOf<List<NewsPiece>>(newsList())
     val news: State<List<NewsPiece>> = _news

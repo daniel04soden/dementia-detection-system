@@ -2,8 +2,6 @@ package com.example.dementiaDetectorApp.api.tests
 
 import android.content.SharedPreferences
 import android.util.Log
-import com.example.dementiaDetectorApp.models.results.RecallRes
-import org.json.JSONObject
 import retrofit2.HttpException
 import java.net.UnknownHostException
 
@@ -15,191 +13,103 @@ class TestRepoImp(
     private val TAG = "TestRepoImp"
 
     override suspend fun reportStage1(
-        testDate: String,
+        patientID: Int,
         dateQuestion: String,
-        clockNumber: String,
-        clockHands: String,
+        clockID: Int,
         news: String,
-        recall: RecallRes
+        recallName: String,
+        recallSurname: String,
+        recallNumber: String,
+        recallStreet: String,
+        recallCity: String
     ): TestResult<Unit> {
         return try {
             val token = prefs.getString("jwt", null)
                 ?: return TestResult.Unauthorized()
 
-            val body = JSONObject().apply {
-                put("patientID", 1)
-                put("doctorID", 1)
-                put("testDate", testDate)
-                put("dateQuestion", dateQuestion)
-                put("clockNumber", clockNumber)
-                put("clockHands", clockHands)
-                put("news", news)
-                put("recall", JSONObject().apply {
-                    put("name", recall.name)
-                    put("surname", recall.surname)
-                    put("number", recall.number)
-                    put("street", recall.street)
-                    put("city", recall.city)
-                })
-            }
-
-            val response = api.reportStage1("Bearer $token", body)
-
-            if (response.isSuccessful) {
-                Log.d(TAG, "Stage 1 submitted successfully")
-                TestResult.Success(Unit)
-            } else {
-                Log.d(
-                    TAG,
-                    "Stage 1 server error ${response.code()}: ${response.errorBody()?.string()}"
+            val response = api.reportStage1(
+                "Bearer $token",
+                Stage1Request(
+                    patientID = patientID,
+                    dateQuestion = dateQuestion,
+                    clockID = clockID,
+                    news = news,
+                    recallName = recallName,
+                    recallSurname = recallSurname,
+                    recallNumber = recallNumber,
+                    recallStreet = recallStreet,
+                    recallCity = recallCity
                 )
-                TestResult.UnknownError()
-            }
-        } catch (e: HttpException) {
-            when {
-                e.code() == 401 -> {
-                    Log.d(TAG, "Stage 1 401 occurred: ${e.message()}")
-                    TestResult.Unauthorized()
-                }
+            )
 
-                else -> {
-                    Log.d(TAG, "Stage 1 HTTP error occurred: ${e.message()}")
-                    TestResult.UnknownError()
-                }
-            }
+            if (response.isSuccessful) TestResult.Success(Unit)
+            else TestResult.UnknownError()
+
+        } catch (e: HttpException) {
+            if (e.code() == 401) TestResult.Unauthorized() else TestResult.UnknownError()
         } catch (e: UnknownHostException) {
-            Log.d(TAG, "Stage 1 network error: ${e.message}")
             TestResult.UnknownError()
         } catch (e: Exception) {
-            Log.d(TAG, "Stage 1 unknown error: $e")
             TestResult.UnknownError()
         }
     }
 
     override suspend fun reportStage2(
-        memory: Int,
-        conversation: Int,
-        speaking: Int,
-        financial: Int,
-        medication: Int,
-        transport: Int
+        patientID: Int,
+        memoryScore: Int,
+        recallRes: Int,
+        speakingScore: Int,
+        financialScore: Int,
+        medicineScore: Int,
+        transportScore: Int
     ): TestResult<Unit> {
         return try {
             val token = prefs.getString("jwt", null)
                 ?: return TestResult.Unauthorized()
 
-            val body = JSONObject().apply {
-                put("memory", memory)
-                put("conversation", conversation)
-                put("speaking", speaking)
-                put("financial", financial)
-                put("medication", medication)
-                put("transport", transport)
-            }
-
-            val response = api.reportStage2("Bearer $token", body)
-
-            if (response.isSuccessful) {
-                Log.d(TAG, "Stage 1 submitted successfully")
-                TestResult.Success(Unit)
-            } else {
-                Log.d(
-                    TAG,
-                    "Stage 1 server error ${response.code()}: ${response.errorBody()?.string()}"
+            val response = api.reportStage2(
+                "Bearer $token",
+                Stage2Request(
+                    patientID = patientID,
+                    memoryScore = memoryScore,
+                    recallRes = recallRes,
+                    speakingScore = speakingScore,
+                    financialScore = financialScore,
+                    medicineScore = medicineScore,
+                    transportScore = transportScore
                 )
-                TestResult.UnknownError()
-            }
-        } catch (e: HttpException) {
-            when {
-                e.code() == 401 -> {
-                    Log.d(TAG, "Stage 1 401 occurred: ${e.message()}")
-                    TestResult.Unauthorized()
-                }
+            )
 
-                else -> {
-                    Log.d(TAG, "Stage 1 HTTP error occurred: ${e.message()}")
-                    TestResult.UnknownError()
-                }
-            }
+            if (response.isSuccessful) TestResult.Success(Unit)
+            else TestResult.UnknownError()
+
+        } catch (e: HttpException) {
+            if (e.code() == 401) TestResult.Unauthorized() else TestResult.UnknownError()
         } catch (e: UnknownHostException) {
-            Log.d(TAG, "Stage 1 network error: ${e.message}")
             TestResult.UnknownError()
         } catch (e: Exception) {
-            Log.d(TAG, "Stage 1 unknown error: $e")
             TestResult.UnknownError()
         }
     }
 
-    override suspend fun reportQuestionnaire(
-        patientID: Int,
-        gender: Int,
-        age: Int,
-        dHand: Int,
-        weight: Float,
-        avgTemp: Float,
-        restingHR: Int,
-        oxLv: Int,
-        history: Boolean,
-        smoke: Boolean,
-        apoe: Boolean,
-        activityLv: String,
-        depressed: Boolean,
-        diet: String,
-        goodSleep: Boolean,
-        edu: String
-    ): TestResult<Unit> {
+    override suspend fun reportQuestionnaire(request: LifestyleRequest): TestResult<Unit> {
         return try {
             val token = prefs.getString("jwt", null)
                 ?: return TestResult.Unauthorized()
 
             val response = api.reportQuestionnaire(
                 "Bearer $token",
-                LifestyleRequest(
-                    patientID = patientID,
-                    gender = gender,
-                    age = age,
-                    dHand = dHand,
-                    weight = weight,
-                    avgTemp = avgTemp,
-                    restingHR = restingHR,
-                    oxLv = oxLv,
-                    history = history,
-                    smoke = smoke,
-                    apoe = apoe,
-                    activityLv = activityLv,
-                    depressed = depressed,
-                    diet = diet,
-                    goodSleep = goodSleep,
-                    edu = edu
-                )
+                request
             )
-            if (response.isSuccessful) {
-                Log.d(TAG, "Questionnaire submitted successfully")
-                TestResult.Success(Unit)
-            } else {
-                Log.d(
-                    TAG,
-                    "Questionnaire server error ${response.code()}: ${response.errorBody()?.string()}"
-                )
-                TestResult.UnknownError()
-            }
-        } catch (e: HttpException) {
-            when {
-                e.code() == 401 -> {
-                    Log.d(TAG, "Questionnaire 401 occurred: ${e.message()}")
-                    TestResult.Unauthorized()
-                }
 
-                else -> {
-                    Log.d(TAG, "Questionnaire HTTP error occurred: ${e.message()}")
-                    TestResult.UnknownError()
-                }
-            }
+            if (response.isSuccessful) TestResult.Success(Unit)
+            else TestResult.UnknownError()
+
+        } catch (e: HttpException) {
+            if (e.code() == 401) TestResult.Unauthorized() else TestResult.UnknownError()
         } catch (e: UnknownHostException) {
-            Log.d(TAG, "Questionnaire network error: ${e.message}")
             TestResult.UnknownError()
         } catch (e: Exception) {
-            Log.d(TAG, "Questionnaire unknown error: $e")
             TestResult.UnknownError()
         }
     }

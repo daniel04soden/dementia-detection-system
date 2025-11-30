@@ -42,13 +42,13 @@ class LaunchPoint : ComponentActivity() {
                 val t1VM:  Stage1VM = viewModel()
                 val t2VM: Stage2VM = viewModel()
 
-                NavHost(navController = nc, startDestination = "login") {
+                NavHost(navController = nc, startDestination = "home") {
                     composable("login"){LoginScreen(authVM,sharedVM, nc)}
                     composable("registration"){ RegistrationScreen(authVM,nc) }
                     composable("home"){ HomeScreen(homeVM, sharedVM, nc) }
                     composable("questionnaire"){QuestionnaireScreen(qVM, nc)}
-                    composable("test1"){ Stage1Screen(t1VM, nc)}
-                    composable("test2"){ Stage2Screen(t2VM, nc)}
+                    composable("test1"){ Stage1Screen(t1VM, sharedVM, nc)}
+                    composable("test2"){ Stage2Screen(t2VM, sharedVM, nc)}
                 }
             }
         }

@@ -48,10 +48,11 @@ import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.ui.theme.buttonColours
 import com.example.dementiaDetectorApp.ui.theme.outLinedTFColours
 import com.example.dementiaDetectorApp.ui.composables.SubmittedSection
+import com.example.dementiaDetectorApp.viewModels.SharedVM
 import com.example.dementiaDetectorApp.viewModels.Stage1VM
 
 @Composable
-fun Stage1Screen(tVM: Stage1VM, nc: NavController){
+fun Stage1Screen(tVM: Stage1VM, sVM: SharedVM, nc: NavController){
     Box(modifier = Modifier
         .fillMaxSize()
         .background(MidPurple)
@@ -66,7 +67,7 @@ fun Stage1Screen(tVM: Stage1VM, nc: NavController){
                 Spacer(Modifier.height(35.dp))
             }
             PrefaceSection(tVM)
-            FormSection(tVM, nc)
+            FormSection(tVM, sVM, nc)
         }
         if(!tVM.timedVisi.collectAsState().value && !tVM.prefaceVisi.collectAsState().value){
             ProgressDots(Modifier.align(Alignment.BottomCenter))
@@ -133,7 +134,7 @@ private fun PrefaceSection(tVM: Stage1VM){
 }
 
 @Composable
-private fun FormSection(tVM: Stage1VM, nc: NavController){
+private fun FormSection(tVM: Stage1VM, sVM: SharedVM, nc: NavController){
     AnimatedVisibility(
         visible = !(tVM.prefaceVisi.collectAsState().value),
     ){
@@ -170,7 +171,7 @@ private fun FormSection(tVM: Stage1VM, nc: NavController){
             AnimatedVisibility(
                 visible = tVM.q4Visi.collectAsState().value,
             ){
-                Question4(tVM)
+                Question4(tVM, sVM)
             }
             AnimatedVisibility(
                 visible = tVM.successVisi.collectAsState().value,
@@ -416,7 +417,7 @@ private fun Question3(tVM:Stage1VM){
 }
 
 @Composable
-private fun Question4(tVM:Stage1VM){
+private fun Question4(tVM:Stage1VM, sharedVM: SharedVM){
     Column(Modifier
         .fillMaxSize()
         .background(Color.White)
@@ -558,7 +559,7 @@ private fun Question4(tVM:Stage1VM){
         ){
             Button(
                 onClick = {
-                    tVM.submitAnswers()
+                    tVM.submitAnswers(sharedVM.id.value)
                 },
                 colors = buttonColours(),
                 shape = RoundedCornerShape(24.dp),
@@ -585,7 +586,6 @@ private fun ClockImage(drawingName: String, tVM: Stage1VM, index: Int){
         .clickable {
             tVM.onConfChange(true)
             tVM.onClockChange(index)
-            tVM.onHandChange(index)
         }
     ){
         Icon(

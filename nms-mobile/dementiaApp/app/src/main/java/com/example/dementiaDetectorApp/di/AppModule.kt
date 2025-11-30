@@ -6,6 +6,9 @@ import android.content.SharedPreferences
 import com.example.dementiaDetectorApp.api.auth.AuthAPI
 import com.example.dementiaDetectorApp.api.auth.AuthRepoImp
 import com.example.dementiaDetectorApp.api.auth.AuthRepository
+import com.example.dementiaDetectorApp.api.clinics.ClinicAPI
+import com.example.dementiaDetectorApp.api.clinics.ClinicRepoImp
+import com.example.dementiaDetectorApp.api.clinics.ClinicRepository
 import com.example.dementiaDetectorApp.api.tests.TestAPI
 import com.example.dementiaDetectorApp.api.tests.TestRepoImp
 import com.example.dementiaDetectorApp.api.tests.TestRepository
@@ -23,6 +26,8 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    val BASE_URL = "http://192.168.1.26:8080/api/"
+
     @Provides
     @Singleton
     fun provAuthAPI(): AuthAPI {
@@ -31,7 +36,7 @@ object AppModule {
             .build()
 
         return Retrofit.Builder()
-            .baseUrl("http://192.168.1.26:8080/api/")
+            .baseUrl(BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
             .create()
@@ -56,7 +61,7 @@ object AppModule {
             .add(KotlinJsonAdapterFactory())
             .build()
         return Retrofit.Builder()
-            .baseUrl("http://192.168.1.26:8080/api/")
+            .baseUrl(BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
             .create()
@@ -66,5 +71,26 @@ object AppModule {
     @Singleton
     fun provTestRepo(api: TestAPI, prefs: SharedPreferences): TestRepository {
         return TestRepoImp(api, prefs)
+    }
+
+    @Provides
+    @Singleton
+    fun provClinicAPI(): ClinicAPI {
+        val moshi = Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
+
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+            .create(ClinicAPI::class.java)
+    }
+
+
+    @Provides
+    @Singleton
+    fun provClinicRepo(api: ClinicAPI, prefs: SharedPreferences): ClinicRepository {
+        return ClinicRepoImp(api, prefs)
     }
 }

@@ -17,9 +17,10 @@ class AuthRepoImp(
         fName: String,
         lName: String,
         phoneNum: String,
-        eircode: String
+        eircode: String,
+        clinicID: Int
     ): AuthResult<Unit> {
-        return try{
+        return try {
             api.signUp(
                 request = SignUpRequest(
                     email = email,
@@ -28,67 +29,47 @@ class AuthRepoImp(
                     lastName = lName,
                     phone = phoneNum,
                     eircode = eircode,
+                    clinicID = clinicID
                 )
             )
-            signIn(email, pswd)
-        }catch (e: HttpException){
-            if(e.code()==401){
-                Log.d("AuthRepImp","singUp 401 occurred ${e.message()}")
+            AuthResult.Authorized()
+        } catch (e: HttpException) {
+            if (e.code() == 401) {
+                Log.d("AuthRepImp", "singUp 401 occurred ${e.message()}")
                 AuthResult.Unauthorized()
-            }else{
-                Log.d("AuthRepImp","signUp error occurred ${e.message()}")
+            } else {
+                Log.d("AuthRepImp", "signUp error occurred ${e.message()}")
                 AuthResult.UnknownError()
             }
-        }catch(e: Exception){
-            Log.d("AuthRepImp","auth error occurred $e")
+        } catch (e: Exception) {
+            Log.d("AuthRepImp", "auth error occurred $e")
             AuthResult.UnknownError()
         }
     }
 
-    override suspend fun signIn(email: String, pswd: String): AuthResult<Unit> {
-        return try{
+    override suspend fun signIn(email: String, pswd: String): AuthResult<LoginResponse> {
+        return try {
             val response = api.signIn(
                 request = LoginRequest(
-                    email=email,
-                    password=pswd
+                    email = email,
+                    password = pswd
                 )
             )
             prefs.edit {
                 putString("jwt", response.token)
             }
-            AuthResult.Authorized()
+            AuthResult.Authorized(response)
 
-        }
-        catch (e: HttpException){
-            if(e.code()==401){
-                Log.d("AuthRepImp","singIn 401 occurred ${e.message()}")
+        } catch (e: HttpException) {
+            if (e.code() == 401) {
+                Log.d("AuthRepImp", "singIn 401 occurred ${e.message()}")
                 AuthResult.Unauthorized()
-            }else{
-                Log.d("AuthRepImp","singIn Http Exception error occurred ${e.message()}")
+            } else {
+                Log.d("AuthRepImp", "singIn Http Exception error occurred ${e.message()}")
                 AuthResult.UnknownError()
             }
-        }catch(e: Exception){
+        } catch (e: Exception) {
             Log.d("AuthRepImp", "UnknownHostException: ${e.message}")
-            AuthResult.UnknownError()
-        }
-    }
-
-    override suspend fun authenticate(): AuthResult<Unit> {
-        return try{
-            val token = prefs.getString("jwt", null)?: return AuthResult.Unauthorized()
-            api.authenticate("Bearer $token")
-            AuthResult.Authorized()
-
-        }catch (e: HttpException){
-            if(e.code()==401) {
-                Log.d("AuthRepImp","auth 401 occurred ${e.message()}")
-                AuthResult.Unauthorized()
-            }else{
-                Log.d("AuthRepImp","auth error occurred ${e.message()}")
-                AuthResult.UnknownError()
-            }
-        }catch(e: Exception) {
-            Log.d("AuthRepImp","auth error occurred $e")
             AuthResult.UnknownError()
         }
     }
