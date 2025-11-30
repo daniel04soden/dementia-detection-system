@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Header from "../dashboard/header/Header";
 import styles from "./stage.module.css";
 import Footer from "../dashboard/footer/Footer";
+import { withAuth } from "../../utils/withAuth";
 
 interface Stage2Data {
   id: number;
@@ -195,4 +196,4 @@ const ReviewStage2: React.FC = () => {
   );
 };
 
-export default ReviewStage2;
+export default withAuth(ReviewStage2, ["doctor", "admin"]);

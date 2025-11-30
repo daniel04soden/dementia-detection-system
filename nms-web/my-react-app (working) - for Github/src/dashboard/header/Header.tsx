@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./header.module.css";
 import logo from '../../assets/da.svg';
@@ -15,10 +15,26 @@ const Header: React.FC = () => {
     navigate("/patients");
   };
 
-  const handleLogout = () => {
-    alert("Logged out successfully!");
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      // Make a request to the backend to log the user out
+      const response = await fetch('/api/web/logout', {
+        method: 'POST',  // You can use GET or POST depending on your backend setup
+        credentials: 'include',  // Ensure cookies are sent with the request
+      });
+
+      if (response.ok) {
+        // Optionally, handle success (e.g., redirect, show message, etc.)
+        console.log('Logged out successfully');
+        // Redirect user to login page or home page
+        window.location.href = '/login';  // Or whatever your login page route is
+      } else {
+      }
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
   };
+
 
   return (
       <header className={styles.dashHeader}>

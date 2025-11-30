@@ -1,6 +1,7 @@
 import React, { FormEvent, useState } from "react";
 import Header from "../dashboard/header/Header";
 import styles from './stage.module.css';
+import { withAuth } from "../../utils/withAuth";
 
 const Stage2: React.FC = () => {
 
@@ -107,4 +108,4 @@ const Stage2: React.FC = () => {
     );
 };
 
-export default Stage2;
+export default withAuth(Stage2, ["doctor", "admin"]);

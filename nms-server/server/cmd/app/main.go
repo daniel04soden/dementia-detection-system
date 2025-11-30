@@ -54,9 +54,6 @@ func main() {
 	//									HANDLERS
 	// ------------------------------------------------------------------------------------------------------
 
-	http.HandleFunc("GET /api/web/news", handlers.HandleGetDoctorNews)
-	http.HandleFunc("GET /api/mobile/news", handlers.HandleGetPatientNews)
-
 	// logging in and auth criteria
 	http.HandleFunc("POST /api/login", handlers.HandleLogin)
 	http.HandleFunc("GET /api/web/me", handlers.WebHandleMe)

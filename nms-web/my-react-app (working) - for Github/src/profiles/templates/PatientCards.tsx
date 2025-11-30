@@ -16,7 +16,7 @@ const PatientCard: React.FC<{ patient : Patient }> = ({ patient }) => {
   };
   return (
     <>
-    <div className={styles.cardContainer} onClick={() => viewInfo(patient.id)}>
+    <div className={styles.cardContainer} onClick={() => viewInfo(patient.id+1)}>
         <img className={styles.pfp} src={pfp}></img>
         <h1>{patient.firstname} {patient.lastname}</h1>
     </div>

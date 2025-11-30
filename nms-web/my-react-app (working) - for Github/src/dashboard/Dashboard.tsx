@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from './dash.module.css';
 import Header from "./header/Header";
 import NewsCards from "./newscard/NewsCards";
 import Footer from "./footer/Footer";
+import { withAuth } from "../../utils/withAuth";
+
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -157,11 +159,15 @@ const [searchTerm, setSearchTerm] = useState("");
         <aside className={styles.newsSection}>
           <div className={styles.tableSection}>
           <table>
-            <thead></thead>
-            <tbody>{sampleNews.map((item, index) => (
-            <NewsCards key={index} news={item} />
+            <tbody>
+            {sampleNews.map((item, index) => (
+              <tr key={index} className={styles.newsRow}>
+                <td className={styles.newsCell}>
+                  <NewsCards news={item} />
+                </td>
+              </tr>
             ))}
-            </tbody>
+          </tbody>
           </table>
           </div>
         </aside>
@@ -172,4 +178,4 @@ const [searchTerm, setSearchTerm] = useState("");
   );
 };
 
-export default Dashboard;
+export default withAuth(Dashboard, ["doctor", "admin"]);
