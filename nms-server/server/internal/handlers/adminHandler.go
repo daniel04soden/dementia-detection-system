@@ -3,8 +3,9 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-	"nms-server/server/internal/services"
 	"strconv"
+
+	"nms-server/server/internal/services"
 )
 
 type SignupAdminRequest struct {
@@ -13,7 +14,6 @@ type SignupAdminRequest struct {
 	Phone     string `json:"phone"`
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
-	IsAdmin   bool   `json:"isAdmin"`
 }
 
 func HandleSignupAdmin(w http.ResponseWriter, r *http.Request) {
@@ -47,15 +47,8 @@ func HandleSignupAdmin(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	// Register the user (this will not add them to the DoctorEmployment table)
-	id, err := services.RegisterUser(db, tx, req.Email, req.Password, req.Phone, req.FirstName, req.LastName, "admin")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	// Set the user as admin
-	_, err = tx.Exec("UPDATE Account SET isAdmin = $1 WHERE ID = $2", true, id)
+	// Register the user
+	_, err = services.RegisterUser(db, tx, req.Email, req.Password, req.Phone, req.FirstName, req.LastName, "admin")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -225,7 +218,6 @@ func HandleAdminCreateClinic(w http.ResponseWriter, r *http.Request) {
         VALUES ($1, $2, $3, $4)
         RETURNING clinicID
     `, req.Name, req.Phone, req.County, req.Eircode).Scan(&req.ClinicID)
-
 	if err != nil {
 		http.Error(w, "Failed to create clinic", 500)
 		return
@@ -249,7 +241,6 @@ func HandleAdminCreatePatient(w http.ResponseWriter, r *http.Request) {
         VALUES ($1, $2, "patient")
         RETURNING ID
     `, req.Email, req.Password).Scan(&newID)
-
 	if err != nil {
 		http.Error(w, "Failed to create account", 500)
 		return
@@ -283,7 +274,6 @@ func HandleAdminCreatePatient(w http.ResponseWriter, r *http.Request) {
         INSERT INTO Patient (patientID, doctorID, eircode)
         VALUES ($1, $2, $3)
     `, newID, doctorID, req.Eircode)
-
 	if err != nil {
 		http.Error(w, "Failed to create patient", 500)
 		return
@@ -313,7 +303,6 @@ func HandleAdminCreateDoctor(w http.ResponseWriter, r *http.Request) {
         VALUES ($1, $2, "doctor")
         RETURNING ID
     `, req.Email, req.Password).Scan(&newID)
-
 	if err != nil {
 		http.Error(w, "Failed to create account", 500)
 		return
@@ -412,7 +401,6 @@ func HandleAdminUpdateClinic(w http.ResponseWriter, r *http.Request) {
         SET name = $1, phone = $2, county = $3, eircode = $4, 
         WHERE clinicID = $5`,
 		req.Name, req.Phone, req.County, req.Eircode, clinicID)
-
 	if err != nil {
 		http.Error(w, "Failed to update clinic", http.StatusInternalServerError)
 		return

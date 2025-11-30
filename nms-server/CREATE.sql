@@ -153,5 +153,5 @@ CREATE TABLE SpeechResponse (
     testDate VARCHAR(20) NOT NULL,
     patientID INT, 
     llmResponse  TEXT,
-    FOREIGN KEY (patientID) REFERENCES Patient(patientID) ON DELETE CASCADE,
+    FOREIGN KEY (patientID) REFERENCES Patient(patientID) ON DELETE CASCADE
 );

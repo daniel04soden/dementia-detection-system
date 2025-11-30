@@ -92,6 +92,9 @@ func main() {
 	http.HandleFunc("GET /api/clinics/county", handlers.HandleGetCountyClinics)
 
 	// Admin
+
+	http.HandleFunc("POST /api/admin/signup", handlers.HandleSignupAdmin)
+	http.HandleFunc("POST /api/admin/approve", handlers.HandleAdminApproveDoctor)
 	http.HandleFunc("POST /api/admin/approve", handlers.HandleAdminApproveDoctor)
 	http.HandleFunc("/api/admin/clinics", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
