@@ -11,6 +11,7 @@ import com.example.dementiaDetectorApp.api.auth.AuthResult
 import com.example.dementiaDetectorApp.api.auth.LoginResponse
 import com.example.dementiaDetectorApp.api.clinics.ClinicRepository
 import com.example.dementiaDetectorApp.api.clinics.ClinicResult
+import com.example.dementiaDetectorApp.api.clinics.CountyResponse
 import com.example.dementiaDetectorApp.models.Clinic
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,8 +31,8 @@ class AuthViewModel @Inject constructor(
     private val resultChannel = Channel<AuthResult<LoginResponse>>()
     val authResults = resultChannel.receiveAsFlow()
 
-    private val clinicResChannel = Channel<ClinicResult<List<Clinic>>>()
-    val clinicResults = resultChannel.receiveAsFlow()
+    private val clinicResChannel = Channel<ClinicResult<CountyResponse>>()
+    val clinicResults = clinicResChannel.receiveAsFlow()
 
     var loginMsg by mutableStateOf("")
     private var isLoading = false
@@ -207,19 +208,27 @@ class AuthViewModel @Inject constructor(
         return res
     }
 
-    private fun getClinicsInCounty(county: String){
-        isLoading = true
-        var res = emptyList<Clinic>()
+    private fun getClinicsInCounty(county: String) {
         viewModelScope.launch {
-            val result = clinicRepo.filterByCounty(county)
-            Log.d("clinicByCounty Result", result.toString())
-            if (result is ClinicResult.Authorized){
-                res = result.data ?: emptyList()
+            isLoading = true
+
+            try {
+                val result = clinicRepo.filterByCounty(county)
+                Log.d("clinicByCounty Result", result.toString())
+
+                if (result is ClinicResult.Authorized) {
+                    _clinics.value = result.data?.list ?: emptyList()
+                } else {
+                    _clinics.value = emptyList()
+                }
+
+                clinicResChannel.send(result)
+
+            } finally {
+                isLoading = false
             }
-            clinicResChannel.send(result)
-            isLoading = false
         }
-        _clinics.value = res
     }
+
 
 }

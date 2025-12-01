@@ -28,7 +28,7 @@ import com.example.dementiaDetectorApp.viewModels.SharedVM
 import com.example.dementiaDetectorApp.viewModels.StatusVM
 
 @Composable
-fun StatusScreen(sVM: StatusVM, sharedVM: SharedVM, nc: NavController){
+fun RiskScreen(/*rVM: RiskVM,*/ sharedVM: SharedVM, nc: NavController){
     //sVM.initTests(sharedVM.id.value)
     Box(modifier = Modifier
         .fillMaxSize()
@@ -61,8 +61,8 @@ private fun HeaderSection(){
             modifier = Modifier.height(45.dp)
         )
         Column {
-            Text("Test Statuses", color = DarkPurple, fontSize = 25.sp)
-            Text("Status information on each test", color = MidPurple, fontSize = 18.sp)
+            Text("Risk Assessment", color = DarkPurple, fontSize = 25.sp)
+            Text("How at risk are you of having dementia", color = MidPurple, fontSize = 18.sp)
         }
     }
 }

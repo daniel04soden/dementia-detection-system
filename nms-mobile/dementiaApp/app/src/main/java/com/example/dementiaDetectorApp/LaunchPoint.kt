@@ -1,11 +1,9 @@
 package com.example.dementiaDetectorApp
 
 import android.os.Bundle
-import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,6 +14,7 @@ import com.example.dementiaDetectorApp.ui.views.HomeScreen
 import com.example.dementiaDetectorApp.ui.views.LoginScreen
 import com.example.dementiaDetectorApp.ui.views.QuestionnaireScreen
 import com.example.dementiaDetectorApp.ui.views.RegistrationScreen
+import com.example.dementiaDetectorApp.ui.views.RiskScreen
 import com.example.dementiaDetectorApp.ui.views.Stage1Screen
 import com.example.dementiaDetectorApp.ui.views.Stage2Screen
 import com.example.dementiaDetectorApp.ui.views.StatusScreen
@@ -23,8 +22,8 @@ import com.example.dementiaDetectorApp.viewModels.AuthViewModel
 import com.example.dementiaDetectorApp.viewModels.ContactVM
 import com.example.dementiaDetectorApp.viewModels.HomeVM
 import com.example.dementiaDetectorApp.viewModels.QViewModel
-import com.example.dementiaDetectorApp.viewModels.Stage1VM
 import com.example.dementiaDetectorApp.viewModels.SharedVM
+import com.example.dementiaDetectorApp.viewModels.Stage1VM
 import com.example.dementiaDetectorApp.viewModels.Stage2VM
 import com.example.dementiaDetectorApp.viewModels.StatusVM
 import dagger.hilt.android.AndroidEntryPoint
@@ -58,6 +57,7 @@ class LaunchPoint : ComponentActivity() {
                     composable("test1"){ Stage1Screen(t1VM, sharedVM, nc)}
                     composable("test2"){ Stage2Screen(t2VM, sharedVM, nc)}
                     composable("status"){ StatusScreen(sVM, sharedVM, nc) }
+                    composable("risk"){ RiskScreen(sharedVM,nc) }
                     composable("contact") { ContactScreen(cVM, sharedVM, nc) }
                 }
             }

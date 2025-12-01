@@ -1,22 +1,25 @@
 package com.example.dementiaDetectorApp.api.clinics
 
 import com.example.dementiaDetectorApp.models.Clinic
+import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Query
 import kotlin.reflect.jvm.internal.impl.descriptors.ConstUtil
 
 interface ClinicAPI {
 
-    @POST("clinic")
+    @GET("patient/clinic")
     suspend fun getClinic(
         @Header("Authorization") token: String,
-        @Body request: ClinicRequest
-    ): Clinic
+        @Query("id") id:String
+    ): Response<Clinic>
 
-    @POST("clinics/county")
+    @GET("clinics/county")
     suspend fun filterByCounty(
         @Header("Authorization") token: String,
-        @Body request: CountyRequest
-    ):CountyResponse
+        @Query("county") county:String
+    ):Response<CountyResponse>
 }

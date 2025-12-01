@@ -40,7 +40,7 @@ class SharedVM: ViewModel(){
             NavBarContent(
                 title = "Risk Assessment",
                 iconId = 0,
-                "home"
+                "risk"
             ),
 
             NavBarContent(
