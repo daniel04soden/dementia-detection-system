@@ -77,6 +77,18 @@ func main() {
 
 	http.HandleFunc("POST /api/speech/insert", handlers.HandleSpeechInsert)
 
+	// Reviews
+	http.HandleFunc("POST /api/review/insert", handlers.HandleInsertReview)
+	http.HandleFunc("POST /api/review/update", handlers.HandleUpdateReview)
+	http.HandleFunc("POST /api/patient/reviews", handlers.HandleGetPatientReviews)
+	http.HandleFunc("GET /api/reviews", handlers.HandleGetAllReviews)
+
+	// Support Tickets
+	http.HandleFunc("POST /api/ticket/insert", handlers.HandleInsertTicket)
+	http.HandleFunc("POST /api/ticket/update", handlers.HandleUpdateTicket)
+	http.HandleFunc("POST /api/patient/tickets", handlers.HandleGetPatientTickets)
+	http.HandleFunc("GET /api/tickets", handlers.HandleGetAllTickets)
+
 	// Patient
 	http.HandleFunc("POST /api/mobile/signup", handlers.HandleSignupPatient)
 	http.HandleFunc("GET /api/patients", handlers.HandleGetAllPatients)

@@ -9,7 +9,7 @@ import (
 
 type LifestyleInsert struct {
 	PatientID               int     `json:"patientID"`
-	Grading                 bool    `json:"grading"`
+	Status                  bool    `json:"status"`
 	Diabetic                int     `json:"diabetic"`
 	AlcoholLevel            float64 `json:"alcoholLevel"`
 	HeartRate               int     `json:"heartRate"`
@@ -62,10 +62,10 @@ func HandleInsertLifestyle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var lifestyleStatus int
-	if req.Grading == false {
+	if req.Status == false {
 		lifestyleStatus = 1
 	}
-	if req.Grading == true {
+	if req.Status == true {
 		lifestyleStatus = 2
 	}
 
