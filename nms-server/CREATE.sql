@@ -45,30 +45,8 @@ CREATE TABLE IF NOT EXISTS DoctorEmployment (
 );
 
 CREATE TABLE IF NOT EXISTS Lifestyle (
-	lifestyleID SERIAL PRIMARY KEY,
-	lifestyleStatus INT DEFAULT 0,
-    patientID INT,
-	gender INT,
-	age INT,
-	dHand INT,
-	weight FLOAT,
-	avgTemp FLOAT,
-	restingHr INT,
-	oxLv INT,
-	history BOOLEAN,
-	smoke BOOLEAN,
-	apoe BOOLEAN,
-	activityLv VARCHAR(20),
-	depressed BOOLEAN,
-	diet VARCHAR(20),
-	goodSleep BOOLEAN,
-	edu VARCHAR(30),
-    FOREIGN KEY (patientID) REFERENCES Patient(patientID) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS Lifestyle (
     lifestyleID SERIAL PRIMARY KEY,
-	lifestyleStatus INT DEFAULT 0,
+    lifestyleStatus INT DEFAULT 0,
     patientID INT,
     diabetic INT,                                   -- 0 for no, 1 for yes
     alcohollevel FLOAT,                             -- ???
@@ -82,7 +60,7 @@ CREATE TABLE IF NOT EXISTS Lifestyle (
     gender INT,                                     -- 0 for female, 1 for male
     familyhistory INT,                              -- 0 for no, 1 for yes
     smoked INT,                                     -- 0 for no, 1 for yes
-    apoeε4 INT,                                     -- 0 for no, 1 for yes
+    apoe4 INT,                                     -- 0 for no, 1 for yes
     physicalactivity VARCHAR(50),                   -- 'Sedentary', 'Moderate Activity', 'Mild Activity'
     depressionstatus INT,                           -- 0 for no depression, 1 for mild, 2 for moderate, etc.
     cognitivetestscores INT,                        -- ???
@@ -93,7 +71,7 @@ CREATE TABLE IF NOT EXISTS Lifestyle (
     cumulativeprimary VARCHAR(5),                   -- 'TRUE' or 'FALSE'
     cumulativesecondary VARCHAR(5),                 -- 'TRUE' or 'FALSE'
     cumulativedegree VARCHAR(5),                    -- 'TRUE' or 'FALSE'
-    dementiastatus VARCHAR(50)                      -- 'N/A', 'Early', 'Moderate', 'Severe'
+    dementiastatus VARCHAR(50),                      -- 'N/A', 'Early', 'Moderate', 'Severe'
     FOREIGN KEY (patientID) REFERENCES Patient(patientID) ON DELETE CASCADE
 );
 
@@ -148,10 +126,36 @@ CREATE TABLE IF NOT EXISTS TestStageTwo (
 );
 
 -- add checks after
-CREATE TABLE SpeechResponse (
+CREATE TABLE IF NOT EXISTS SpeechResponse (
     speechTestID SERIAL PRIMARY KEY,
     testDate VARCHAR(20) NOT NULL,
-    patientID INT, 
+    patientID INT,
     llmResponse  TEXT,
+    FOREIGN KEY (patientID) REFERENCES Patient(patientID) ON DELETE CASCADE
+);
+
+-- add Reviews
+CREATE TABLE IF NOT EXISTS Reviews (
+    reviewID SERIAL PRIMARY KEY,
+    date VARCHAR(20) NOT NULL,
+    patientID INT,
+    score INT, 
+    critique  TEXT,
+    answer TEXT,
+    FOREIGN KEY (patientID) REFERENCES Patient(patientID) ON DELETE CASCADE
+);
+
+-- add support tickets
+CREATE TABLE IF NOT EXISTS Tickets (
+    ticketID SERIAL PRIMARY KEY,
+    dateOpened VARCHAR(20) NOT NULL,
+    dateClosed VARCHAR(20) NOT NULL,
+    patientID INT,
+    priority INT,
+    status INT,
+    workaround TEXT,
+    solution TEXT,
+
+    details  TEXT,
     FOREIGN KEY (patientID) REFERENCES Patient(patientID) ON DELETE CASCADE
 );
