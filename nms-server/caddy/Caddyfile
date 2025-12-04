@@ -1,3 +1,3 @@
-ben-murphy.dev.com {
-	reverse_proxy go_server:8080
+magestle.dev {
+	reverse_proxy go_web:8080
 }

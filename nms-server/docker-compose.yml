@@ -28,7 +28,17 @@ services:
       DB_NAME: mydb
     ports:
       - "8080:8080"
+  cloudflared:
+    image: cloudflare/cloudflared
+    container_name: cloudflared
+    environment:
+      - TZ=Europe/Dublin # Change this to your timezone
+      - TUNNEL_TOKEN=
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    network_mode: "host"                              # Use the host network (no isolation between host and container)
 
 volumes:
   pgdata:
+
 

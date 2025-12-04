@@ -104,6 +104,8 @@ func main() {
 			handlers.HandleAdminCreateClinic(w, r)
 		case http.MethodPut:
 			handlers.HandleAdminUpdateClinic(w, r)
+		case http.MethodDelete:
+			handlers.HandleAdminDeleteClinic(w, r)
 		default:
 			http.Error(w, "Method Not Allowed", 405)
 		}
@@ -116,6 +118,9 @@ func main() {
 			handlers.HandleAdminCreatePatient(w, r)
 		case http.MethodPut:
 			handlers.HandleAdminUpdatePatient(w, r)
+		case http.MethodDelete:
+			handlers.HandleAdminDeleteUser(w, r)
+
 		default:
 			http.Error(w, "Method Not Allowed", 405)
 		}
@@ -128,6 +133,9 @@ func main() {
 			handlers.HandleAdminCreateDoctor(w, r)
 		case http.MethodPut:
 			handlers.HandleAdminUpdateDoctor(w, r)
+		case http.MethodDelete:
+			handlers.HandleAdminDeleteUser(w, r)
+
 		default:
 			http.Error(w, "Method Not Allowed", 405)
 		}
