@@ -19,7 +19,6 @@ func HandleInsertReview(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Convert the ID string to an integer
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		http.Error(w, "invalid id", http.StatusBadRequest)
@@ -40,7 +39,6 @@ func HandleInsertReview(w http.ResponseWriter, r *http.Request) {
 		) 
 		VALUES ($1, $2, $3, $4)
 	`, date, id, req.Score, req.Critique)
-
 	if err != nil {
 		http.Error(w, "invalid insert", http.StatusBadRequest)
 		return
