@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS Patient (
 	patientID INT PRIMARY KEY NOT NULL,
     doctorID INT,
 	eircode VARCHAR(10),
+    premium BOOLEAN DEFAULT false,
 	FOREIGN KEY(patientID) REFERENCES Users(userID) ON DELETE CASCADE,
 	FOREIGN KEY(doctorID) REFERENCES Doctor(doctorID)
 );
@@ -125,7 +126,6 @@ CREATE TABLE IF NOT EXISTS TestStageTwo (
     ) STORED
 );
 
--- add checks after
 CREATE TABLE IF NOT EXISTS SpeechResponse (
     speechTestID SERIAL PRIMARY KEY,
     testDate VARCHAR(20) NOT NULL,
@@ -134,7 +134,6 @@ CREATE TABLE IF NOT EXISTS SpeechResponse (
     FOREIGN KEY (patientID) REFERENCES Patient(patientID) ON DELETE CASCADE
 );
 
--- add Reviews
 CREATE TABLE IF NOT EXISTS Reviews (
     reviewID SERIAL PRIMARY KEY,
     date VARCHAR(20) NOT NULL,
@@ -145,7 +144,6 @@ CREATE TABLE IF NOT EXISTS Reviews (
     FOREIGN KEY (patientID) REFERENCES Patient(patientID) ON DELETE CASCADE
 );
 
--- add support tickets
 CREATE TABLE IF NOT EXISTS Tickets (
     ticketID SERIAL PRIMARY KEY,
     dateOpened VARCHAR(20) NOT NULL,
@@ -155,7 +153,17 @@ CREATE TABLE IF NOT EXISTS Tickets (
     status INT,
     workaround TEXT,
     solution TEXT,
-
     details  TEXT,
     FOREIGN KEY (patientID) REFERENCES Patient(patientID) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS Payments (
+    paymentID SERIAL PRIMARY KEY,
+    stripeIntentID TEXT UNIQUE NOT NULL,
+    patientID INT,
+    status VARCHAR(20) DEFAULT 'pending',
+    amount INT
+    FOREIGN KEY (patientID) REFERENCES Patient(patientID) ON DELETE CASCADE
+);
+
+

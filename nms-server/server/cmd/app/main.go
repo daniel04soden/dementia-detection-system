@@ -54,6 +54,11 @@ func main() {
 	//									HANDLERS
 	// ------------------------------------------------------------------------------------------------------
 
+	// Payment
+
+	http.HandleFunc("POST /api/mobile/payment", handlers.HandleCreatePayment)
+	http.HandleFunc("POST /api/stripe/webhook", handlers.HandleCreatePayment)
+
 	http.HandleFunc("GET /api/web/news", handlers.HandleGetDoctorNews)
 	http.HandleFunc("GET /api/mobile/news", handlers.HandleGetPatientNews)
 
