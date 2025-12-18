@@ -28,6 +28,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.disableHotReloadMode
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +46,7 @@ import com.example.dementiaDetectorApp.R
 import com.example.dementiaDetectorApp.models.NewsPiece
 import com.example.dementiaDetectorApp.models.Test
 import com.example.dementiaDetectorApp.ui.composables.NavMenu
+import com.example.dementiaDetectorApp.ui.composables.ReusableToast
 import com.example.dementiaDetectorApp.ui.composables.TestPrompt
 import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.Gray
@@ -66,6 +68,9 @@ fun HomeScreen(homeVM: HomeVM, sharedVM: SharedVM, nc: NavController){
             HeaderPrompts(sharedVM, nc)
             NewsSection(homeVM)
         }
+
+        ReusableToast()
+
         NavMenu(
             sharedVM = sharedVM,
             nc = nc,
@@ -107,7 +112,7 @@ private fun HeaderPrompts(
         ){
             items(prompts.size){
                 Box(Modifier.width(350.dp)){
-                    TestPrompt(test=prompts[it], nc)
+                    TestPrompt(test=prompts[it], sharedVM, nc)
                 }
             }
         }
@@ -145,7 +150,7 @@ private fun NewsBox(
     val ctx = LocalContext.current
     val urlIntent = Intent(
         Intent.ACTION_VIEW,
-        news.link.toUri()
+        news.url.toUri()
     )
     BoxWithConstraints(
         modifier = Modifier
@@ -222,7 +227,7 @@ private fun NewsBox(
                 )
                 HorizontalDivider(thickness = 1.dp, color = Color.White)
                 Text(
-                    text = news.description,
+                    text = news.snippet,
                     lineHeight = 13.sp,
                     color = Gray,
                     fontWeight = FontWeight.Bold,

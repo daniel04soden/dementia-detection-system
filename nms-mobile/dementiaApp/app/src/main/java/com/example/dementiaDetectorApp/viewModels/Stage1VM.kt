@@ -35,7 +35,7 @@ class Stage1VM @Inject constructor(
 
     fun visiTimer(){
         viewModelScope.launch {
-            delay(1_000L)
+            delay(10_000L)
             onTimedVisiChange(false)
             onQ1VisiChange(true)
         }

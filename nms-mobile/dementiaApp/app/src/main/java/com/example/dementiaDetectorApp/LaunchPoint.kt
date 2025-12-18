@@ -25,7 +25,6 @@ import com.example.dementiaDetectorApp.viewModels.QViewModel
 import com.example.dementiaDetectorApp.viewModels.SharedVM
 import com.example.dementiaDetectorApp.viewModels.Stage1VM
 import com.example.dementiaDetectorApp.viewModels.Stage2VM
-import com.example.dementiaDetectorApp.viewModels.StatusVM
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -46,17 +45,16 @@ class LaunchPoint : ComponentActivity() {
                 val qVM : QViewModel = viewModel()
                 val t1VM:  Stage1VM = viewModel()
                 val t2VM: Stage2VM = viewModel()
-                val sVM: StatusVM = viewModel()
                 val cVM: ContactVM = viewModel()
 
-                NavHost(navController = nc, startDestination = "home") {
+                NavHost(navController = nc, startDestination = "login") {
                     composable("login"){LoginScreen(authVM,sharedVM, nc)}
-                    composable("registration"){ RegistrationScreen(authVM,nc) }
+                    composable("registration"){ RegistrationScreen(authVM,sharedVM, nc) }
                     composable("home"){ HomeScreen(homeVM, sharedVM, nc) }
                     composable("questionnaire"){QuestionnaireScreen(qVM, nc)}
                     composable("test1"){ Stage1Screen(t1VM, sharedVM, nc)}
                     composable("test2"){ Stage2Screen(t2VM, sharedVM, nc)}
-                    composable("status"){ StatusScreen(sVM, sharedVM, nc) }
+                    composable("status"){ StatusScreen(sharedVM, nc) }
                     composable("risk"){ RiskScreen(sharedVM,nc) }
                     composable("contact") { ContactScreen(cVM, sharedVM, nc) }
                 }

@@ -25,7 +25,6 @@ import com.example.dementiaDetectorApp.ui.composables.NavMenu
 import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.viewModels.SharedVM
-import com.example.dementiaDetectorApp.viewModels.StatusVM
 
 @Composable
 fun RiskScreen(/*rVM: RiskVM,*/ sharedVM: SharedVM, nc: NavController){
