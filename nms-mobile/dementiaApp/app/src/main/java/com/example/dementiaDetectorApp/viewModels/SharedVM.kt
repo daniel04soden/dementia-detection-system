@@ -154,7 +154,7 @@ class SharedVM @Inject constructor(
 
             Test(
                 name = "Speech Test",
-                route = "test2",
+                route = "speech",
                 state = speechStatus.intValue,
             )
         )

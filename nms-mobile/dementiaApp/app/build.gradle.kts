@@ -11,7 +11,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.logindemo"
+        applicationId = "com.example.DDA"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -65,6 +65,8 @@ dependencies {
     val hiltVersion = "2.57.1"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     kapt("com.google.dagger:hilt-compiler:$hiltVersion")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    kapt("androidx.hilt:hilt-compiler:1.2.0")
 
     //Survey Compose
     implementation("com.github.zekierciyas:survey-compose:1.0.0")
@@ -74,6 +76,10 @@ dependencies {
 
     //osmdroid
     implementation("org.osmdroid:osmdroid-android:6.1.15")
+
+    //.wav recording
+    implementation("com.github.ygorluizfrazao.compose-audio-controls:audio-services:v1.0.0-alpha03")
+    implementation("com.github.ygorluizfrazao.compose-audio-controls:ui:v1.0.0-alpha03")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

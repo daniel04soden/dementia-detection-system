@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -18,12 +19,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.dementiaDetectorApp.R
 import com.example.dementiaDetectorApp.models.Test
 import com.example.dementiaDetectorApp.ui.composables.NavMenu
@@ -125,8 +128,13 @@ private fun TestSection(sharedVM: SharedVM, nc: NavController){
         .padding(bottom = 100.dp),
         verticalArrangement = Arrangement.spacedBy(35.dp)
     ){
-        for (test in sharedVM.tests.value){
-            TestCard(test, sharedVM, nc)
+        LazyColumn(
+            Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(35.dp)
+        ){
+            items(sharedVM.tests.value.size){idx ->
+                TestCard(sharedVM.tests.value[idx], sharedVM, nc)
+            }
         }
     }
 }

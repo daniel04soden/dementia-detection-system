@@ -46,7 +46,7 @@ fun QuestionnaireScreen(qVM: QViewModel, nc: NavController){
             Modifier.padding(bottom = 50.dp)
         ){
             if(qVM.prefaceVisi.collectAsState().value){
-                Spacer(Modifier.height(200.dp))
+                Spacer(Modifier.height(120.dp))
             }
             else{
                 Spacer(Modifier.height(35.dp))

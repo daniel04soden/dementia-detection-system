@@ -61,7 +61,7 @@ fun Stage1Screen(tVM: Stage1VM, sVM: SharedVM, nc: NavController){
             Modifier.padding(bottom = 50.dp)
         ){
             if(tVM.prefaceVisi.collectAsState().value){
-                Spacer(Modifier.height(200.dp))
+                Spacer(Modifier.height(120.dp))
             }
             else{
                 Spacer(Modifier.height(35.dp))
@@ -313,7 +313,9 @@ private fun Question2(tVM: Stage1VM){
             Text(
                 text = "2) Select the Correct Clock",
                 fontSize = 30.sp,
-                color = DarkPurple
+                color = DarkPurple,
+                lineHeight = 32.5.sp,
+                modifier = Modifier.padding(horizontal = 7.5.dp)
             )
         }
         Spacer(Modifier.height(35.dp))
@@ -622,7 +624,8 @@ private fun ConfirmationSection(tVM: Stage1VM){
                 text = "Are you sure you want to select clock ${tVM.clock.collectAsState().value+1}?",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = MidPurple
+                color = MidPurple,
+                modifier = Modifier.padding(horizontal = 7.5.dp)
             )
 
             val context = LocalContext.current

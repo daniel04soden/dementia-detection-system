@@ -50,7 +50,7 @@ fun Stage2Screen(tVM: Stage2VM, sVM: SharedVM, nc: NavController){
             Modifier.padding(bottom = 50.dp)
         ){
             if(tVM.prefaceVisi.collectAsState().value){
-                Spacer(Modifier.height(200.dp))
+                Spacer(Modifier.height(120.dp))
             }
             else{
                 Spacer(Modifier.height(35.dp))
@@ -112,7 +112,8 @@ private fun PrefaceSection(tVM: Stage2VM){
                             tVM.onFormChange(true)}
                     ){
                         Text(
-                            text = "Continue"
+                            text = "Continue",
+                            fontSize = 20.sp
                         )
                     }
                 }

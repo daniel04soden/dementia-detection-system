@@ -1,7 +1,6 @@
 package com.example.dementiaDetectorApp.viewModels
 
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dementiaDetectorApp.api.tests.TestRepository
