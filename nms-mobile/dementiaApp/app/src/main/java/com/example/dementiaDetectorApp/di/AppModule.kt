@@ -9,6 +9,9 @@ import com.example.dementiaDetectorApp.api.auth.AuthRepository
 import com.example.dementiaDetectorApp.api.clinics.ClinicAPI
 import com.example.dementiaDetectorApp.api.clinics.ClinicRepoImp
 import com.example.dementiaDetectorApp.api.clinics.ClinicRepository
+import com.example.dementiaDetectorApp.api.feedback.FeedbackAPI
+import com.example.dementiaDetectorApp.api.feedback.FeedbackRepo
+import com.example.dementiaDetectorApp.api.feedback.FeedbackRepoImp
 import com.example.dementiaDetectorApp.api.news.NewsAPI
 import com.example.dementiaDetectorApp.api.news.NewsRepo
 import com.example.dementiaDetectorApp.api.news.NewsRepoImp
@@ -115,5 +118,25 @@ object AppModule {
     @Singleton
     fun provNewsRepo(api: NewsAPI, prefs: SharedPreferences): NewsRepo{
         return NewsRepoImp(api, prefs)
+    }
+
+    @Provides
+    @Singleton
+    fun provFeedbackAPI(): FeedbackAPI{
+        val moshi = Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
+
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+            .create(FeedbackAPI::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provFeedbackRepo(api:FeedbackAPI, prefs: SharedPreferences): FeedbackRepo{
+        return FeedbackRepoImp(api, prefs)
     }
 }

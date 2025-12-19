@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -28,7 +27,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.disableHotReloadMode
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +43,7 @@ import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.R
 import com.example.dementiaDetectorApp.models.NewsPiece
 import com.example.dementiaDetectorApp.models.Test
+import com.example.dementiaDetectorApp.ui.composables.FeedbackPanel
 import com.example.dementiaDetectorApp.ui.composables.NavMenu
 import com.example.dementiaDetectorApp.ui.composables.ReusableToast
 import com.example.dementiaDetectorApp.ui.composables.TestPrompt
@@ -58,6 +57,7 @@ import com.example.dementiaDetectorApp.viewModels.SharedVM
 
 @Composable
 fun HomeScreen(homeVM: HomeVM, sharedVM: SharedVM, nc: NavController){
+    homeVM.countTestsDone(sharedVM.tests.value)
     Box(modifier = Modifier
         .background(Color.White)
         .fillMaxSize()
@@ -68,9 +68,8 @@ fun HomeScreen(homeVM: HomeVM, sharedVM: SharedVM, nc: NavController){
             HeaderPrompts(sharedVM, nc)
             NewsSection(homeVM)
         }
-
+        FeedbackPanel(homeVM, sharedVM)
         ReusableToast()
-
         NavMenu(
             sharedVM = sharedVM,
             nc = nc,

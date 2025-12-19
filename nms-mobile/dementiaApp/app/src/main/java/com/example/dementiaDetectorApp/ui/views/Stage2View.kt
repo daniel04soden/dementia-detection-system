@@ -29,13 +29,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.ui.composables.ProgressDots
+import com.example.dementiaDetectorApp.ui.composables.ReusableToast
 import com.example.dementiaDetectorApp.ui.theme.Gray
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.ui.theme.buttonColours
 import com.example.dementiaDetectorApp.ui.composables.SubmittedSection
+import com.example.dementiaDetectorApp.ui.util.ToastManager
 import com.example.dementiaDetectorApp.viewModels.SharedVM
 import com.example.dementiaDetectorApp.viewModels.Stage2VM
 import com.zekierciyas.library.view.SurveyScreen
+import org.osmdroid.tileprovider.ReusableBitmapDrawable
 
 @Composable
 fun Stage2Screen(tVM: Stage2VM, sVM: SharedVM, nc: NavController){
@@ -153,10 +156,9 @@ private fun FormSection(tVM: Stage2VM, sVM: SharedVM, nc: NavController){
                     }
                     Button(
                         onClick = {
-                            if(tVM.allQuestionsAnswered()){
-                                tVM.submitAnswers(sVM.id.value)
-                            }
+                            tVM.submitAnswers(sVM.id.value)
                         },
+                        enabled = tVM.allQuestionsAnswered.collectAsState().value,
                         colors = buttonColours(),
                         shape = RoundedCornerShape(24.dp),
                         modifier = Modifier

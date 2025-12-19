@@ -1,6 +1,9 @@
 package com.example.dementiaDetectorApp.viewModels
 
 import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dementiaDetectorApp.api.tests.LifestyleRequest
@@ -24,8 +27,7 @@ class QViewModel @Inject constructor(
     private val resultChannel = Channel<TestResult<Unit>>()
     val testResults = resultChannel.receiveAsFlow()
 
-    var isLoading = false
-        private set
+    private var isLoading = false
 
     // Preface
     private val _prefaceVisi = MutableStateFlow(true)
@@ -38,19 +40,28 @@ class QViewModel @Inject constructor(
     fun onS1Change(newVisi: Boolean){_s1visi.value = newVisi}
 
     private val _gender = MutableStateFlow(-1)
-    val gender: StateFlow<Int> = _gender
-    private fun onGenderChange(newGender: Int){_gender.value=newGender}
+    private val gender: StateFlow<Int> = _gender
+    private fun onGenderChange(newGender: Int){
+        _gender.value=newGender
+        isS1Complete()
+    }
 
     private val _age = MutableStateFlow(0)
-    val age: StateFlow<Int> = _age
-    private fun onAgeChange(newAge: Int) { _age.value = newAge }
+    private val age: StateFlow<Int> = _age
+    private fun onAgeChange(newAge: Int) {
+        _age.value = newAge
+        isS1Complete()
+    }
 
     private val _dominantHand = MutableStateFlow(-1)
-    val dominantHand: StateFlow<Int> = _dominantHand
-    private fun onDominantHandChange(newValue: Int) { _dominantHand.value = newValue }
+    private val dominantHand: StateFlow<Int> = _dominantHand
+    private fun onDominantHandChange(newValue: Int) {
+        _dominantHand.value = newValue
+        isS1Complete()
+    }
 
     private val _education = MutableStateFlow("")
-    val education: StateFlow<String> = _education
+    private val education: StateFlow<String> = _education
     private fun onEducationChange(newEdu: String)
     {
         _education.value = newEdu
@@ -74,6 +85,7 @@ class QViewModel @Inject constructor(
             onSecondaryChange(false)
             onDegreeChange(false)
         }
+        isS1Complete()
     }
 
     private val _cumulativePrimary = MutableStateFlow("")
@@ -86,10 +98,13 @@ class QViewModel @Inject constructor(
     private fun onDegreeChange(change:Boolean){_cumulativeDegree.value = change.toString().uppercase()}
 
     private val _familyHistory = MutableStateFlow(-1)
-    val familyHistory: StateFlow<Int> = _familyHistory
-    fun onFamilyHistoryChange(v: Int) { _familyHistory.value = v }
+    private val familyHistory: StateFlow<Int> = _familyHistory
+    private fun onFamilyHistoryChange(v: Int) {
+        _familyHistory.value = v
+        isS1Complete()
+    }
 
-    val eduOptions = listOf("Primary Level", "Secondary Level", "Tertiary Level")
+    private val eduOptions = listOf("Primary Level", "Secondary Level", "Tertiary Level")
 
     val s1Survey = listOf(
         SurveyModel(
@@ -128,70 +143,114 @@ class QViewModel @Inject constructor(
         )
     )
 
-    fun isS1Complete(): Boolean {
-        return gender.value != -1 &&
+    private val _s1Complete = mutableStateOf(false)
+    val s1Complete:State<Boolean> = _s1Complete
+
+    private fun isS1Complete(){
+        _s1Complete.value = (
+                gender.value != -1 &&
                 age.value > 0 &&
                 dominantHand.value != -1 &&
                 education.value.isNotEmpty() &&
                 familyHistory.value != -1
+                )
     }
 
     // ---------------------- S2: Medical / Measurements ----------------------
     private val _s2visi = MutableStateFlow(false)
     val s2visi: StateFlow<Boolean> = _s2visi
-    fun onS2Change(newVisi: Boolean){_s2visi.value = newVisi}
+    fun onS2Change(newVisi: Boolean){
+        _s2visi.value = newVisi
+        isS2Complete()
+    }
 
     private val _weight = MutableStateFlow(-1.0F)
-    val weight: StateFlow<Float> = _weight
-    fun onWeightChange(newWeight: Float){_weight.value = newWeight}
+    private val weight: StateFlow<Float> = _weight
+    private fun onWeightChange(newWeight: Float){
+        _weight.value = newWeight
+        isS2Complete()
+    }
 
     private val _bodyTemperature = MutableStateFlow(-1.0F)
-    val bodyTemperature: StateFlow<Float> = _bodyTemperature
-    fun onBodyTemperatureChange(v: Float) { _bodyTemperature.value = v }
+    private val bodyTemperature: StateFlow<Float> = _bodyTemperature
+    private fun onBodyTemperatureChange(v: Float) {
+        _bodyTemperature.value = v
+        isS2Complete()
+    }
 
     private val _heartRate = MutableStateFlow(-1)
-    val heartRate: MutableStateFlow<Int> = _heartRate
-    fun onHeartRateChange(v: Int) { _heartRate.value = v }
+    private val heartRate: MutableStateFlow<Int> = _heartRate
+    private fun onHeartRateChange(v: Int) {
+        _heartRate.value = v
+        isS2Complete()
+    }
 
     private val _bloodOxygen = MutableStateFlow(-1.0F)
-    val bloodOxygen: StateFlow<Float> = _bloodOxygen
-    fun onBloodOxygenChange(v: Float) { _bloodOxygen.value = v }
+    private val bloodOxygen: StateFlow<Float> = _bloodOxygen
+    private fun onBloodOxygenChange(v: Float) {
+        _bloodOxygen.value = v
+        isS2Complete()
+    }
 
     private val _apoeE4 = MutableStateFlow(-1)
-    val apoeE4: StateFlow<Int> = _apoeE4
-    fun onApoeE4Change(v: Int) { _apoeE4.value = v }
+    private val apoeE4: StateFlow<Int> = _apoeE4
+    private fun onApoeE4Change(v: Int) {
+        _apoeE4.value = v
+        isS2Complete()
+    }
 
     private val _diabetic = MutableStateFlow(-1)
-    val diabetic: StateFlow<Int> = _diabetic
-    fun onDiabeticChange(value: Int) { _diabetic.value = value }
+    private val diabetic: StateFlow<Int> = _diabetic
+    private fun onDiabeticChange(value: Int) {
+        _diabetic.value = value
+        isS2Complete()
+    }
 
     private val _alcoholLevel = MutableStateFlow(-1.0f)
-    val alcoholLevel: StateFlow<Float> = _alcoholLevel
-    fun onAlcoholLevelChange(value: Float) { _alcoholLevel.value = value }
+    private val alcoholLevel: StateFlow<Float> = _alcoholLevel
+    private fun onAlcoholLevelChange(value: Float) {
+        _alcoholLevel.value = value
+        isS2Complete()
+    }
 
     private val _bloodPressure = MutableStateFlow(-1)
-    val bloodPressure: StateFlow<Int> = _bloodPressure
-    fun onBloodPressureChange(value: Int) { _bloodPressure.value = value }
+    private val bloodPressure: StateFlow<Int> = _bloodPressure
+    private fun onBloodPressureChange(value: Int) {
+        _bloodPressure.value = value
+        isS2Complete()
+    }
 
     private val _hearingLoss = MutableStateFlow(-1)
-    val hearingLoss: StateFlow<Int> = _hearingLoss
-    fun onHearingLossChange(value: Int) { _hearingLoss.value = value }
+    private val hearingLoss: StateFlow<Int> = _hearingLoss
+    private fun onHearingLossChange(value: Int) { _hearingLoss.value = value }
 
     private val _mriDelay = MutableStateFlow(-1.0f)
-    val mriDelay: StateFlow<Float> = _mriDelay
-    fun onMRIDelayChange(value: Float){ _mriDelay.value = value }
+    private val mriDelay: StateFlow<Float> = _mriDelay
+    private fun onMRIDelayChange(value: Float){
+        _mriDelay.value = value
+        isS2Complete()
+    }
 
     private val _cognitiveTestScores = MutableStateFlow(-1)
-    val cognitiveTestScores: StateFlow<Int> = _cognitiveTestScores
-    fun onCognitiveTestScoresChange(v: Int){ _cognitiveTestScores.value = v }
+    private val cognitiveTestScores: StateFlow<Int> = _cognitiveTestScores
+    private fun onCognitiveTestScoresChange(v: Int){
+        _cognitiveTestScores.value = v
+        isS2Complete()
+    }
 
     private val _medicationHistory = MutableStateFlow(-1)
-    val medicationHistory: StateFlow<Int> = _medicationHistory
-    fun onMedicationHistoryChange(v: Int){ _medicationHistory.value = v }
+    private val medicationHistory: StateFlow<Int> = _medicationHistory
+    private fun onMedicationHistoryChange(v: Int){
+        _medicationHistory.value = v
+        isS2Complete()
+    }
 
     private val _chronicHealthConditions = MutableStateFlow("")
-    val chronicHealthConditions: StateFlow<String> = _chronicHealthConditions
-    fun onChronicHealthConditionsChange(v: String){ _chronicHealthConditions.value = v }
+    private val chronicHealthConditions: StateFlow<String> = _chronicHealthConditions
+    private fun onChronicHealthConditionsChange(v: String){
+        _chronicHealthConditions.value = v
+        isS2Complete()
+    }
 
     val s2Survey = listOf(
         SurveyModel(
@@ -278,54 +337,80 @@ class QViewModel @Inject constructor(
         )
     )
 
-    fun isS2Complete(): Boolean {
-        return weight.value > -1f &&
-                bodyTemperature.value > -1f &&
-                heartRate.value > -1 &&
-                bloodOxygen.value > -1f &&
-                apoeE4.value != -1 &&
-                diabetic.value != -1 &&
-                alcoholLevel.value > -1f &&
-                bloodPressure.value != -1 &&
-                hearingLoss.value != -1 &&
-                mriDelay.value > -1f &&
-                cognitiveTestScores.value > -1 &&
-                medicationHistory.value > -1 &&
-                chronicHealthConditions.value != ""
+    private val _s2Complete = mutableStateOf(false)
+    val s2Complete:State<Boolean> = _s2Complete
+
+    private fun isS2Complete(){
+        _s2Complete.value = (
+                weight.value > -1f &&
+                        bodyTemperature.value > -1f &&
+                        heartRate.value > -1 &&
+                        bloodOxygen.value > -1f &&
+                        apoeE4.value != -1 &&
+                        diabetic.value != -1 &&
+                        alcoholLevel.value > -1f &&
+                        bloodPressure.value != -1 &&
+                        hearingLoss.value != -1 &&
+                        mriDelay.value > -1f &&
+                        cognitiveTestScores.value > -1 &&
+                        medicationHistory.value > -1 &&
+                        chronicHealthConditions.value != ""
+                )
     }
 
     // ---------------------- S3: Hobbies / Lifestyle ----------------------
     private val _s3visi = MutableStateFlow(false)
     val s3visi: StateFlow<Boolean> = _s3visi
-    fun onS3Change(newVisi: Boolean){_s3visi.value = newVisi}
+    fun onS3Change(newVisi: Boolean){
+        _s3visi.value = newVisi
+        isS3Complete()
+    }
 
     private val _smoked = MutableStateFlow(-1)
-    val smoked: MutableStateFlow<Int> = _smoked
-    fun onSmokedChange(v: Int) { _smoked.value = v }
+    private val smoked: MutableStateFlow<Int> = _smoked
+    private fun onSmokedChange(v: Int) {
+        _smoked.value = v
+        isS3Complete()
+    }
 
     private val _physicalActivity = MutableStateFlow("")
-    val physicalActivity: StateFlow<String> = _physicalActivity
-    fun onPhysicalActivityChange(v: String) { _physicalActivity.value = v }
+    private val physicalActivity: StateFlow<String> = _physicalActivity
+    private fun onPhysicalActivityChange(v: String) {
+        _physicalActivity.value = v
+        isS3Complete()
+    }
 
     private val _depressionStatus = MutableStateFlow(-1)
-    val depressionStatus: StateFlow<Int> = _depressionStatus
-    fun onDepressionStatusChange(v: Int) { _depressionStatus.value = v }
+    private val depressionStatus: StateFlow<Int> = _depressionStatus
+    private fun onDepressionStatusChange(v: Int) {
+        _depressionStatus.value = v
+        isS3Complete()
+    }
 
     private val _nutritionDiet = MutableStateFlow("")
-    val nutritionDiet: StateFlow<String> = _nutritionDiet
-    fun onNutritionDietChange(v: String) { _nutritionDiet.value = v }
+    private val nutritionDiet: StateFlow<String> = _nutritionDiet
+    private fun onNutritionDietChange(v: String) {
+        _nutritionDiet.value = v
+        isS3Complete()
+    }
 
     private val _sleepQuality = MutableStateFlow(-1)
-    val sleepQuality: StateFlow<Int> =_sleepQuality
-    fun onSleepQualityChange(v: Int) { _sleepQuality.value = v }
+    private val sleepQuality: StateFlow<Int> =_sleepQuality
+    private fun onSleepQualityChange(v: Int) {
+        _sleepQuality.value = v
+        isS3Complete()
+    }
 
     private val _dementiaStatus = MutableStateFlow("")
-    val dementiaStatus: StateFlow<String> = _dementiaStatus
-    fun onDementiaStatusChange(v: String){ _dementiaStatus.value = v }
+    private val dementiaStatus: StateFlow<String> = _dementiaStatus
+    private fun onDementiaStatusChange(v: String){
+        _dementiaStatus.value = v
+        isS3Complete()
+    }
 
-    val activityOptions = listOf("Sedentary", "Lightly Active", "Moderately Active")
-    val dietOptions = listOf("Balanced", "Low Carb", "Mediterranean")
-    val dementiaOptions = listOf("No Dementia", "Mild", "Moderate", "Severe")
+    private val activityOptions = listOf("Sedentary", "Lightly Active", "Moderately Active")
+    private val dietOptions = listOf("Balanced", "Low Carb", "Mediterranean")
+    private val dementiaOptions = listOf("No Dementia", "Mild", "Moderate", "Severe")
 
     val s3Survey = listOf(
         SurveyModel(
@@ -372,13 +457,18 @@ class QViewModel @Inject constructor(
         )
     )
 
-    fun isS3Complete(): Boolean {
-        return smoked.value != -1 &&
+    private val _s3Complete = mutableStateOf(false)
+    val s3Complete: State<Boolean> =_s3Complete
+
+    private fun isS3Complete(){
+        _s3Complete.value = (
+                smoked.value != -1 &&
                 sleepQuality.value != -1 &&
                 depressionStatus.value != -1 &&
                 physicalActivity.value.isNotEmpty() &&
                 nutritionDiet.value.isNotEmpty() &&
                 dementiaStatus.value.isNotEmpty()
+        )
     }
 
     // ---------------------- Survey Answer Handling ----------------------

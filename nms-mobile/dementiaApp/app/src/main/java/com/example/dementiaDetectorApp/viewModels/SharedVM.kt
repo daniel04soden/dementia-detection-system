@@ -98,7 +98,7 @@ class SharedVM @Inject constructor(
             }
 
             "test2" -> {
-                if (stage2Status.intValue != 10) {
+                if (stage2Status.intValue != 0) {
                     ToastManager.showToast("Test stage 2 already completed")
                 } else {
                     todo()

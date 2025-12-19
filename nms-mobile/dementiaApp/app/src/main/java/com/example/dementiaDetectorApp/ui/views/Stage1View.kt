@@ -124,7 +124,8 @@ private fun PrefaceSection(tVM: Stage1VM){
                             tVM.onTimedVisiChange(true)}
                     ){
                         Text(
-                            text = "Continue"
+                            text = "Continue",
+                            fontSize = 20.sp
                         )
                     }
                 }
@@ -146,7 +147,7 @@ private fun FormSection(tVM: Stage1VM, sVM: SharedVM, nc: NavController){
             AnimatedVisibility(
                 visible = tVM.timedVisi.collectAsState().value
             ){
-                TimedSection(tVM)
+                TimedSection()
             }
             AnimatedVisibility(
                 visible = tVM.q1Visi.collectAsState().value,
@@ -183,7 +184,7 @@ private fun FormSection(tVM: Stage1VM, sVM: SharedVM, nc: NavController){
 }
 
 @Composable
-private fun TimedSection(tVM: Stage1VM){
+private fun TimedSection() {
     Column(Modifier
         .fillMaxSize()
         .background(MidPurple),
@@ -266,7 +267,7 @@ private fun Question1(tVM: Stage1VM){
         ){
             OutlinedTextField(
                 value = answer,
-                onValueChange = {tVM.onDateChange(it)},
+                onValueChange = {if(it.length<=10){tVM.onDateChange(it)}},
                 placeholder = {Text(text = "dd/mm/yyyy")},
                 singleLine = true,
                 colors = outLinedTFColours(),
@@ -283,6 +284,7 @@ private fun Question1(tVM: Stage1VM){
                     tVM.onQ1VisiChange(false)
                     tVM.onQ2VisiChange(true)
                 },
+                enabled = tVM.date.collectAsState().value.length==10,
                 colors = buttonColours(),
                 shape = RoundedCornerShape(24.dp),
                 modifier = Modifier
@@ -404,6 +406,7 @@ private fun Question3(tVM:Stage1VM){
                     tVM.onQ3VisiChange(false)
                     tVM.onQ4VisiChange(true)
                 },
+                enabled = tVM.newsEntry.collectAsState().value.isNotEmpty(),
                 colors = buttonColours(),
                 shape = RoundedCornerShape(24.dp),
                 modifier = Modifier
@@ -561,6 +564,7 @@ private fun Question4(tVM:Stage1VM, sharedVM: SharedVM){
                 onClick = {
                     tVM.submitAnswers(sharedVM.id.value)
                 },
+                enabled = tVM.q4FullyAnswered.value,
                 colors = buttonColours(),
                 shape = RoundedCornerShape(24.dp),
                 modifier = Modifier
@@ -598,7 +602,7 @@ private fun ClockImage(drawingName: String, tVM: Stage1VM, index: Int){
 }
 
 @Composable
-fun ConfirmationSection(tVM: Stage1VM){
+private fun ConfirmationSection(tVM: Stage1VM){
     Box(modifier = Modifier
         .fillMaxSize()
         .background(Color.White)
