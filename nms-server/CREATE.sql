@@ -126,8 +126,9 @@ CREATE TABLE IF NOT EXISTS TestStageTwo (
     ) STORED
 );
 
-CREATE TABLE IF NOT EXISTS SpeechResponse (
+CREATE TABLE IF NOT EXISTS SpeechTest (
     speechTestID SERIAL PRIMARY KEY,
+    speechTestStatus INT DEFAULT 0,
     testDate VARCHAR(20) NOT NULL,
     patientID INT,
     llmResponse  TEXT,
