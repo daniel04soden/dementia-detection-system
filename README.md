@@ -1,5 +1,5 @@
 # 🧠 Dementia Detection System
-The Dementia Detection System is a comprehensive application designed to detect dementia through speech analysis and machine learning models. The system consists of a web application, machine learning models, and a dashboard for administrators to manage the system. The project aims to provide an efficient and accurate way to detect dementia, improving the lives of individuals and their families.
+The Dementia Detection System is a comprehensive application designed to detect dementia through speech analysis and machine learning models. The system consists of a web application, machine learning models,a mobile application for patients, and a dashboard for administrators and doctors to use the system. The project aims to provide an efficient and accurate way to detect dementia, improving the lives of individuals and their families.
 
 ## 🚀 Features
 * Speech analysis using OpenAI models to determine the likelihood of dementia
