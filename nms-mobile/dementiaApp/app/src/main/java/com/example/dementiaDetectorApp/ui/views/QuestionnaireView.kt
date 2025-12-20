@@ -108,7 +108,8 @@ private fun PrefaceSection(qVM: QViewModel){
                             qVM.onS1Change(true)}
                     ){
                         Text(
-                            text = "Take Questionnaire"
+                            text = "Take Questionnaire",
+                            fontSize = 20.sp
                         )
                     }
                 }
@@ -172,14 +173,13 @@ private fun S1Section(qVM: QViewModel){
                     qVM.onSurveyAnswerChange(answers)
                 }
             )
-            //backgroundColor = LightPurple,)
         }
         Button(
             onClick = {
-                if(qVM.isS1Complete()){
-                    qVM.onS1Change(false)
-                    qVM.onS2Change(true)}
+                qVM.onS1Change(false)
+                qVM.onS2Change(true)
             },
+            enabled = qVM.s1Complete.value,
             colors = buttonColours(),
             shape = RoundedCornerShape(24.dp),
             modifier = Modifier
@@ -223,10 +223,10 @@ private fun S2Section(qVM: QViewModel){
         }
         Button(
             onClick = {
-                if (qVM.isS2Complete()){
-                    qVM.onS2Change(false)
-                    qVM.onS3Change(true)}
+                qVM.onS2Change(false)
+                qVM.onS3Change(true)
             },
+            enabled = qVM.s2Complete.value,
             colors = buttonColours(),
             shape = RoundedCornerShape(24.dp),
             modifier = Modifier
@@ -269,10 +269,9 @@ private fun S3Section(qVM: QViewModel){
         }
         Button(
             onClick = {
-                if(qVM.isS3Complete()){
 
-                }
             },
+            enabled = qVM.s3Complete.value,
             colors = buttonColours(),
             shape = RoundedCornerShape(24.dp),
             modifier = Modifier

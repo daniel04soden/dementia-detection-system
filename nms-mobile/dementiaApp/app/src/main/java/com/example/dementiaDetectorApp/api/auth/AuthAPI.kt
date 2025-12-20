@@ -12,7 +12,7 @@ interface AuthAPI {
         @Body request: SignUpRequest
     )
 
-    @POST("mobile/login")
+    @POST("login")
     suspend fun signIn(
         @Body request: LoginRequest
     ): LoginResponse

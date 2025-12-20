@@ -1,5 +1,5 @@
 package com.example.dementiaDetectorApp.viewModels
-import android.accounts.Account
+
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -12,31 +12,28 @@ import com.example.dementiaDetectorApp.api.auth.LoginResponse
 import com.example.dementiaDetectorApp.api.clinics.ClinicRepository
 import com.example.dementiaDetectorApp.api.clinics.ClinicResult
 import com.example.dementiaDetectorApp.models.Clinic
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val repository: AuthRepository,
     private val clinicRepo: ClinicRepository
-): ViewModel() {
-    //Api related vars
+) : ViewModel() {
     private val resultChannel = Channel<AuthResult<LoginResponse>>()
     val authResults = resultChannel.receiveAsFlow()
 
     private val clinicResChannel = Channel<ClinicResult<List<Clinic>>>()
-    val clinicResults = resultChannel.receiveAsFlow()
+    val clinicResults = clinicResChannel.receiveAsFlow()
 
-    var loginMsg by mutableStateOf("")
     private var isLoading = false
 
-    //Login + Register vals
+    // Login + Register vals
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email
     fun onEmailChange(newEmail: String) {
@@ -44,7 +41,7 @@ class AuthViewModel @Inject constructor(
     }
 
     private val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\$"
-    fun isValidEmail(): Boolean {
+    fun validateEmail(): Boolean {
         return email.value.matches(emailRegex.toRegex())
     }
 
@@ -56,12 +53,12 @@ class AuthViewModel @Inject constructor(
 
     private fun validatePassword(): Boolean {
         val password = pswd.value
-        return password.length >= 8 &&                    // Minimum 8 characters required
-                password.any { it.isUpperCase() } &&       // At least one uppercase letter
-                password.any { it.isLowerCase() } &&       // At least one lowercase letter
-                password.any { it.isDigit() } &&           // At least one digit (0-9)
-                password.any { !it.isLetterOrDigit() } &&  // At least one special character
-                password.none { it.isWhitespace() }        // No spaces or whitespace allowed
+        return password.length >= 8 &&
+                password.any { it.isUpperCase() } &&
+                password.any { it.isLowerCase() } &&
+                password.any { it.isDigit() } &&
+                password.any { !it.isLetterOrDigit() } &&
+                password.none { it.isWhitespace() }
     }
 
     private val _confPswd = MutableStateFlow("")
@@ -100,12 +97,10 @@ class AuthViewModel @Inject constructor(
     }
 
     private fun validateEircode(): Boolean {
-        val eircode =
-            eircode.value.uppercase().replace(" ", "")  // Normalize: uppercase, remove spaces
-        return eircode.length == 7 &&                             // Exactly 7 characters total
-                eircode.matches("^(?:[AC-FHKNPRTV-Y][0-9]{2}|D6W)[0-9AC-FHKNPRTV-Y]{4}$".toRegex())  // Official Eircode pattern
+        val eircode = eircode.value.uppercase().replace(" ", "")
+        return eircode.length == 7 &&
+                eircode.matches("^(?:[AC-FHKNPRTV-Y][0-9]{2}|D6W)[0-9AC-FHKNPRTV-Y]{4}$".toRegex())
     }
-
 
     private val _clinic = MutableStateFlow(-1)
     val clinic: StateFlow<Int> = _clinic
@@ -118,12 +113,12 @@ class AuthViewModel @Inject constructor(
 
     private val _county = MutableStateFlow("Antrim")
     val county: StateFlow<String> = _county
-    fun onCountyChange(newCounty: String){
+    fun onCountyChange(newCounty: String) {
         _county.value = newCounty
         getClinicsInCounty(newCounty)
     }
 
-    //UI vals
+    // UI vals
     private val _s1Visi = MutableStateFlow(true)
     val s1Visi: StateFlow<Boolean> = _s1Visi
     fun onS1VisiChange(newVisi: Boolean) {
@@ -144,7 +139,7 @@ class AuthViewModel @Inject constructor(
     }
 
     fun validateS2(): Boolean {
-        return _email.value != "" &&
+        return validateEmail() &&
                 validatePassword() &&
                 _pswd.value == confPswd.value
     }
@@ -158,10 +153,9 @@ class AuthViewModel @Inject constructor(
     private val _registered = MutableStateFlow(false)
     val registered: StateFlow<Boolean> = _registered
 
-    //API calls
-    fun signUp(
-        onSignIn: () -> Unit
-    ) {
+    // API calls
+    fun signUp(onSignIn: () -> Unit):Int {
+        var id = -1
         viewModelScope.launch {
             isLoading = true
             val result = repository.signUp(
@@ -175,51 +169,51 @@ class AuthViewModel @Inject constructor(
             )
             if (result is AuthResult.Authorized) {
                 _registered.value = true
-                signIn { onSignIn() }
+                id = signIn { onSignIn() }
             }
             isLoading = false
         }
+        return id
     }
 
-    fun signIn(
-        onSignIn: () -> Unit
-    ):Int{
-        var res = -1
+    fun signIn(onSignIn: () -> Unit):Int {
+        var id = -1
         viewModelScope.launch {
             isLoading = true
-            val result = repository.signIn(
-                email = email.value,
-                pswd = pswd.value
-            )
+            val result = repository.signIn(email.value, pswd.value)
             Log.d("Sign in Result", result.toString())
+
             if (result is AuthResult.Authorized) {
-                val loginResponse = result.data // LoginResponse instance with token and id
+                val loginResponse = result.data
                 loginResponse?.let {
                     Log.d("Token", it.token)
-                    Log.d("User ID", it.id.toString())
-                    res = it.id
+                    Log.d("User ID", it.ID.toString())
+                    id = it.ID
                     onSignIn()
                 }
             }
             resultChannel.send(result)
             isLoading = false
         }
-        return res
+        return id
     }
 
-    private fun getClinicsInCounty(county: String){
-        isLoading = true
-        var res = emptyList<Clinic>()
+    private fun getClinicsInCounty(county: String) {
         viewModelScope.launch {
-            val result = clinicRepo.filterByCounty(county)
-            Log.d("clinicByCounty Result", result.toString())
-            if (result is ClinicResult.Authorized){
-                res = result.data ?: emptyList()
-            }
-            clinicResChannel.send(result)
-            isLoading = false
-        }
-        _clinics.value = res
-    }
+            isLoading = true
+            try {
+                val result = clinicRepo.filterByCounty(county)
+                Log.d("clinicByCounty Result", result.toString())
 
+                if (result is ClinicResult.Authorized) {
+                    _clinics.value = result.data ?: emptyList()
+                } else {
+                    _clinics.value = emptyList()
+                }
+                clinicResChannel.send(result)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
 }

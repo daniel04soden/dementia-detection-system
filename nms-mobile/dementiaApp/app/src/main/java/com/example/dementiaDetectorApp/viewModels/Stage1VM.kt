@@ -1,6 +1,8 @@
 package com.example.dementiaDetectorApp.viewModels
 
 import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dementiaDetectorApp.api.tests.TestRepository
@@ -8,11 +10,10 @@ import com.example.dementiaDetectorApp.api.tests.TestResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
 
 @HiltViewModel
 class Stage1VM @Inject constructor(
@@ -20,7 +21,6 @@ class Stage1VM @Inject constructor(
 ) : ViewModel() {
 
     private val resultChannel = Channel<TestResult<Unit>>()
-    val testResults = resultChannel.receiveAsFlow()
 
     var isLoading = false
         private set
@@ -47,7 +47,21 @@ class Stage1VM @Inject constructor(
 
     private val _date = MutableStateFlow("")
     val date: StateFlow<String> = _date
-    fun onDateChange(newDate: String){_date.value = newDate}
+    fun onDateChange(newDate: String){
+        _date.value = newDate
+        if(_date.value.length==8){
+            _date.value = validateAndFormatDate()
+        }
+    }
+
+    fun validateAndFormatDate(): String {
+        val cleanInput = _date.value.replace("/", "").take(8)
+        if (cleanInput.length >= 6 && cleanInput.matches(Regex("\\d{6,}"))) {
+            return "${cleanInput.take(2)}/${cleanInput.drop(2).take(2)}/${cleanInput.drop(4)}"
+        }
+        return _date.value
+    }
+
 
     private val _q2Visi = MutableStateFlow(false)
     val q2Visi: StateFlow<Boolean> = _q2Visi
@@ -84,23 +98,51 @@ class Stage1VM @Inject constructor(
 
     private val _fName = MutableStateFlow("")
     val fName: StateFlow<String> = _fName
-    fun onFNChange(newFN: String){_fName.value = newFN}
+    fun onFNChange(newFN: String){
+        _fName.value = newFN
+        isQ4FullyAnswered()
+    }
 
     private val _lName = MutableStateFlow("")
     val lName: StateFlow<String> = _lName
-    fun onLNChange(newLN: String){_lName.value = newLN}
+    fun onLNChange(newLN: String){
+        _lName.value = newLN
+        isQ4FullyAnswered()
+    }
 
     private val _number = MutableStateFlow("")
     val number: StateFlow<String> = _number
-    fun onNumberChange(newNum: String){_number.value = newNum}
+    fun onNumberChange(newNum: String){
+        _number.value = newNum
+        isQ4FullyAnswered()
+    }
 
     private val _street = MutableStateFlow("")
     val street: StateFlow<String> = _street
-    fun onStreetChange(newStreet: String){_street.value = newStreet}
+    fun onStreetChange(newStreet: String){
+        _street.value = newStreet
+        isQ4FullyAnswered()
+    }
 
     private val _city = MutableStateFlow("")
     val city: StateFlow<String> = _city
-    fun onAreaChange(newCity: String){_city.value = newCity}
+    fun onAreaChange(newCity: String){
+        _city.value = newCity
+        isQ4FullyAnswered()
+    }
+
+    private val _q4FullyAnswered = mutableStateOf(false)
+    val q4FullyAnswered: State<Boolean> = _q4FullyAnswered
+
+    private fun  isQ4FullyAnswered(){
+        _q4FullyAnswered.value = (
+                _fName.value.isNotEmpty() &&
+                        _lName.value.isNotEmpty() &&
+                        _number.value.isNotEmpty() &&
+                        _street.value.isNotEmpty() &&
+                        _city.value.isNotEmpty()
+                )
+    }
 
     // Submit function - matches AuthViewModel pattern with Channel results and loading state
     fun submitAnswers(patientID: Int) {

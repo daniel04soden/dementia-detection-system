@@ -1,6 +1,7 @@
 package com.example.dementiaDetectorApp.ui.views
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,20 +20,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.R
+import com.example.dementiaDetectorApp.models.Test
 import com.example.dementiaDetectorApp.ui.composables.NavMenu
+import com.example.dementiaDetectorApp.ui.composables.ReusableToast
 import com.example.dementiaDetectorApp.ui.theme.DarkPurple
+import com.example.dementiaDetectorApp.ui.theme.LightPurple
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
-import com.example.dementiaDetectorApp.viewModels.ContactVM
+import com.example.dementiaDetectorApp.ui.theme.Yellow
 import com.example.dementiaDetectorApp.viewModels.SharedVM
-import com.example.dementiaDetectorApp.viewModels.StatusVM
 
 @Composable
-fun StatusScreen(sVM: StatusVM, sharedVM: SharedVM, nc: NavController){
-    //sVM.initTests(sharedVM.id.value)
+fun StatusScreen(sharedVM: SharedVM, nc: NavController){
     Box(modifier = Modifier
         .fillMaxSize()
         .background(Color.White)
@@ -38,7 +43,11 @@ fun StatusScreen(sVM: StatusVM, sharedVM: SharedVM, nc: NavController){
         Column{
             Spacer(Modifier.height(35.dp))
             HeaderSection()
+            TestSection(sharedVM, nc)
         }
+
+        ReusableToast(alignment = Alignment.BottomCenter)
+
         NavMenu(
             sharedVM,
             nc,
@@ -64,6 +73,60 @@ private fun HeaderSection(){
         Column {
             Text("Test Statuses", color = DarkPurple, fontSize = 25.sp)
             Text("Status information on each test", color = MidPurple, fontSize = 18.sp)
+        }
+    }
+}
+
+@Composable
+private fun TestCard(test:Test, sharedVM: SharedVM, nc: NavController){
+    Card(
+        colors = CardDefaults.cardColors(containerColor = LightPurple),
+        modifier = Modifier.clickable {sharedVM.CheckCompleted(test.route, {nc.navigate(test.route)})}
+    ){
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ){
+            Text(
+                text = test.name,
+                fontSize = 26.sp,
+                fontWeight = FontWeight.Bold,
+                color = DarkPurple
+            )
+
+            val status = when (test.state){
+                0 -> {"Not Completed"}
+                1 -> {"Awaiting Grade"}
+                else -> {"Graded"}
+            }
+
+            val col = when (test.state){
+                0 -> {Color.Red}
+                1 -> { Yellow}
+                else -> {Color.Green}
+            }
+
+            Text(
+                text = status,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Medium,
+                color = col
+            )
+        }
+    }
+}
+
+@Composable
+private fun TestSection(sharedVM: SharedVM, nc: NavController){
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(16.dp)
+        .padding(bottom = 100.dp),
+        verticalArrangement = Arrangement.spacedBy(35.dp)
+    ){
+        for (test in sharedVM.tests.value){
+            TestCard(test, sharedVM, nc)
         }
     }
 }

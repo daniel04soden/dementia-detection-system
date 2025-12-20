@@ -1,18 +1,23 @@
 package com.example.dementiaDetectorApp.viewModels
 
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dementiaDetectorApp.api.tests.TestRepository
 import com.example.dementiaDetectorApp.api.tests.TestResult
+import com.example.dementiaDetectorApp.ui.util.ToastManager
 import com.zekierciyas.library.model.QuestionType
 import com.zekierciyas.library.model.SurveyModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -23,8 +28,7 @@ class Stage2VM @Inject constructor(
     private val resultChannel = Channel<TestResult<Unit>>()
     val testResults = resultChannel.receiveAsFlow()
 
-    var isLoading = false
-        private set
+    private var isLoading = false
 
     private val _prefaceVisi = MutableStateFlow(true)
     val prefaceVisi: StateFlow<Boolean> = _prefaceVisi
@@ -35,31 +39,41 @@ class Stage2VM @Inject constructor(
     fun onFormChange(newVisi: Boolean){_formVisi.value = newVisi}
 
     private val _memory = MutableStateFlow(-1)
-    val memory: StateFlow<Int> = _memory
-    fun onMemoryChange(newVal: Int){_memory.value = newVal}
+    private val memory: StateFlow<Int> = _memory
+    private fun onMemoryChange(newVal: Int){_memory.value = newVal}
 
     private val _conversation = MutableStateFlow(-1)
-    val conversation: StateFlow<Int> = _conversation
-    fun onConvoChange(newVal: Int){_conversation.value = newVal}
+    private val conversation: StateFlow<Int> = _conversation
+    private fun onConvoChange(newVal: Int){_conversation.value = newVal}
 
     private val _speaking = MutableStateFlow(-1)
-    val speaking: StateFlow<Int> = _speaking
-    fun onSpeakChange(newVal: Int){ _speaking.value = newVal}
+    private val speaking: StateFlow<Int> = _speaking
+    private fun onSpeakChange(newVal: Int){ _speaking.value = newVal}
 
     private val _financial = MutableStateFlow(-1)
-    val financial: StateFlow<Int> = _financial
-    fun onFinanceChange(newVal: Int){_financial.value = newVal}
+    private val financial: StateFlow<Int> = _financial
+    private fun onFinanceChange(newVal: Int){_financial.value = newVal}
 
     private val _medication = MutableStateFlow(-1)
-    val medication: StateFlow<Int> = _medication
-    fun onMedicationChange(newVal: Int){_medication.value = newVal}
+    private val medication: StateFlow<Int> = _medication
+    private fun onMedicationChange(newVal: Int){_medication.value = newVal}
 
     private val _transport = MutableStateFlow(-1)
-    val transport: StateFlow<Int> = _transport
-    fun onTransportChange(newVal: Int){_transport.value = newVal}
+    private val transport: StateFlow<Int> = _transport
+    private fun onTransportChange(newVal: Int){_transport.value = newVal}
 
-    val answerSet1 = listOf("Yes", "No", "Don't know")
-    val answerSet2 = listOf("Yes", "No", "Don't know", "N/A")
+    val allQuestionsAnswered: StateFlow<Boolean> = combine(
+        memory, conversation, speaking, financial, medication, transport
+    ) { values ->
+        values.all { it != -1 }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = false
+    )
+
+    private val answerSet1 = listOf("Yes", "No", "Don't know")
+    private val answerSet2 = listOf("Yes", "No", "Don't know", "N/A")
 
     val survey = listOf(
         SurveyModel(
@@ -107,85 +121,67 @@ class Stage2VM @Inject constructor(
     )
 
     fun onSurveyAnswerChange(answers: Map<String, Set<String>>) {
-        answers.forEach { (questionId, answerSet) ->
-            val answer = answerSet.firstOrNull() ?: return@forEach
-
-            val newValue = when (answer) {
-                "Yes" -> 1
-                "No" -> 0
-                "Don't know" -> 2
-                "N/A" -> 3
-                else -> -1  // Keep unanswered state
-            }
-
-            // Clear error when user answers a question
-            clearError()
-
-            when (questionId) {
-                "memory" -> onMemoryChange(newValue)
-                "convo" -> onConvoChange(newValue)
-                "speech" -> onSpeakChange(newValue)
-                "finance" -> onFinanceChange(newValue)
-                "medication" -> onMedicationChange(newValue)
-                "transport" -> onTransportChange(newValue)
-                else -> {}
-            }
-        }
-    }
-
-
-    fun allQuestionsAnswered(): Boolean {
-        return listOf(
-            _memory.value,
-            _conversation.value,
-            _speaking.value,
-            _financial.value,
-            _medication.value,
-            _transport.value
-        ).none { it == -1 }
-    }
-
-    private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> = _errorMessage
-    private fun clearError() { _errorMessage.value = null}
-
-    fun submitAnswers(patientID: Int){
-        clearError()
-        if(!allQuestionsAnswered()){
-            _errorMessage.value= "Please answer all questions before submitting"
+        Log.e("S2-CALLBACK", "Answers map: $answers")
+        if (answers.isEmpty()) {
+            Log.e("S2-CALLBACK", "Empty answers - skipping")
             return
         }
-        else{
-            viewModelScope.launch{
-                isLoading = true
-
-                val result = repository.reportStage2(
-                    patientID = patientID,
-                    memoryScore = _memory.value,
-                    recallRes = _conversation.value,
-                    speakingScore = _speaking.value,
-                    financialScore = _financial.value,
-                    medicineScore = _medication.value,
-                    transportScore = _transport.value
-                )
-
-                when (result) {
-                    is TestResult.Success -> {
-                        Log.d("Stage2VM", "Submit success: $result")
-                        onFormChange(false)
-                        onSuccessChange(true)
-                    }
-                    is TestResult.Unauthorized -> {
-                        Log.d("Stage2VM", "Submit unauthorized: $result")
-                    }
-                    is TestResult.UnknownError -> {
-                        Log.d("Stage2VM", "Submit unknown error: $result")
-                    }
+        answers.forEach { (questionId, answerSet) ->
+            val answer = answerSet.firstOrNull()
+            Log.e("S2-CALLBACK", "Processing: $questionId = $answer")
+            if (answer != null) {
+                val newValue = when (answer) {
+                    "Yes" -> 1
+                    "No" -> 0
+                    "Don't know" -> 2
+                    "N/A" -> 3
+                    else -> -1
                 }
-
-                resultChannel.trySend(result)
-                isLoading = false
+                Log.e("S2-CALLBACK", "$questionId set to $newValue")
+                when (questionId) {
+                    "memory" -> onMemoryChange(newValue)
+                    "convo" -> onConvoChange(newValue)
+                    "speech" -> onSpeakChange(newValue)
+                    "finance" -> onFinanceChange(newValue)
+                    "medication" -> onMedicationChange(newValue)
+                    "transport" -> onTransportChange(newValue)
+                    else -> Log.e("S2-CALLBACK", "Unknown ID: $questionId")
+                }
             }
+        }
+    }
+
+    fun submitAnswers(patientID: Int){
+        viewModelScope.launch{
+            isLoading = true
+
+            val result = repository.reportStage2(
+                patientID = patientID,
+                memoryScore = _memory.value,
+                recallRes = _conversation.value,
+                speakingScore = _speaking.value,
+                financialScore = _financial.value,
+                medicineScore = _medication.value,
+                transportScore = _transport.value
+            )
+
+            when (result) {
+                is TestResult.Success -> {
+                    Log.d("Stage2VM", "Submit success: $result")
+                    onFormChange(false)
+                    onSuccessChange(true)
+                }
+                is TestResult.Unauthorized -> {
+                    Log.d("Stage2VM", "Submit unauthorized: $result")
+                    ToastManager.showToast("There was an authorization error, please logout and log back in again")
+                }
+                is TestResult.UnknownError -> {
+                    Log.d("Stage2VM", "Submit unknown error: $result")
+                    ToastManager.showToast("There was an error submitting the results, please try again later.")
+                }
+            }
+            resultChannel.trySend(result)
+            isLoading = false
         }
     }
 

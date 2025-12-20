@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -44,7 +43,9 @@ import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.R
 import com.example.dementiaDetectorApp.models.NewsPiece
 import com.example.dementiaDetectorApp.models.Test
+import com.example.dementiaDetectorApp.ui.composables.FeedbackPanel
 import com.example.dementiaDetectorApp.ui.composables.NavMenu
+import com.example.dementiaDetectorApp.ui.composables.ReusableToast
 import com.example.dementiaDetectorApp.ui.composables.TestPrompt
 import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.Gray
@@ -56,6 +57,7 @@ import com.example.dementiaDetectorApp.viewModels.SharedVM
 
 @Composable
 fun HomeScreen(homeVM: HomeVM, sharedVM: SharedVM, nc: NavController){
+    homeVM.countTestsDone(sharedVM.tests.value)
     Box(modifier = Modifier
         .background(Color.White)
         .fillMaxSize()
@@ -66,6 +68,8 @@ fun HomeScreen(homeVM: HomeVM, sharedVM: SharedVM, nc: NavController){
             HeaderPrompts(sharedVM, nc)
             NewsSection(homeVM)
         }
+        FeedbackPanel(homeVM, sharedVM)
+        ReusableToast()
         NavMenu(
             sharedVM = sharedVM,
             nc = nc,
@@ -107,7 +111,7 @@ private fun HeaderPrompts(
         ){
             items(prompts.size){
                 Box(Modifier.width(350.dp)){
-                    TestPrompt(test=prompts[it], nc)
+                    TestPrompt(test=prompts[it], sharedVM, nc)
                 }
             }
         }
@@ -145,7 +149,7 @@ private fun NewsBox(
     val ctx = LocalContext.current
     val urlIntent = Intent(
         Intent.ACTION_VIEW,
-        news.link.toUri()
+        news.url.toUri()
     )
     BoxWithConstraints(
         modifier = Modifier
@@ -222,7 +226,7 @@ private fun NewsBox(
                 )
                 HorizontalDivider(thickness = 1.dp, color = Color.White)
                 Text(
-                    text = news.description,
+                    text = news.snippet,
                     lineHeight = 13.sp,
                     color = Gray,
                     fontWeight = FontWeight.Bold,

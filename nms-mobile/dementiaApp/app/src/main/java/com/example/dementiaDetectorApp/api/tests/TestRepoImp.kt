@@ -113,4 +113,27 @@ class TestRepoImp(
             TestResult.UnknownError()
         }
     }
+
+    override suspend fun getStatus(request: StatusRequest): StatusResult<StatusResponse> {
+        return try {
+            val token = prefs.getString("jwt", null)
+                ?: return StatusResult.Unauthorized()
+
+            val response = api.getStatus("Bearer $token", request.toString())
+
+            if (response.isSuccessful && response.body() != null) {
+                StatusResult.Authorized(response.body()!!)
+            } else if (response.code() == 401) {
+                StatusResult.Unauthorized()
+            } else {
+                StatusResult.UnknownError()
+            }
+        } catch (e: HttpException) {
+            if (e.code() == 401) StatusResult.Unauthorized() else StatusResult.UnknownError()
+        } catch (e: UnknownHostException) {
+            StatusResult.UnknownError()
+        } catch (e: Exception) {
+            StatusResult.UnknownError()
+        }
+    }
 }

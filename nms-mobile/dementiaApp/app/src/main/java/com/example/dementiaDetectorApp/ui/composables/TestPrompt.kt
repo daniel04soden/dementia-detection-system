@@ -24,10 +24,12 @@ import com.example.dementiaDetectorApp.R
 import com.example.dementiaDetectorApp.models.Test
 import com.example.dementiaDetectorApp.ui.theme.LightPurple
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
+import com.example.dementiaDetectorApp.viewModels.SharedVM
 
 @Composable
 fun TestPrompt(
     test: Test,
+    sharedVM: SharedVM,
     nc: NavController
 ){
     Row(modifier = Modifier
@@ -36,7 +38,7 @@ fun TestPrompt(
         .background(MidPurple)//CHANGE
         .padding(horizontal = 15.dp , vertical = 20.dp)
         .fillMaxWidth()
-        .clickable {nc.navigate(test.route)},
+        .clickable {sharedVM.CheckCompleted(test.route,{nc.navigate(test.route)})},
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ){
@@ -74,7 +76,6 @@ private fun deriveState(test: Test): String{
     else if (stateVal>=2){
         test.route = "status"
         return "Graded"
-
     }
     else{
         return "To be completed"
