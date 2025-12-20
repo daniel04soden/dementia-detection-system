@@ -34,7 +34,7 @@ func HandleInsertReview(w http.ResponseWriter, r *http.Request) {
 	date := time.Now().Format("02/01/2006")
 
 	_, err = db.Exec(`
-		INSERT INTO Reviews (
+		INSERT INTO Review (
 			date, patientID, score, critique
 		) 
 		VALUES ($1, $2, $3, $4)
@@ -138,29 +138,24 @@ type ReviewUpdate struct {
 }
 
 func HandleUpdateReview(w http.ResponseWriter, r *http.Request) {
-	// Get the ID from the URL parameters
 	id := r.URL.Query().Get("id")
 
-	// Check if the ID is valid
 	if id == "" {
 		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
 	}
 
-	// Parse the request body as JSON
 	var review ReviewUpdate
 	if err := json.NewDecoder(r.Body).Decode(&review); err != nil {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 
-	// Update the ticket in the database
 	_, err := db.Exec(`UPDATE Review SET answer = ? WHERE ticketID = ?`, review.Answer, id)
 	if err != nil {
 		http.Error(w, "Failed to update review", http.StatusInternalServerError)
 		return
 	}
 
-	// Return the updated ticket as JSON
 	json.NewEncoder(w).Encode(review)
 }

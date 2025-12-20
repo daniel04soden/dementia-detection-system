@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS SpeechResponse (
     FOREIGN KEY (patientID) REFERENCES Patient(patientID) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS Reviews (
+CREATE TABLE IF NOT EXISTS Review (
     reviewID SERIAL PRIMARY KEY,
     date VARCHAR(20) NOT NULL,
     patientID INT,
@@ -144,7 +144,7 @@ CREATE TABLE IF NOT EXISTS Reviews (
     FOREIGN KEY (patientID) REFERENCES Patient(patientID) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS Tickets (
+CREATE TABLE IF NOT EXISTS Ticket (
     ticketID SERIAL PRIMARY KEY,
     dateOpened VARCHAR(20) NOT NULL,
     dateClosed VARCHAR(20) NOT NULL,
@@ -157,12 +157,12 @@ CREATE TABLE IF NOT EXISTS Tickets (
     FOREIGN KEY (patientID) REFERENCES Patient(patientID) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS Payments (
+CREATE TABLE IF NOT EXISTS Payment (
     paymentID SERIAL PRIMARY KEY,
     stripeIntentID TEXT UNIQUE NOT NULL,
     patientID INT,
     status VARCHAR(20) DEFAULT 'pending',
-    amount INT
+    amount INT,
     FOREIGN KEY (patientID) REFERENCES Patient(patientID) ON DELETE CASCADE
 );
 

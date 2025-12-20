@@ -34,12 +34,11 @@ func HandleInsertTicket(w http.ResponseWriter, r *http.Request) {
 	date := time.Now().Format("02/01/2006")
 
 	_, err = db.Exec(`
-		INSERT INTO Tickets (
+		INSERT INTO Ticket (
 			dateOpened, dateUpdated, patientID, priority, status, workaround, solution, details
 		) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
 	`, date, "", id, 0, 1, "", "", req.Details)
-
 	if err != nil {
 		http.Error(w, "invalid insert", http.StatusBadRequest)
 		return

@@ -42,7 +42,7 @@ func HandleCreatePayment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	db.Exec(`
-		INSERT INTO Payments(patientID, stripeIntentID, amount, status)
+		INSERT INTO Payment(patientID, stripeIntentID, amount, status)
 		VALUES ($1, $2, $3)
 		`, req.PatientID, intent.ID, 1000)
 
