@@ -26,7 +26,8 @@ services:
       DB_USER: myuser
       DB_PASSWORD: password
       DB_NAME: mydb
-      CLOUDFLARE_KEY: secret
+      WEBHOOK_KEY: secret
+      STRIPE_KEY: secret
     ports:
       - "8080:8080"
   cloudflared:
