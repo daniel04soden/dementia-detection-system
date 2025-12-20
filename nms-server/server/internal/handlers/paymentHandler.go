@@ -17,7 +17,7 @@ type PatientPaymentRequest struct {
 }
 
 func HandleCreatePayment(w http.ResponseWriter, r *http.Request) {
-	stripe.Key = os.Getenv("StripeKey")
+	stripe.Key = os.Getenv("STRIPE_KEY")
 	var req PatientPaymentRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "invalid request", http.StatusBadRequest)
@@ -42,7 +42,7 @@ func HandleCreatePayment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	db.Exec(`
-		INSERT INTO Payments(patientID, stripeIntentID, amount, status)
+		INSERT INTO Payment(patientID, stripeIntentID, amount, status)
 		VALUES ($1, $2, $3)
 		`, req.PatientID, intent.ID, 1000)
 
@@ -64,7 +64,7 @@ func HandleStripeWebhook(w http.ResponseWriter, r *http.Request) {
 	event, err := webhook.ConstructEvent(
 		payload,
 		sig,
-		os.Getenv("WebHookKey"),
+		os.Getenv("WEBHOOK_KEY"),
 	)
 	if err != nil {
 		http.Error(w, "bad signature", 400)

@@ -205,6 +205,9 @@ results/
 .crewai/
 .abstra/
 
+# Ignore env
+/nms-server/.env
+
 # VSCode, JetBrains, OS
 .vscode/
 *.swp
