@@ -1,6 +1,7 @@
 package com.example.dementiaDetectorApp.ui.views
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
@@ -19,8 +20,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -28,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -152,15 +156,20 @@ private fun HeaderSection(sVM: SpeechViewModel) {
 
 @Composable
 private fun ImageSection(sVM: SpeechViewModel) {
+    val img = sVM.img.collectAsState().value
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Image(
-            painter = painterResource(R.drawable.logo),
+            painter = painterResource(img),
             contentDescription = "Image to describe",
-            modifier = Modifier.fillMaxHeight(0.4f),
-            alignment = Alignment.Center
+            modifier = Modifier
+                .padding(horizontal = 15.dp)
+                .fillMaxWidth(1f)
+                .fillMaxHeight(0.5f),
+            alignment = Alignment.Center,
+            contentScale = ContentScale.FillBounds
         )
 
         Row(
@@ -170,7 +179,7 @@ private fun ImageSection(sVM: SpeechViewModel) {
             horizontalArrangement = Arrangement.Center,
         ) {
             Button(
-                onClick = {},
+                onClick = {sVM.OnImgChange()},
                 enabled = sVM.audioStatus.collectAsState().value == SpeechViewModel.AudioNoteStatus.RECORDING,
                 colors = buttonColours(),
                 shape = RoundedCornerShape(24.dp),
@@ -195,7 +204,10 @@ private fun RecordingSection(sVM: SpeechViewModel) {
 
     when (audioStatus) {
         SpeechViewModel.AudioNoteStatus.HAVE_TO_RECORD -> ReadyToRecordSection(sVM)
-        SpeechViewModel.AudioNoteStatus.RECORDING -> RecordingActiveSection(sVM, audioRecordingData, remainingSeconds)
+        SpeechViewModel.AudioNoteStatus.RECORDING -> RecordingActiveSection(
+            audioRecordingData,
+            remainingSeconds
+        )
         SpeechViewModel.AudioNoteStatus.CAN_PLAY -> RecordingCompleteSection(sVM)
     }
 }
@@ -227,28 +239,18 @@ private fun ReadyToRecordSection(sVM: SpeechViewModel) {
                 Icon(
                     painter = painterResource(id = R.drawable.mic),
                     contentDescription = "Record",
-                    modifier = Modifier.size(60.dp),
+                    modifier = Modifier.size(70.dp),
                     tint = Color.White
                 )
             },
-            stopIcon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.stop),
-                    contentDescription = "Stop",
-                    modifier = Modifier.size(60.dp),
-                    tint = Color.Red
-                )
-            },
             audioRecordingData = emptyList(),
-            onRecordRequested = { sVM.startRecording() },
-            onStopRequested = {}
+            onRecordRequested = { sVM.startRecording() }
         )
     }
 }
 
 @Composable
 private fun RecordingActiveSection(
-    sVM: SpeechViewModel,
     audioRecordingData: List<AudioRecordingData>,
     remainingSeconds: Long
 ) {
@@ -272,18 +274,16 @@ private fun RecordingActiveSection(
         Spacer(modifier = Modifier.height(20.dp))
         AudioRecorder(
             modifier = Modifier.fillMaxWidth(),
-            recordIcon = {},
-            stopIcon = {
+            recordIcon = {
                 Icon(
-                    painter = painterResource(id = R.drawable.stop),
-                    contentDescription = "Stop",
-                    modifier = Modifier.size(60.dp),
-                    tint = Color.Red
+                    painter = painterResource(id = R.drawable.mic),
+                    contentDescription = "Recording",
+                    modifier = Modifier.size(70.dp),
+                    tint = Color.White
                 )
             },
             audioRecordingData = audioRecordingData,
-            onRecordRequested = {},
-            onStopRequested = { sVM.stopRecording() }
+            onRecordRequested = {}
         )
     }
 }
@@ -315,37 +315,113 @@ private fun RecordingCompleteSection(sVM: SpeechViewModel) {
             color = DarkPurple
         )
         Spacer(modifier = Modifier.height(20.dp))
-        Button(
-            onClick = { sVM.resetRecording() },
-            colors = buttonColours(),
-            shape = RoundedCornerShape(24.dp),
-            modifier = Modifier
-                .width(300.dp)
-                .padding(bottom = 25.dp)
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 7.5.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "New Recording", fontSize = 20.sp, color = Color.White)
+            Button(
+                onClick = { sVM.resetRecording() },
+                colors = buttonColours(),
+                shape = RoundedCornerShape(24.dp),
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .padding(bottom = 25.dp)
+                    .padding(horizontal = 7.5.dp)
+            ) {
+                Text(
+                    text = "Redo",
+                    fontSize = 20.sp,
+                    color = Color.White,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Button(
+                onClick = {},
+                colors = buttonColours(),
+                shape = RoundedCornerShape(24.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 25.dp)
+                    .padding(horizontal = 7.5.dp)
+            ) {
+                Text(
+                    text = "Submit Recording",
+                    fontSize = 20.sp,
+                    color = Color.White,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun AudioRecorder(
+fun AudioRecorder(
     modifier: Modifier = Modifier,
     recordIcon: @Composable () -> Unit,
-    stopIcon: @Composable () -> Unit,
     audioRecordingData: List<AudioRecordingData>,
     onRecordRequested: () -> Unit,
-    onStopRequested: () -> Unit
-){
-    Box(modifier = modifier) {
+    totalDurationMs: Long = 30_000L
+) {
+    val latestData = audioRecordingData.lastOrNull()
+    val elapsed = (latestData as? AudioRecordingData.Recording)?.elapsedTime ?: 0L
+    val progress = (elapsed.toFloat() / totalDurationMs).coerceIn(0f, 1f)
+    val isRecording = audioRecordingData.isNotEmpty()
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ){
+        AnimatedVisibility(
+            visible = isRecording,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                // Progress bar
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.75f)
+                        .height(10.dp)
+                        .background(Color.Red.copy(alpha = 0.2f), RoundedCornerShape(5.dp))
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(progress)
+                            .fillMaxHeight()
+                            .background(Color.Red, RoundedCornerShape(5.dp))
+                    )
+                }
+            }
+        }
+
+        // Shows that the mic is in use
         Button(
             onClick = onRecordRequested,
-            colors = buttonColours(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (isRecording) Color.Red else buttonColours().containerColor
+            ),
+            shape = RoundedCornerShape(70.dp),
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
+                .fillMaxWidth(0.5F)
+                .height(50.dp)
         ) {
             recordIcon()
         }
+
+        val statusText = when {
+            isRecording -> "Recording..."
+            else -> "Tap to record"
+        }
+        Text(
+            text = statusText,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp)
+        )
     }
 }

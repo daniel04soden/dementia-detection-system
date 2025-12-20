@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.frazo.audio_services.recorder.AndroidAudioRecorder
 import br.com.frazo.audio_services.recorder.AudioRecordingData
+import com.example.dementiaDetectorApp.R
 import com.example.dementiaDetectorApp.api.tests.TestResult
 import com.example.dementiaDetectorApp.di.DispatcherProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,6 +41,16 @@ class SpeechViewModel @Inject constructor(
     val prefaceVisi: StateFlow<Boolean> = _prefaceVisi
     fun onVisiChange(newVisi: Boolean) { _prefaceVisi.value = newVisi }
 
+    private val _img = MutableStateFlow(R.drawable.beach)
+    val img: StateFlow<Int> = _img
+    fun OnImgChange(){
+        if (_img.value == R.drawable.beach){_img.value = R.drawable.desert}
+        else if (_img.value == R.drawable.desert){_img.value = R.drawable.forrest}
+        else if (_img.value == R.drawable.forrest){_img.value = R.drawable.mountains}
+        else{_img.value = R.drawable.beach}
+    }
+
+    //Recording vals
     enum class AudioNoteStatus { HAVE_TO_RECORD, RECORDING, CAN_PLAY }
 
     private val _audioRecordFlow = MutableStateFlow<List<AudioRecordingData>>(emptyList())
@@ -52,6 +63,8 @@ class SpeechViewModel @Inject constructor(
 
     private var recordingJob: Job? = null
 
+
+    //Recording functions
     fun getRecordedFile(): File? = currentAudioFile
 
     fun startRecording() {
@@ -95,7 +108,7 @@ class SpeechViewModel @Inject constructor(
         }
     }
 
-    fun stopRecording() {
+    private fun stopRecording() {
         Log.d("SpeechVM", "stopRecording called")
         recordingJob?.cancel()
         recordingJob = null
@@ -114,7 +127,6 @@ class SpeechViewModel @Inject constructor(
         currentAudioFile?.delete()
         currentAudioFile = null
         _audioNoteStatus.value = AudioNoteStatus.HAVE_TO_RECORD
-        _prefaceVisi.value = true
     }
 
     override fun onCleared() {

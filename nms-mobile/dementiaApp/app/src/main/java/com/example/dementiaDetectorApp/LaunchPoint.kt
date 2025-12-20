@@ -64,7 +64,7 @@ class LaunchPoint : ComponentActivity() {
                 val sVM: SpeechViewModel = hiltViewModel()
                 val cVM: ContactVM = hiltViewModel()
 
-                NavHost(navController = nc, startDestination = "login") {
+                NavHost(navController = nc, startDestination = "speech") {
                     composable("login"){LoginScreen(authVM,sharedVM, nc)}
                     composable("registration"){ RegistrationScreen(authVM,sharedVM, nc) }
                     composable("home"){ HomeScreen(homeVM, sharedVM, nc) }
