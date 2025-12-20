@@ -1,10 +1,10 @@
 from prompt import run_test
 import json
+from speech_ai import accept_speech
 from flask import Flask, request, jsonify
 import keras
 import joblib
 from sklearn.preprocessing import LabelEncoder
-import os
 
 app = Flask(__name__)
 
@@ -26,12 +26,7 @@ except FileNotFoundError as e:
 except Exception as e:
     print(f"AN UNEXPECTED ERROR OCCURRED during model loading: {e}")
 
-try:
-    from speech_ai import accept_speech
-except ImportError:
-    def accept_speech(speech):
-        print(f"Warning: accept_speech not found. Dummy function called with: {speech}")
-        return '0' 
+
 
 @app.route('/articles', methods=['GET'])
 def retrieveArticle():
@@ -140,6 +135,10 @@ def handle_post_speech():
                 "message": f"Classification failed: {classification_result}"
             }), 500
 
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
 def main():
     app.run()
 
