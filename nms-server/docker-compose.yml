@@ -28,6 +28,8 @@ services:
       DB_NAME: ddsdb
       WEBHOOK_KEY: ${STRIPE_WEBHOOK_SECRET}
       STRIPE_KEY: ${STRIPE_SECRET}
+      ASSEMBLY_AI_KEY: ${ASSEMBLY_AI_KEY_SECRET}
+
     ports:
       - "8080:8080"
   cloudflared:

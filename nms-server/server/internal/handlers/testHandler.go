@@ -8,7 +8,6 @@ import (
 	"time"
 )
 
-// --------------------------------- Get Graded Details -------------------------------------
 type TestStageOne struct {
 	TestID        int    `json:"testID"`
 	TestDate      string `json:"testDate"`
@@ -614,38 +613,4 @@ func HandleGetPatientRisk(w http.ResponseWriter, r *http.Request) {
 		score.RiskScore++
 	}
 	json.NewEncoder(w).Encode(score)
-}
-
-type SpeechInsert struct {
-	LlmResponse string `json:"llmResponse"`
-}
-
-func HandleSpeechInsert(w http.ResponseWriter, r *http.Request) {
-	var req SpeechInsert
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid JSON", 400)
-		return
-	}
-
-	idStr := r.URL.Query().Get("id")
-	if idStr == "" {
-		http.Error(w, "id is required", http.StatusBadRequest)
-		return
-	}
-
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		http.Error(w, "invalid id", http.StatusBadRequest)
-		return
-	}
-
-	_, err = db.Exec(`
-		INSERT INTO SpeechTest(
-			testDate, patientID, llmResponse
-		) VALUES ($1,$2,$3)
-		`, time.Now().Format("02/01/2006"), id, req.LlmResponse)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
 }

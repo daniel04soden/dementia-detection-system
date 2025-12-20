@@ -166,6 +166,8 @@ func main() {
 		w.Write([]byte("Hello, world!"))
 	})
 
+	http.HandleFunc("GET /api/testmodel", handlers.AiAnalyseHandler)
+
 	port := ":8080"
 	log.Printf("Server running at http://localhost%s/", port)
 	if err := http.ListenAndServe(port, nil); err != nil {
