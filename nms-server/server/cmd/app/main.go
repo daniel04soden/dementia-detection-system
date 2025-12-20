@@ -66,6 +66,7 @@ func main() {
 	http.HandleFunc("POST /api/login", handlers.HandleLogin)
 	http.HandleFunc("GET /api/web/me", handlers.WebHandleMe)
 	http.HandleFunc("POST /api/web/logout", handlers.WebHandleLogout)
+	http.HandleFunc("GET /api/mobile/me", handlers.MobileHandleMe)
 
 	// testing
 	http.HandleFunc("GET /api/web/stageone/review", handlers.HandleGetTestStageOne)

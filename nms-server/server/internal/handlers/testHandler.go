@@ -509,12 +509,11 @@ func HandleGradeStageTwo(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// ------------------------ Get Overall Status -----------------------------
 type TestStatus struct {
-	StageOneStatus  int  `json:"stageOneStatus"`
-	StageTwoStatus  int  `json:"stageTwoStatus"`
-	LifestyleStatus int  `json:"lifestyleStatus"`
-	SpeechStatus    bool `json:"speechStatus"`
+	StageOneStatus  int `json:"stageOneStatus"`
+	StageTwoStatus  int `json:"stageTwoStatus"`
+	LifestyleStatus int `json:"lifestyleStatus"`
+	SpeechStatus    int `json:"speechStatus"`
 }
 
 func HandleGetPatientTestStatus(w http.ResponseWriter, r *http.Request) {
@@ -530,55 +529,93 @@ func HandleGetPatientTestStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	row := db.QueryRow(`
-		SELECT testID, stageOneStatus, stageTwoStatus
-		FROM Test
-		WHERE patientID = $1
-		`, id)
-
 	var ts TestStatus
-	if err := row.Scan(&ts.StageOneStatus, &ts.StageTwoStatus); err != nil {
-		http.Error(w, "failed to scan test status", http.StatusInternalServerError)
-		return
-	}
 
-	row = db.QueryRow(`
-		SELECT speechTestID
-		FROM SpeechResponse
-		WHERE patientID = $1
-		`, id)
-
-	var speechTestID int
-	err = row.Scan(&speechTestID)
-	if err == sql.ErrNoRows {
-		ts.SpeechStatus = false
-	} else if err != nil {
-		ts.SpeechStatus = false
-	} else {
-		ts.SpeechStatus = true
-	}
-
-	var lifestyleStatusRead int
 	err = db.QueryRow(`
-		SELECT lifestyleStatus
-		FROM Lifestyle
-		WHERE patientID = $1
-	`, id).Scan(&lifestyleStatusRead)
-
-	if err == sql.ErrNoRows {
-		ts.LifestyleStatus = 0
-	} else if err != nil {
-		ts.LifestyleStatus = 0
-	} else {
-		ts.LifestyleStatus = lifestyleStatusRead
+        SELECT 
+            t.stageOneStatus, 
+            t.stageTwoStatus, 
+            COALESCE(l.lifestyleStatus, 0) AS lifestyleStatus, 
+            COALESCE(s.speechStatus, 0) AS speechStatus
+        FROM Test t
+        LEFT JOIN Lifestyle l ON t.patientID = l.patientID
+        LEFT JOIN SpeechTest s ON t.patientID = s.patientID
+        WHERE t.patientID = $1;
+    `, id).Scan(&ts.StageOneStatus, &ts.StageTwoStatus, &ts.LifestyleStatus, &ts.SpeechStatus)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "patient not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(ts)
 }
 
-// Set Speech
-// ------------------------ Get Overall Status -----------------------------
+type RiskScore struct {
+	RiskScore int `json:"riskScore"`
+}
+
+type RiskStatus struct {
+	StageOneStatus  int
+	StageTwoStatus  int
+	LifestyleStatus sql.NullInt32
+	SpeechStatus    sql.NullInt32
+}
+
+func HandleGetPatientRisk(w http.ResponseWriter, r *http.Request) {
+	var rs RiskStatus
+	var score RiskScore
+
+	idStr := r.URL.Query().Get("id")
+	if idStr == "" {
+		http.Error(w, "id is required", http.StatusBadRequest)
+		return
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+
+	err = db.QueryRow(`
+        SELECT 
+            t.stageOneStatus, 
+            t.stageTwoStatus, 
+            l.lifestyleStatus, 
+            s.speechStatus
+        FROM Test t
+        LEFT JOIN Lifestyle l ON t.patientID = l.patientID
+        LEFT JOIN SpeechTest s ON t.patientID = s.patientID
+        WHERE t.patientID = $1;
+    `, id).Scan(&rs.StageOneStatus, &rs.StageTwoStatus, &rs.LifestyleStatus, &rs.SpeechStatus)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "patient not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if rs.StageOneStatus == 2 {
+		score.RiskScore++
+	}
+	if rs.StageTwoStatus == 2 {
+		score.RiskScore++
+	}
+	if rs.LifestyleStatus.Valid && rs.LifestyleStatus.Int32 == 2 {
+		score.RiskScore++
+	}
+	if rs.SpeechStatus.Valid && rs.SpeechStatus.Int32 == 2 {
+		score.RiskScore++
+	}
+	json.NewEncoder(w).Encode(score)
+}
+
 type SpeechInsert struct {
 	LlmResponse string `json:"llmResponse"`
 }
@@ -603,7 +640,7 @@ func HandleSpeechInsert(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = db.Exec(`
-		INSERT INTO SpeechResponse (
+		INSERT INTO SpeechTest(
 			testDate, patientID, llmResponse
 		) VALUES ($1,$2,$3)
 		`, time.Now().Format("02/01/2006"), id, req.LlmResponse)

@@ -16,7 +16,7 @@ type LifestyleInsert struct {
 	BloodOxygen             float64 `json:"bloodOxygen"`
 	BodyTemperature         float64 `json:"bodyTemperature"`
 	Weight                  float64 `json:"weight"`
-	MRI_Delay               float64 `json:"mriDelay"`
+	MRIDelay                float64 `json:"mriDelay"`
 	Age                     int     `json:"age"`
 	DominantHand            int     `json:"dominantHand"`     // assuming Dominant_Hand is an integer (0 for left, 1 for right)
 	Gender                  int     `json:"gender"`           // assuming Gender is an integer (0 for female, 1 for male)
@@ -38,7 +38,6 @@ type LifestyleInsert struct {
 // 2 is corrected by a doctor
 
 func HandleInsertLifestyle(w http.ResponseWriter, r *http.Request) {
-
 	var req LifestyleInsert
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
@@ -82,7 +81,7 @@ func HandleInsertLifestyle(w http.ResponseWriter, r *http.Request) {
 			$15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27
 		)`,
 		lifestyleStatus, req.PatientID, req.Diabetic, req.AlcoholLevel, req.HeartRate, req.BloodOxygen,
-		req.BodyTemperature, req.Weight, req.MRI_Delay, req.Age, req.DominantHand,
+		req.BodyTemperature, req.Weight, req.MRIDelay, req.Age, req.DominantHand,
 		req.Gender, req.FamilyHistory, req.Smoked, req.APOEε4, req.PhysicalActivity,
 		req.DepressionStatus, req.CognitiveTestScores, req.MedicationHistory, req.NutritionDiet,
 		req.SleepQuality, req.ChronicHealthConditions, req.Education,
@@ -91,7 +90,6 @@ func HandleInsertLifestyle(w http.ResponseWriter, r *http.Request) {
 		cumulativeDegree,
 		"N/A",
 	)
-
 	if err != nil {
 		http.Error(w, "invalid insert", http.StatusBadRequest)
 		return
@@ -112,7 +110,7 @@ type LifestyleResponse struct {
 	BloodOxygen             float64 `json:"bloodOxygen"`
 	BodyTemperature         float64 `json:"bodyTemperature"`
 	Weight                  float64 `json:"weight"`
-	MRI_Delay               float64 `json:"mriDelay"`
+	MRIDelay                float64 `json:"mriDelay"`
 	Age                     int     `json:"age"`
 	DominantHand            int     `json:"dominantHand"`
 	Gender                  int     `json:"gender"`
@@ -161,14 +159,13 @@ func HandleGetLifestyle(w http.ResponseWriter, r *http.Request) {
 	err = db.QueryRow(query, id).Scan(
 		&lifestyle.LifestyleID, &lifestyle.LifestyleStatus, &lifestyle.PatientID, &lifestyle.Diabetic,
 		&lifestyle.AlcoholLevel, &lifestyle.HeartRate, &lifestyle.BloodOxygen, &lifestyle.BodyTemperature,
-		&lifestyle.Weight, &lifestyle.MRI_Delay, &lifestyle.Age, &lifestyle.DominantHand, &lifestyle.Gender,
+		&lifestyle.Weight, &lifestyle.MRIDelay, &lifestyle.Age, &lifestyle.DominantHand, &lifestyle.Gender,
 		&lifestyle.FamilyHistory, &lifestyle.Smoked, &lifestyle.APOEε4, &lifestyle.PhysicalActivity,
 		&lifestyle.DepressionStatus, &lifestyle.CognitiveTestScores, &lifestyle.MedicationHistory,
 		&lifestyle.NutritionDiet, &lifestyle.SleepQuality, &lifestyle.ChronicHealthConditions,
 		&lifestyle.CumulativePrimary, &lifestyle.CumulativeSecondary, &lifestyle.CumulativeDegree,
 		&lifestyle.DementiaStatus,
 	)
-
 	// Check for errors
 	if err != nil {
 		if err == sql.ErrNoRows {
