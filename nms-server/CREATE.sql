@@ -128,7 +128,8 @@ CREATE TABLE IF NOT EXISTS TestStageTwo (
 
 CREATE TABLE IF NOT EXISTS SpeechTest (
     speechTestID SERIAL PRIMARY KEY,
-    speechTestStatus INT DEFAULT 0,
+    speechTestStatus INT DEFAULT 0, -- 0 Means not done, 1 Means done, 2 means has dementia, 3 means hasn't dementia
+    assemblyAIStatus TEXT DEFAULT 'pending', -- HAS STATES, FAILED, PASSED, PENDING
     testDate VARCHAR(20) NOT NULL,
     patientID INT,
     llmResponse  TEXT,
