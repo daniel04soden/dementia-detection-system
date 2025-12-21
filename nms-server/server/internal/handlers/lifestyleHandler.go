@@ -63,14 +63,6 @@ func HandleInsertLifestyle(w http.ResponseWriter, r *http.Request) {
 		cumulativeDegree = "TRUE"
 	}
 
-	var lifestyleStatus int
-	if req.Status == false {
-		lifestyleStatus = 1
-	}
-	if req.Status == true {
-		lifestyleStatus = 2
-	}
-
 	err := db.QueryRow(`
 		INSERT INTO Lifestyle (
 			lifestyleStatus, patientID, diabetic, alcohollevel, heartrate, bloodoxygen, bodytemperature, 
@@ -83,7 +75,7 @@ func HandleInsertLifestyle(w http.ResponseWriter, r *http.Request) {
 			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 
 			$15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27
 		)`,
-		lifestyleStatus, req.PatientID, req.Diabetic, req.AlcoholLevel, req.HeartRate, req.BloodOxygen,
+		1, req.PatientID, req.Diabetic, req.AlcoholLevel, req.HeartRate, req.BloodOxygen,
 		req.BodyTemperature, req.Weight, req.MRIDelay, req.Age, req.DominantHand,
 		req.Gender, req.FamilyHistory, req.Smoked, req.APOE4, req.PhysicalActivity,
 		req.DepressionStatus, req.CognitiveTestScores, req.MedicationHistory, req.NutritionDiet,
