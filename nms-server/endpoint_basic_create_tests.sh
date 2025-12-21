@@ -55,7 +55,7 @@ curl -X POST "$URL/mobile/signup" \
   -H "content-type: application/json" \
   -d '{
     "email": "patient1@test.ie",
-    "password": "$'"$TEST_PASSWORD"'",
+    "password": "'"$TEST_PASSWORD"'",
     "firstname": "Steve",
     "lastname": "Jobs",
     "phone": "09764323457",

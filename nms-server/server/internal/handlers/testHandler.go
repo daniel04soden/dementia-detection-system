@@ -528,7 +528,7 @@ type TestStatus struct {
 	StageOneStatus  int `json:"stageOneStatus"`
 	StageTwoStatus  int `json:"stageTwoStatus"`
 	LifestyleStatus int `json:"lifestyleStatus"`
-	SpeechStatus    int `json:"speechStatus"`
+	SpeechStatus    int `json:"speechTestStatus"`
 }
 
 func HandleGetPatientTestStatus(w http.ResponseWriter, r *http.Request) {
@@ -551,7 +551,7 @@ func HandleGetPatientTestStatus(w http.ResponseWriter, r *http.Request) {
             t.stageOneStatus, 
             t.stageTwoStatus, 
             COALESCE(l.lifestyleStatus, 0) AS lifestyleStatus, 
-            COALESCE(s.speechStatus, 0) AS speechStatus
+            COALESCE(s.speechTestStatus, 0) AS speechTestStatus
         FROM Test t
         LEFT JOIN Lifestyle l ON t.patientID = l.patientID
         LEFT JOIN SpeechTest s ON t.patientID = s.patientID
@@ -601,7 +601,7 @@ func HandleGetPatientRisk(w http.ResponseWriter, r *http.Request) {
             t.stageOneStatus, 
             t.stageTwoStatus, 
             l.lifestyleStatus, 
-            s.speechStatus
+            s.speechTestStatus
         FROM Test t
         LEFT JOIN Lifestyle l ON t.patientID = l.patientID
         LEFT JOIN SpeechTest s ON t.patientID = s.patientID
