@@ -85,7 +85,7 @@ func HandleInsertLifestyle(w http.ResponseWriter, r *http.Request) {
 		)`,
 		lifestyleStatus, req.PatientID, req.Diabetic, req.AlcoholLevel, req.HeartRate, req.BloodOxygen,
 		req.BodyTemperature, req.Weight, req.MRIDelay, req.Age, req.DominantHand,
-		req.Gender, req.FamilyHistory, req.Smoked, req.APOEε4, req.PhysicalActivity,
+		req.Gender, req.FamilyHistory, req.Smoked, req.APOE4, req.PhysicalActivity,
 		req.DepressionStatus, req.CognitiveTestScores, req.MedicationHistory, req.NutritionDiet,
 		req.SleepQuality, req.ChronicHealthConditions, req.Education,
 		cumulativePrimary,
@@ -119,7 +119,7 @@ type LifestyleResponse struct {
 	Gender                  int     `json:"gender"`
 	FamilyHistory           int     `json:"familyHistory"`
 	Smoked                  int     `json:"smoked"`
-	APOEε4                  int     `json:"apoe4"`
+	APOE4                   int     `json:"apoe4"`
 	PhysicalActivity        string  `json:"physicalActivity"`
 	DepressionStatus        int     `json:"depressionStatus"`
 	CognitiveTestScores     int     `json:"cognitiveTestScores"`
@@ -163,7 +163,7 @@ func HandleGetLifestyle(w http.ResponseWriter, r *http.Request) {
 		&lifestyle.LifestyleID, &lifestyle.LifestyleStatus, &lifestyle.PatientID, &lifestyle.Diabetic,
 		&lifestyle.AlcoholLevel, &lifestyle.HeartRate, &lifestyle.BloodOxygen, &lifestyle.BodyTemperature,
 		&lifestyle.Weight, &lifestyle.MRIDelay, &lifestyle.Age, &lifestyle.DominantHand, &lifestyle.Gender,
-		&lifestyle.FamilyHistory, &lifestyle.Smoked, &lifestyle.APOEε4, &lifestyle.PhysicalActivity,
+		&lifestyle.FamilyHistory, &lifestyle.Smoked, &lifestyle.APOE4, &lifestyle.PhysicalActivity,
 		&lifestyle.DepressionStatus, &lifestyle.CognitiveTestScores, &lifestyle.MedicationHistory,
 		&lifestyle.NutritionDiet, &lifestyle.SleepQuality, &lifestyle.ChronicHealthConditions,
 		&lifestyle.CumulativePrimary, &lifestyle.CumulativeSecondary, &lifestyle.CumulativeDegree,
