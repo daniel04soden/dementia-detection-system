@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 )
@@ -103,10 +104,11 @@ func AiAnalyseHandler(w http.ResponseWriter, r *http.Request) {
 
 	req, err := http.NewRequest(
 		"POST",
-		"http://localhost:5000/classify",
+		"https://ai.magestle.dev/classify",
 		bytes.NewBuffer(jsonData),
 	)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
