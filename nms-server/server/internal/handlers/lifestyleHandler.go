@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
+
+	"nms-server/server/internal/auth"
 )
 
 type LifestyleInsert struct {
@@ -22,7 +25,7 @@ type LifestyleInsert struct {
 	Gender                  int     `json:"gender"`           // assuming Gender is an integer (0 for female, 1 for male)
 	FamilyHistory           int     `json:"familyHistory"`    // assuming FamilyHistory is an integer (0 for no, 1 for yes)
 	Smoked                  int     `json:"smoked"`           // assuming Smoked is an integer (0 for no, 1 for yes)
-	APOEε4                  int     `json:"apoe4"`            // assuming APOEε4 is an integer (0 for no, 1 for yes)
+	APOE4                   int     `json:"apoe4"`            // assuming APOEε4 is an integer (0 for no, 1 for yes)
 	PhysicalActivity        string  `json:"physicalActivity"` // assuming values: Sedentary, Moderate Activity, Mild Activity
 	DepressionStatus        int     `json:"depressionStatus"` // assuming 0 for no depression, 1 for mild, 2 for moderate, etc.
 	CognitiveTestScores     int     `json:"cognitiveTestScores"`
@@ -179,4 +182,88 @@ func HandleGetLifestyle(w http.ResponseWriter, r *http.Request) {
 	// Return the data as JSON
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(lifestyle)
+}
+
+type LifestyleAIAnalyse struct {
+	Diabetic                int     `json:"diabetic"`
+	AlcoholLevel            float64 `json:"alcoholLevel"`
+	HeartRate               int     `json:"heartRate"`
+	BloodOxygen             float64 `json:"bloodOxygen"`
+	BodyTemperature         float64 `json:"bodyTemperature"`
+	Weight                  float64 `json:"weight"`
+	MRIDelay                float64 `json:"mriDelay"`
+	Age                     int     `json:"age"`
+	DominantHand            int     `json:"dominantHand"`
+	Gender                  int     `json:"gender"`
+	FamilyHistory           int     `json:"familyHistory"`
+	Smoked                  int     `json:"smoked"`
+	APOE4                   int     `json:"apoe4"`
+	PhysicalActivity        string  `json:"physicalActivity"`
+	DepressionStatus        int     `json:"depressionStatus"`
+	CognitiveTestScores     int     `json:"cognitiveTestScores"`
+	MedicationHistory       int     `json:"medicationHistory"`
+	NutritionDiet           string  `json:"nutritionDiet"`
+	SleepQuality            int     `json:"sleepQuality"`
+	ChronicHealthConditions string  `json:"chronicHealthConditions"`
+	CumulativePrimary       string  `json:"cumulativePrimary"`
+	CumulativeSecondary     string  `json:"cumulativeSecondary"`
+	CumulativeDegree        string  `json:"cumulativeDegree"`
+	DementiaStatus          string  `json:"dementiaStatus"`
+}
+
+func HandleReviewLifestyle(w http.ResponseWriter, r *http.Request) {
+	authHeader := r.Header.Get("Authorization")
+	var token string
+	token, ok := strings.CutPrefix(authHeader, "Bearer ")
+	if !ok {
+		http.Error(w, "Missing or invalid Authorization header", http.StatusUnauthorized)
+		return
+	}
+
+	claims, err := auth.ValidateJWT(token)
+	if err != nil {
+		http.Error(w, "Invalid or expired token", http.StatusUnauthorized)
+		return
+	}
+
+	row := db.QueryRow(`
+		SELECT premium 
+		FROM Patient
+		WHERE patientID = $1
+		`, claims.ID)
+
+	var premium bool
+
+	err = row.Scan(&premium)
+	if err != nil {
+		http.Error(w, "failed to scan patient", http.StatusInternalServerError)
+		return
+	}
+
+	if !premium {
+		http.Error(w, "Access not allowed", http.StatusUnauthorized)
+	}
+
+	var ls LifestyleAIAnalyse
+
+	row = db.QueryRow(`
+		SELECT diabetic, alcoholLevel,
+		heartRate, bloodOxygen, bodyTemperature, weight, MRIDelay,
+		age, dominantHand, gender, familyHistory, smoked, apoe4, physicalActivity,
+		depressionStatus, cognitiveTestScores, medicationHistory, nutritionDiet,
+		sleepQuality, cumulativePrimary, cumulativeSecondary, cumulativeDegree, dementiaStatus
+		FROM Lifestyle 
+		WHERE patientID = $1
+		`, claims.ID)
+	err = row.Scan(ls.Diabetic, ls.AlcoholLevel, ls.HeartRate, ls.BloodOxygen, ls.BodyTemperature, ls.Weight,
+		ls.MRIDelay, ls.Age, ls.DominantHand, ls.Gender, ls.FamilyHistory, ls.Smoked, ls.APOE4, ls.PhysicalActivity,
+		ls.DepressionStatus, ls.CognitiveTestScores, ls.MedicationHistory, ls.NutritionDiet, ls.SleepQuality,
+		ls.CumulativePrimary, ls.CumulativeSecondary, ls.CumulativeDegree, ls.DementiaStatus)
+	if err != nil {
+		http.Error(w, "failed to scan lifestyle", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(ls)
 }

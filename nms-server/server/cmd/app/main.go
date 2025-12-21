@@ -57,8 +57,9 @@ func main() {
 	// Payment
 
 	http.HandleFunc("POST /api/mobile/payment", handlers.HandleCreatePayment)
-	http.HandleFunc("POST /api/stripe/webhook", handlers.HandleCreatePayment)
+	http.HandleFunc("POST /api/stripe/webhook", handlers.HandleStripeWebhook)
 
+	// news
 	http.HandleFunc("GET /api/web/news", handlers.HandleGetDoctorNews)
 	http.HandleFunc("GET /api/mobile/news", handlers.HandleGetPatientNews)
 
@@ -81,7 +82,9 @@ func main() {
 	http.HandleFunc("POST /api/lifestyle/insert", handlers.HandleInsertLifestyle)
 	http.HandleFunc("POST /api/lifestyle/review", handlers.HandleGetLifestyle)
 
-	http.HandleFunc("POST /api/speech/insert", handlers.HandleSpeechInsert)
+	// testing - // AssemblyAI / Speech
+	http.HandleFunc("POST /api/assembly/webhook", handlers.HandleAssemblyWebHook)
+	http.HandleFunc("POST /api/mobile/uploadaudio", handlers.HandleUpload)
 
 	// Reviews
 	http.HandleFunc("POST /api/review/insert", handlers.HandleInsertReview)
