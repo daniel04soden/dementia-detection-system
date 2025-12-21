@@ -50,29 +50,29 @@ CREATE TABLE IF NOT EXISTS Lifestyle (
     lifestyleStatus INT DEFAULT 0,
     patientID INT,
     diabetic INT,                                   -- 0 for no, 1 for yes
-    alcohollevel FLOAT,                             -- ???
-    heartrate INT,                                  -- float with heartrate
-    bloodoxygen FLOAT,                              -- float with blood oxygen
-    bodytemperature FLOAT,                          -- float with temperature
+    alcoholLevel FLOAT,                             -- ???
+    heartRate INT,                                  -- float with heartrate
+    bloodOxygen FLOAT,                              -- float with blood oxygen
+    bodyTemperature FLOAT,                          -- float with temperature
     weight FLOAT,                                   -- float with weight
-    mri_delay FLOAT,                                -- ???
+    mriDelay FLOAT,                                -- ???
     age INT,                                        -- int with age
-    dominanthand INT,                               -- 0 for left, 1 for right
+    dominantHand INT,                               -- 0 for left, 1 for right
     gender INT,                                     -- 0 for female, 1 for male
-    familyhistory INT,                              -- 0 for no, 1 for yes
+    familyHistory INT,                              -- 0 for no, 1 for yes
     smoked INT,                                     -- 0 for no, 1 for yes
     apoe4 INT,                                     -- 0 for no, 1 for yes
-    physicalactivity VARCHAR(50),                   -- 'Sedentary', 'Moderate Activity', 'Mild Activity'
-    depressionstatus INT,                           -- 0 for no depression, 1 for mild, 2 for moderate, etc.
-    cognitivetestscores INT,                        -- ???
-    medicationhistory INT,                          -- 0 for no, 1 for yes
-    nutritiondiet VARCHAR(50),                      -- 'Low-Carb Diet', 'Mediterranean Diet', 'Balanced Diet'
-    sleepquality INT,                               -- Assuming scale 1-5 or some numeric scale
-    chronichealthconditions VARCHAR(50),            -- 'N/A', 'Heart Disease', 'Hypertension', 'Diabetes'
-    cumulativeprimary VARCHAR(5),                   -- 'TRUE' or 'FALSE'
-    cumulativesecondary VARCHAR(5),                 -- 'TRUE' or 'FALSE'
-    cumulativedegree VARCHAR(5),                    -- 'TRUE' or 'FALSE'
-    dementiastatus VARCHAR(50),                      -- 'N/A', 'Early', 'Moderate', 'Severe'
+    physicalActivity VARCHAR(50),                   -- 'Sedentary', 'Moderate Activity', 'Mild Activity'
+    depressionStatus INT,                           -- 0 for no depression, 1 for mild, 2 for moderate, etc.
+    cognitiveTestScores INT,                        -- ???
+    medicationHistory INT,                          -- 0 for no, 1 for yes
+    nutritionDiet VARCHAR(50),                      -- 'Low-Carb Diet', 'Mediterranean Diet', 'Balanced Diet'
+    sleepQuality INT,                               -- Assuming scale 1-5 or some numeric scale
+    chronicHealthConditions VARCHAR(50),            -- 'N/A', 'Heart Disease', 'Hypertension', 'Diabetes'
+    cumulativePrimary VARCHAR(5),                   -- 'TRUE' or 'FALSE'
+    cumulativeSecondary VARCHAR(5),                 -- 'TRUE' or 'FALSE'
+    cumulativeDegree VARCHAR(5),                    -- 'TRUE' or 'FALSE'
+    dementiaStatus VARCHAR(50),                      -- 'N/A', 'Early', 'Moderate', 'Severe'
     FOREIGN KEY (patientID) REFERENCES Patient(patientID) ON DELETE CASCADE
 );
 

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 )
@@ -24,7 +23,7 @@ func uploadAudio(apiKey string, data []byte) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 	if resp.StatusCode != 200 {
 		return "", fmt.Errorf("upload failed: %s", string(body))
 	}
@@ -49,7 +48,7 @@ func transcribeAudio(apiKey, uploadURL string) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 	if resp.StatusCode != 200 {
 		return "", fmt.Errorf("transcription request failed: %s", string(body))
 	}
@@ -59,8 +58,8 @@ func transcribeAudio(apiKey, uploadURL string) (string, error) {
 	return result["id"].(string), nil
 }
 
-func uploadHandler(w http.ResponseWriter, r *http.Request) {
-	r.ParseMultipartForm(50 << 20) // max 50 MB
+func HandleUpload(w http.ResponseWriter, r *http.Request) {
+	r.ParseMultipartForm(50 << 20)
 
 	file, _, err := r.FormFile("file")
 	if err != nil {
@@ -69,7 +68,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	fileBytes, _ := ioutil.ReadAll(file)
+	fileBytes, _ := io.ReadAll(file)
 
 	uploadURL, err := uploadAudio(ASSEMBLY_SECRET, fileBytes)
 	if err != nil {
@@ -82,6 +81,9 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Transcription request failed: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func HandleAssemblyWebHook(w http.ResponseWriter, r *http.Request) {
 }
 
 type AiAnalyseRequest struct {
