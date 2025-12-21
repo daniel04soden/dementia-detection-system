@@ -12,7 +12,6 @@ import (
 
 type LifestyleInsert struct {
 	PatientID               int     `json:"patientID"`
-	Status                  bool    `json:"status"`
 	Diabetic                int     `json:"diabetic"`
 	AlcoholLevel            float64 `json:"alcoholLevel"`
 	HeartRate               int     `json:"heartRate"`
@@ -144,7 +143,7 @@ func HandleGetLifestyle(w http.ResponseWriter, r *http.Request) {
 			lifestyleID, lifestyleStatus, patientID, diabetic, alcoholLevel, heartRate, bloodOxygen, 
 			bodyTemperature, weight, mriDelay, age, dominantHand, gender, familyHistory, smoked, apoe4, 
 			physicalActivity, depressionStatus, cognitiveTestScores, medicationHistory, nutritionDiet, 
-			sleepQuality, chronicHealthConditions, cumulativePrimary, cumulativeSecondary, cumulativeDegree, dementiaStatus
+			sleepQuality, chronicHealthConditions, cumulativerimary, cumulativesecondary, cumulativedegree, dementiastatus
 		FROM Lifestyle 
 		WHERE patientID = $1
 	`
