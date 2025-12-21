@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.io.File
+import java.lang.Thread.State
 import java.util.UUID
 
 @HiltViewModel
@@ -37,9 +38,22 @@ class SpeechViewModel @Inject constructor(
 
     private var isLoading = false
 
+    //UI
     private val _prefaceVisi = MutableStateFlow(true)
     val prefaceVisi: StateFlow<Boolean> = _prefaceVisi
     fun onVisiChange(newVisi: Boolean) { _prefaceVisi.value = newVisi }
+
+    private val _recVisi = MutableStateFlow(false)
+    val recVisi: StateFlow<Boolean> = _recVisi
+    fun onRecChange(){_recVisi.value = !_recVisi.value}
+
+    private val _paymentVisi = MutableStateFlow(false)
+    val paymentVisi: StateFlow<Boolean> = _paymentVisi
+    fun isPaymentReq(paid:Boolean){_paymentVisi.value = paid}
+
+    private val _successVisi = MutableStateFlow(false)
+    val successVisi: StateFlow<Boolean> = _successVisi
+    fun onSuccess(){_successVisi.value = !_successVisi.value}
 
     private val _img = MutableStateFlow(R.drawable.beach)
     val img: StateFlow<Int> = _img

@@ -28,17 +28,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.dementiaDetectorApp.ui.composables.ProgressDots
-import com.example.dementiaDetectorApp.ui.composables.ReusableToast
+import com.example.dementiaDetectorApp.ui.composables.Footer
+import com.example.dementiaDetectorApp.ui.composables.SubmittedSection
 import com.example.dementiaDetectorApp.ui.theme.Gray
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.ui.theme.buttonColours
-import com.example.dementiaDetectorApp.ui.composables.SubmittedSection
-import com.example.dementiaDetectorApp.ui.util.ToastManager
 import com.example.dementiaDetectorApp.viewModels.SharedVM
 import com.example.dementiaDetectorApp.viewModels.Stage2VM
 import com.zekierciyas.library.view.SurveyScreen
-import org.osmdroid.tileprovider.ReusableBitmapDrawable
 
 @Composable
 fun Stage2Screen(tVM: Stage2VM, sVM: SharedVM, nc: NavController){
@@ -59,7 +56,7 @@ fun Stage2Screen(tVM: Stage2VM, sVM: SharedVM, nc: NavController){
             FormSection(tVM,sVM,nc)
         }
         if(!(tVM.prefaceVisi.collectAsState().value)){
-            ProgressDots(Modifier.align(Alignment.BottomCenter))
+            Footer(Modifier.align(Alignment.BottomCenter))
         }
     }
 }

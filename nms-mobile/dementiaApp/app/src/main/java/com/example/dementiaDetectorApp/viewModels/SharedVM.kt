@@ -1,13 +1,11 @@
 package com.example.dementiaDetectorApp.viewModels
 
-import android.accounts.Account
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dementiaDetectorApp.api.clinics.ClinicRepository
 import com.example.dementiaDetectorApp.api.tests.StatusRequest
 import com.example.dementiaDetectorApp.api.tests.TestRepository
 import com.example.dementiaDetectorApp.api.tests.TestResult
@@ -19,7 +17,6 @@ import jakarta.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlin.enums.enumEntries
 
 @HiltViewModel
 class SharedVM @Inject constructor(
@@ -38,6 +35,10 @@ class SharedVM @Inject constructor(
         _id.intValue = newID
         Log.d("Id change", "${_id.intValue}")
     }
+
+    private val _hasPaid = mutableStateOf(false)
+    val hasPaid:State<Boolean> = _hasPaid
+    fun PaidChange(){_hasPaid.value = !_hasPaid.value}
 
     //NavBar
     val nav = listOf(
@@ -119,7 +120,7 @@ class SharedVM @Inject constructor(
     private val stage2Status = mutableIntStateOf(0)
     private val speechStatus = mutableIntStateOf(0)
 
-    private fun getStatus(){
+    fun getStatus(){
         viewModelScope.launch{
             isLoading = true
             val result = repository.getStatus(StatusRequest(id.value))

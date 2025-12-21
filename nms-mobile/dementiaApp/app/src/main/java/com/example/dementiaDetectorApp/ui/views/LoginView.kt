@@ -35,12 +35,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.R
 import com.example.dementiaDetectorApp.api.auth.AuthResult
+import com.example.dementiaDetectorApp.ui.composables.WaveBGBox
 import com.example.dementiaDetectorApp.ui.theme.buttonColours
 import com.example.dementiaDetectorApp.ui.theme.outLinedTFColours
-import com.example.dementiaDetectorApp.ui.composables.WaveBGBox
 import com.example.dementiaDetectorApp.viewModels.AuthViewModel
 import com.example.dementiaDetectorApp.viewModels.SharedVM
-import kotlin.math.log
 
 @Composable
 fun LoginScreen(authVM: AuthViewModel, sharedVM: SharedVM, nc: NavController) {

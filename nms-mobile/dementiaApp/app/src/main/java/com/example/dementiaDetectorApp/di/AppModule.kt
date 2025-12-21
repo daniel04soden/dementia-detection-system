@@ -15,6 +15,9 @@ import com.example.dementiaDetectorApp.api.feedback.FeedbackRepoImp
 import com.example.dementiaDetectorApp.api.news.NewsAPI
 import com.example.dementiaDetectorApp.api.news.NewsRepo
 import com.example.dementiaDetectorApp.api.news.NewsRepoImp
+import com.example.dementiaDetectorApp.api.stripe.StripeAPI
+import com.example.dementiaDetectorApp.api.stripe.StripeRepo
+import com.example.dementiaDetectorApp.api.stripe.StripeRepoImp
 import com.example.dementiaDetectorApp.api.tests.TestAPI
 import com.example.dementiaDetectorApp.api.tests.TestRepoImp
 import com.example.dementiaDetectorApp.api.tests.TestRepository
@@ -33,14 +36,13 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
     val BASE_URL = "https://magestle.dev/api/"
+    val moshi = Moshi.Builder()
+        .add(KotlinJsonAdapterFactory())
+        .build()
 
     @Provides
     @Singleton
     fun provAuthAPI(): AuthAPI {
-        val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
@@ -63,9 +65,6 @@ object AppModule {
     @Provides
     @Singleton
     fun provTestAPI(): TestAPI {
-        val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
@@ -82,17 +81,12 @@ object AppModule {
     @Provides
     @Singleton
     fun provClinicAPI(): ClinicAPI {
-        val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
             .create(ClinicAPI::class.java)
     }
-
 
     @Provides
     @Singleton
@@ -103,10 +97,6 @@ object AppModule {
     @Provides
     @Singleton
     fun provNewsAPI(): NewsAPI{
-        val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
@@ -123,10 +113,6 @@ object AppModule {
     @Provides
     @Singleton
     fun provFeedbackAPI(): FeedbackAPI{
-        val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
@@ -138,5 +124,21 @@ object AppModule {
     @Singleton
     fun provFeedbackRepo(api:FeedbackAPI, prefs: SharedPreferences): FeedbackRepo{
         return FeedbackRepoImp(api, prefs)
+    }
+
+    @Provides
+    @Singleton
+    fun provStripeAPI(): StripeAPI {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+            .create(StripeAPI::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provStripeRepo(api: StripeAPI, prefs: SharedPreferences): StripeRepo {
+        return StripeRepoImp(api, prefs)
     }
 }

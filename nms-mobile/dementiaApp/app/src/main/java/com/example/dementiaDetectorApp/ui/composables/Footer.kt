@@ -3,7 +3,10 @@ package com.example.dementiaDetectorApp.ui.composables
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
 
 @Composable
-fun ProgressDots(
+fun Footer(
     modifier: Modifier
 ){
     Row(modifier = modifier
@@ -23,6 +26,6 @@ fun ProgressDots(
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ){
-        Text("Progress dots here")
+        Spacer(Modifier.height(48.dp))
     }
 }

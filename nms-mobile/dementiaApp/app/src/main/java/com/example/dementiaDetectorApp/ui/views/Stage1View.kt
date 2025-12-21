@@ -41,13 +41,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.dementiaDetectorApp.ui.composables.ProgressDots
+import com.example.dementiaDetectorApp.ui.composables.Footer
+import com.example.dementiaDetectorApp.ui.composables.SubmittedSection
 import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.Gray
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.ui.theme.buttonColours
 import com.example.dementiaDetectorApp.ui.theme.outLinedTFColours
-import com.example.dementiaDetectorApp.ui.composables.SubmittedSection
 import com.example.dementiaDetectorApp.viewModels.SharedVM
 import com.example.dementiaDetectorApp.viewModels.Stage1VM
 
@@ -70,7 +70,7 @@ fun Stage1Screen(tVM: Stage1VM, sVM: SharedVM, nc: NavController){
             FormSection(tVM, sVM, nc)
         }
         if(!tVM.timedVisi.collectAsState().value && !tVM.prefaceVisi.collectAsState().value){
-            ProgressDots(Modifier.align(Alignment.BottomCenter))
+            Footer(Modifier.align(Alignment.BottomCenter))
         }
     }
 }
@@ -109,7 +109,7 @@ private fun PrefaceSection(tVM: Stage1VM){
                     Text(
                         text = "The following is a questionnaire that will ask you 4 questions\n\n" +
                                 "The test will begin by displaying information that will remain on screen for 10 seconds that you must remember for a later question\n\n"+
-                                "If you don't have an answer for a quesiton, leave it blank",
+                                "If you don't have an answer for a question, leave it blank",
                         fontSize = 20.sp,
                         color = Gray,
                         textAlign = TextAlign.Center,

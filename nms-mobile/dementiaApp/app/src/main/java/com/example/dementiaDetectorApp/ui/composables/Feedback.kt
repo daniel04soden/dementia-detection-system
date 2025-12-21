@@ -117,7 +117,7 @@ fun FeedbackPanel(
                 )
             )
 
-            // Submit Button
+            // Submit/Cancel Button
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

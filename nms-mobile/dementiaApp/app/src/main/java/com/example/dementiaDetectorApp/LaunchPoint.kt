@@ -13,6 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHost
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -30,6 +31,7 @@ import com.example.dementiaDetectorApp.ui.views.StatusScreen
 import com.example.dementiaDetectorApp.viewModels.AuthViewModel
 import com.example.dementiaDetectorApp.viewModels.ContactVM
 import com.example.dementiaDetectorApp.viewModels.HomeVM
+import com.example.dementiaDetectorApp.viewModels.PaymentVM
 import com.example.dementiaDetectorApp.viewModels.QViewModel
 import com.example.dementiaDetectorApp.viewModels.SharedVM
 import com.example.dementiaDetectorApp.viewModels.SpeechViewModel
@@ -63,15 +65,16 @@ class LaunchPoint : ComponentActivity() {
                 val t2VM: Stage2VM = hiltViewModel()
                 val sVM: SpeechViewModel = hiltViewModel()
                 val cVM: ContactVM = hiltViewModel()
+                val pVM:PaymentVM = hiltViewModel()
 
-                NavHost(navController = nc, startDestination = "speech") {
+                NavHost(navController = nc, startDestination = "questionnaire") {
                     composable("login"){LoginScreen(authVM,sharedVM, nc)}
                     composable("registration"){ RegistrationScreen(authVM,sharedVM, nc) }
                     composable("home"){ HomeScreen(homeVM, sharedVM, nc) }
-                    composable("questionnaire"){QuestionnaireScreen(qVM, nc)}
+                    composable("questionnaire"){QuestionnaireScreen(qVM, pVM, sharedVM, nc)}
                     composable("test1"){ Stage1Screen(t1VM, sharedVM, nc)}
                     composable("test2"){ Stage2Screen(t2VM, sharedVM, nc)}
-                    composable("speech"){SpeechScreenWithPermission(sVM, sharedVM, nc, ::requestMicPermission)}
+                    composable("speech"){SpeechScreenWithPermission(sVM, sharedVM, pVM, nc, ::requestMicPermission)}
                     composable("status"){ StatusScreen(sharedVM, nc) }
                     composable("risk"){ RiskScreen(sharedVM,nc) }
                     composable("contact") { ContactScreen(cVM, sharedVM, nc) }
@@ -98,6 +101,7 @@ class LaunchPoint : ComponentActivity() {
 private fun SpeechScreenWithPermission(
     sVM: SpeechViewModel,
     sharedVM: SharedVM,
+    pVM: PaymentVM,
     nc: NavController,
     requestPermission: () -> Unit
 ) {
@@ -105,6 +109,5 @@ private fun SpeechScreenWithPermission(
     LaunchedEffect(Unit) {
         requestPermission()
     }
-
-    SpeechScreen(sVM, sharedVM, nc)
+    SpeechScreen(sVM, sharedVM, pVM, nc)
 }
