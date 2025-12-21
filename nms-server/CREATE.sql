@@ -111,14 +111,14 @@ CREATE TABLE IF NOT EXISTS TestStageTwo (
     testID INT PRIMARY KEY REFERENCES Test(testID) ON DELETE CASCADE,
     testDate VARCHAR(20) NOT NULL,
     memoryScore INT, 
-    conversationScore INT,
+    recallScore INT,
     speakingScore INT,
     financialScore INT,
     medicineScore INT,
     transportScore INT,
     totalScore INT GENERATED ALWAYS AS (
         COALESCE(memoryScore,0) +
-        COALESCE(conversationScore,0) +
+        COALESCE(recallScore,0) +
         COALESCE(speakingScore,0) +
         COALESCE(financialScore,0) +
         COALESCE(medicineScore,0) +
