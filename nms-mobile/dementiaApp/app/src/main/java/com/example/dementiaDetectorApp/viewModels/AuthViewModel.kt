@@ -96,7 +96,7 @@ class AuthViewModel @Inject constructor(
         _eircode.value = newEircode
     }
 
-    private fun validateEircode(): Boolean {
+    fun validateEircode(): Boolean {
         val eircode = eircode.value.uppercase().replace(" ", "")
         return eircode.length == 7 &&
                 eircode.matches("^(?:[AC-FHKNPRTV-Y][0-9]{2}|D6W)[0-9AC-FHKNPRTV-Y]{4}$".toRegex())

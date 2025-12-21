@@ -33,6 +33,7 @@ import com.example.dementiaDetectorApp.viewModels.ContactVM
 import com.example.dementiaDetectorApp.viewModels.HomeVM
 import com.example.dementiaDetectorApp.viewModels.PaymentVM
 import com.example.dementiaDetectorApp.viewModels.QViewModel
+import com.example.dementiaDetectorApp.viewModels.RiskVM
 import com.example.dementiaDetectorApp.viewModels.SharedVM
 import com.example.dementiaDetectorApp.viewModels.SpeechViewModel
 import com.example.dementiaDetectorApp.viewModels.Stage1VM
@@ -66,8 +67,9 @@ class LaunchPoint : ComponentActivity() {
                 val sVM: SpeechViewModel = hiltViewModel()
                 val cVM: ContactVM = hiltViewModel()
                 val pVM:PaymentVM = hiltViewModel()
+                val rVM:RiskVM = hiltViewModel()
 
-                NavHost(navController = nc, startDestination = "questionnaire") {
+                NavHost(navController = nc, startDestination = "risk") {
                     composable("login"){LoginScreen(authVM,sharedVM, nc)}
                     composable("registration"){ RegistrationScreen(authVM,sharedVM, nc) }
                     composable("home"){ HomeScreen(homeVM, sharedVM, nc) }
@@ -76,7 +78,7 @@ class LaunchPoint : ComponentActivity() {
                     composable("test2"){ Stage2Screen(t2VM, sharedVM, nc)}
                     composable("speech"){SpeechScreenWithPermission(sVM, sharedVM, pVM, nc, ::requestMicPermission)}
                     composable("status"){ StatusScreen(sharedVM, nc) }
-                    composable("risk"){ RiskScreen(sharedVM,nc) }
+                    composable("risk"){ RiskScreen(rVM, sharedVM,nc)}
                     composable("contact") { ContactScreen(cVM, sharedVM, nc) }
                 }
             }

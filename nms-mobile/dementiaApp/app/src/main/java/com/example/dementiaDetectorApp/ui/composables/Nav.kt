@@ -81,10 +81,10 @@ fun NavBarItem(
             contentAlignment = Alignment.Center
         ){
             Icon(
-                painter = painterResource(R.drawable.logo),
+                painter = painterResource(item.iconId),
                 contentDescription = item.title,
                 tint = (if(isSelected) activeTextColor else inactiveTextColor),
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(30.dp)
             )
         }
         Text(

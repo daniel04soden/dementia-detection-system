@@ -15,6 +15,9 @@ import com.example.dementiaDetectorApp.api.feedback.FeedbackRepoImp
 import com.example.dementiaDetectorApp.api.news.NewsAPI
 import com.example.dementiaDetectorApp.api.news.NewsRepo
 import com.example.dementiaDetectorApp.api.news.NewsRepoImp
+import com.example.dementiaDetectorApp.api.risk.RiskAPI
+import com.example.dementiaDetectorApp.api.risk.RiskRepo
+import com.example.dementiaDetectorApp.api.risk.RiskRepoImp
 import com.example.dementiaDetectorApp.api.stripe.StripeAPI
 import com.example.dementiaDetectorApp.api.stripe.StripeRepo
 import com.example.dementiaDetectorApp.api.stripe.StripeRepoImp
@@ -140,5 +143,21 @@ object AppModule {
     @Singleton
     fun provStripeRepo(api: StripeAPI, prefs: SharedPreferences): StripeRepo {
         return StripeRepoImp(api, prefs)
+    }
+
+    @Provides
+    @Singleton
+    fun provRiskAPI(): RiskAPI{
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+            .create(RiskAPI::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provRiskRepo(api: RiskAPI, prefs: SharedPreferences):RiskRepo{
+        return RiskRepoImp(api, prefs)
     }
 }

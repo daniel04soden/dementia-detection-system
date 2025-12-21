@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.dementiaDetectorApp.R
 import com.example.dementiaDetectorApp.api.tests.StatusRequest
 import com.example.dementiaDetectorApp.api.tests.TestRepository
 import com.example.dementiaDetectorApp.api.tests.TestResult
@@ -44,25 +45,25 @@ class SharedVM @Inject constructor(
     val nav = listOf(
         NavBarContent(
             title = "Home",
-            iconId = 0,
+            iconId = R.drawable.home,
             "home"
         ),
 
         NavBarContent(
             title = "Test Status",
-            iconId = 0,
+            iconId = R.drawable.test,
             "status"
         ),
 
         NavBarContent(
             title = "Risk Assessment",
-            iconId = 0,
+            iconId = R.drawable.ra,
             "risk"
         ),
 
         NavBarContent(
             title = "Contact",
-            iconId = 0,
+            iconId = R.drawable.contact,
             "contact"
         )
     )
@@ -160,5 +161,35 @@ class SharedVM @Inject constructor(
             )
         )
         _tests.value = testList
+    }
+
+    private val _riskScore = mutableIntStateOf(0)
+    val riskScore:State<Int> = _riskScore
+    fun getRiskScore():Int{return _riskScore.intValue}
+
+    fun onTestSubmission(idx: Int){
+        _tests.value[idx].state = 1
+        var riskScore = 0
+        for (test in _tests.value){
+            riskScore += getTestScore(test.state)
+        }
+    }
+
+    private fun getTestScore(state:Int):Int{
+        when (state){
+            2 ->{return 1}
+            3 -> {return 1}
+            4 -> {return 1}
+            5 -> {return 1}
+            else -> {return 0}
+        }
+    }
+
+    fun getTestsDone():Int{
+        var count=0
+        for (test in _tests.value){
+            if(test.state>1){count++}
+        }
+        return count
     }
 }
