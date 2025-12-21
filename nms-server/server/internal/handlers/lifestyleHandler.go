@@ -138,14 +138,13 @@ func HandleGetLifestyle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Declare a struct to hold the result
 	var lifestyle LifestyleResponse
 	query := `
 		SELECT 
-			lifestyleID, lifestyleStatus, patientID, diabetic, alcohollevel, heartrate, bloodoxygen, 
-			bodytemperature, weight, mri_delay, age, dominanthand, gender, familyhistory, smoked, apoeε4, 
-			physicalactivity, depressionstatus, cognitivetestscores, medicationhistory, nutritiondiet, 
-			sleepquality, chronichealthconditions, cumulativeprimary, cumulativesecondary, cumulativedegree, dementiastatus
+			lifestyleID, lifestyleStatus, patientID, diabetic, alcoholLevel, heartRate, bloodOxygen, 
+			bodyTemperature, weight, mriDelay, age, dominantHand, gender, familyHistory, smoked, apoe4, 
+			physicalActivity, depressionStatus, cognitiveTestScores, medicationHistory, nutritionDiet, 
+			sleepQuality, chronicHealthConditions, cumulativePrimary, cumulativeSecondary, cumulativeDegree, dementiaStatus
 		FROM Lifestyle 
 		WHERE patientID = $1
 	`
