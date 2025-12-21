@@ -280,6 +280,8 @@ func HandleInsertStageTwo(w http.ResponseWriter, r *http.Request) {
 
 	tx, err := db.Begin()
 	if err != nil {
+
+		log.Println("Start Transaction Error" + err.Error())
 		http.Error(w, "Failed to start transaction: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -299,6 +301,7 @@ func HandleInsertStageTwo(w http.ResponseWriter, r *http.Request) {
     `, req.PatientID).Scan(&testID)
 	if err != nil {
 		tx.Rollback()
+		log.Println("No active test found for Stage Two" + err.Error())
 		http.Error(w, "No active test found for Stage Two", http.StatusNotFound)
 		return
 	}
@@ -314,6 +317,8 @@ func HandleInsertStageTwo(w http.ResponseWriter, r *http.Request) {
 		req.FinancialScore, req.MedicineScore, req.TransportScore)
 	if err != nil {
 		tx.Rollback()
+
+		log.Println("Failed to insert into stage two" + err.Error())
 		http.Error(w, "Could not insert TestStageTwo: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -325,11 +330,15 @@ func HandleInsertStageTwo(w http.ResponseWriter, r *http.Request) {
     `, 1, testID)
 	if err != nil {
 		tx.Rollback()
+
+		log.Println("Failed to mark stage two as complete" + err.Error())
 		http.Error(w, "DB error: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if err := tx.Commit(); err != nil {
+
+		log.Println("Failed to commit" + err.Error())
 		http.Error(w, "Failed to commit transaction", http.StatusInternalServerError)
 		return
 	}
