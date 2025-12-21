@@ -65,11 +65,11 @@ func HandleInsertLifestyle(w http.ResponseWriter, r *http.Request) {
 
 	err := db.QueryRow(`
 		INSERT INTO Lifestyle (
-			lifestyleStatus, patientID, diabetic, alcohollevel, heartrate, bloodoxygen, bodytemperature, 
-			weight, mri_delay, age, dominanthand, gender, familyhistory, smoked, apoeε4, 
-			physicalactivity, depressionstatus, cognitivetestscores, medicationhistory, 
-			nutritiondiet, sleepquality, chronichealthconditions, education, 
-			cumulativeprimary, cumulativesecondary, cumulativedegree, dementiastatus
+			lifestyleStatus, patientID, diabetic, alcoholLevel, heartRate, bloodOxygen, bodyTemperature, 
+			weight, mriDelay, age, dominantHand, gender, familyHistory, smoked, apoe4, 
+			physicalActivity, depressionStatus, cognitiveTestScores, medicationHistory, 
+			nutritionDiet, sleepQuality, chronicHealthConditions, education, 
+			cumulativePrimary, cumulativeSecondary, cumulativeDegree, dementiaStatus
 		) 
 		VALUES (
 			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 
