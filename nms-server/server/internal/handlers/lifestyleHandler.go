@@ -248,3 +248,88 @@ func HandleReviewLifestyle(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(ls)
 }
+
+// Review Lifestyle
+
+func HandleDoctorReviewLifestyle(w http.ResponseWriter, r *http.Request) {
+	var ls LifestyleInsert
+
+	if err := json.NewDecoder(r.Body).Decode(&ls); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	tx, err := db.Begin()
+	if err != nil {
+		http.Error(w, "Transaction start failed", http.StatusInternalServerError)
+		return
+	}
+	defer tx.Rollback()
+
+	lifestyleQuery := `
+        UPDATE Lifestyle
+        SET
+            lifestyleStatus = 2,
+            diabetic = $2,
+            alcoholLevel = $3,
+            heartRate = $4,
+            bloodOxygen = $5,
+            bodyTemperature = $6,
+            weight = $7,
+            mriDelay = $8,
+            age = $9,
+            dominantHand = $10,
+            gender = $11,
+            familyHistory = $12,
+            smoked = $13,
+            apoe4 = $14,
+            physicalActivity = $15,
+            depressionStatus = $16,
+            cognitiveTestScores = $17,
+            medicationHistory = $18,
+            nutritionDiet = $19,
+            sleepQuality = $20,
+            chronicHealthConditions = $21,
+            education = $22
+        WHERE patientID = $1;
+    `
+
+	_, err = tx.Exec(
+		lifestyleQuery,
+		ls.PatientID,
+		ls.Diabetic,
+		ls.AlcoholLevel,
+		ls.HeartRate,
+		ls.BloodOxygen,
+		ls.BodyTemperature,
+		ls.Weight,
+		ls.MRIDelay,
+		ls.Age,
+		ls.DominantHand,
+		ls.Gender,
+		ls.FamilyHistory,
+		ls.Smoked,
+		ls.APOE4,
+		ls.PhysicalActivity,
+		ls.DepressionStatus,
+		ls.CognitiveTestScores,
+		ls.MedicationHistory,
+		ls.NutritionDiet,
+		ls.SleepQuality,
+		ls.ChronicHealthConditions,
+		ls.Education,
+	)
+	if err != nil {
+		http.Error(w, "Lifestyle update failed", http.StatusInternalServerError)
+		return
+	}
+
+	if err := tx.Commit(); err != nil {
+		http.Error(w, "Transaction commit failed", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(map[string]any{
+		"message": "success",
+	})
+}
