@@ -114,6 +114,7 @@ type LifestyleResponse struct {
 	NutritionDiet           string  `json:"nutritionDiet"`
 	SleepQuality            int     `json:"sleepQuality"`
 	ChronicHealthConditions string  `json:"chronicHealthConditions"`
+	Education               string  `json:"education"`
 }
 
 func HandleGetLifestyle(w http.ResponseWriter, r *http.Request) {
@@ -135,7 +136,7 @@ func HandleGetLifestyle(w http.ResponseWriter, r *http.Request) {
 			lifestyleID, lifestyleStatus, patientID, diabetic, alcoholLevel, heartRate, bloodOxygen, 
 			bodyTemperature, weight, mriDelay, age, dominantHand, gender, familyHistory, smoked, apoe, 
 			physicalActivity, depressionStatus, cognitiveTestScores, medicationHistory, nutritionDiet, 
-			sleepQuality, chronicHealthConditions
+			sleepQuality, chronicHealthConditions, education
 		FROM Lifestyle 
 		WHERE patientID = $1
 	`
@@ -147,6 +148,7 @@ func HandleGetLifestyle(w http.ResponseWriter, r *http.Request) {
 		&lifestyle.FamilyHistory, &lifestyle.Smoked, &lifestyle.APOE4, &lifestyle.PhysicalActivity,
 		&lifestyle.DepressionStatus, &lifestyle.CognitiveTestScores, &lifestyle.MedicationHistory,
 		&lifestyle.NutritionDiet, &lifestyle.SleepQuality, &lifestyle.ChronicHealthConditions,
+		&lifestyle.Education,
 	)
 	// Check for errors
 	if err != nil {
