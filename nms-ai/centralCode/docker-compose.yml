@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  dementia-detection-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dementia-detection-api
+    ports:
+      - "5000:5000"
+    environment:
+      - GENERAL_KEY=${GENERAL_KEY:-default_key}
+    volumes:
+      # Mount model files for easier updates without rebuilding
+      - ./model_store:/app/model_store:ro
+      # Mount training data
+      - ./ADReSS-IS2020-data-train:/app/ADReSS-IS2020-data-train:ro
+      - ./ADReSS-IS2020-data-test:/app/ADReSS-IS2020-data-test:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
