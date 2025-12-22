@@ -23,6 +23,7 @@ import com.example.dementiaDetectorApp.ui.composables.NavMenu
 import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.viewModels.RiskVM
+import androidx.compose.ui.graphics.ColorFilter
 import com.example.dementiaDetectorApp.viewModels.SharedVM
 
 @Composable
@@ -86,7 +87,8 @@ private fun ImageSection(rVM: RiskVM) {
             .padding(horizontal = 15.dp)
             .fillMaxWidth()
             .fillMaxHeight(0.35f),
-        contentScale = ContentScale.FillBounds
+        contentScale = ContentScale.FillBounds,
+        colorFilter = ColorFilter.tint(rVM.tint.collectAsState().value)
     )
 }
 

@@ -481,6 +481,10 @@ class QViewModel @Inject constructor(
     val successVisi: StateFlow<Boolean> = _successVisi
     fun onSuccessChange(newVisi: Boolean){_successVisi.value = newVisi}
 
+    private val _aiSuccessVisi = MutableStateFlow(false)
+    val aiSuccessVisi: StateFlow<Boolean> = _successVisi
+    fun AiSuccessChange(newVisi: Boolean){_successVisi.value = newVisi}
+
     private val _paymentVisi = MutableStateFlow(false)
     val paymentVisi: StateFlow<Boolean> = _paymentVisi
     fun isPaymentReq(paid:Boolean){_paymentVisi.value = paid}

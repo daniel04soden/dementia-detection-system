@@ -109,12 +109,19 @@ class SharedVM @Inject constructor(
         }
     }
 
-    fun CheckCompleted(route: String, todo: () -> Unit) {
+    fun CheckCompleted(route: String, todo: () -> Unit, aiTodo: (()->Unit)?=null){
         when (route) {
             "questionnaire" -> {
-                if (questionnaireStatus.intValue != 0)
+                if ((questionnaireStatus.intValue != 0) &&questionnaireStatus.intValue !=5){
                     ToastManager.showToast("Questionnaire already completed")
-                else todo()
+                }
+                else{
+                    if(questionnaireStatus.intValue == 5){
+                        aiTodo!!.invoke()
+                    }else{
+                        todo()
+                    }
+                }
             }
             "test1" -> {
                 if (stage1Status.intValue != 0)
@@ -122,7 +129,7 @@ class SharedVM @Inject constructor(
                 else todo()
             }
             "test2" -> {
-                // Add dependency check: stage 1 must be completed
+                //Dependency check: stage 1 must be completed
                 if (stage1Status.intValue == 0) {
                     ToastManager.showToast("Complete Stage 1 before Stage 2")
                 } else if (stage2Status.intValue != 0) {

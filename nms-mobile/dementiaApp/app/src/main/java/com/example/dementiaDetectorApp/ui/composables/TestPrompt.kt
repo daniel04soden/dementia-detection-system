@@ -40,7 +40,13 @@ fun TestPrompt(
             .background(MidPurple)
             .padding(horizontal = 15.dp, vertical = 20.dp)
             .fillMaxWidth()
-            .clickable { sharedVM.CheckCompleted(test.route) { nc.navigate(test.route) } },
+            .clickable {
+                if (test.route != "questionnaire") {
+                    sharedVM.CheckCompleted(test.route, todo = { nc.navigate(test.route) })
+                } else {
+                    sharedVM.CheckCompleted(route = test.route, todo = {nc.navigate(test.route)}, aiTodo = {nc.navigate("submitQuestionnaire")})
+                }
+            },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {

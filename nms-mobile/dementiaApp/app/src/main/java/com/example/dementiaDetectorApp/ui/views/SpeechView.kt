@@ -67,7 +67,7 @@ fun SpeechScreen(
     ) {
         Column(Modifier.padding(bottom = 50.dp)) {
             if (sVM.prefaceVisi.collectAsState().value) {
-                Spacer(Modifier.height(120.dp))
+                Spacer(Modifier.height(100.dp))
             } else {
                 Spacer(Modifier.height(35.dp))
             }
@@ -415,8 +415,8 @@ private fun PaymentPrompt(
             }
 
             Button(
-                onClick = { nc.navigate("home") },
-                //onClick = {sVM.uploadAudioFile()},
+                //onClick = { nc.navigate("home") },
+                onClick = {sVM.uploadAudioFile()},
                 colors = buttonColours(),
                 modifier = Modifier.fillMaxWidth(0.75f)
             ) {
