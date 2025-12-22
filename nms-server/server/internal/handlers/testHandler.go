@@ -21,11 +21,11 @@ type TestStageOne struct {
 	RecallStreet  string `json:"recallStreet"`
 	RecallCity    string `json:"recallCity"`
 
-	ClockNumberRes  bool `json:"clockNumberRes"`
-	ClockHandsRes   bool `json:"clockHandsRes"`
-	DateQuestionRes bool `json:"dateQuestionRes"`
-	NewsRes         bool `json:"newsRes"`
-	RecallRes       int  `json:"recallRes"`
+	ClockNumberRes  sql.NullBool  `json:"clockNumberRes"`
+	ClockHandsRes   sql.NullBool  `json:"clockHandsRes"`
+	DateQuestionRes sql.NullBool  `json:"dateQuestionRes"`
+	NewsRes         sql.NullBool  `json:"newsRes"`
+	RecallRes       sql.NullInt32 `json:"recallRes"`
 }
 
 func HandleGetTestStageOne(w http.ResponseWriter, r *http.Request) {
@@ -89,7 +89,7 @@ func HandleGetTestStageOne(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "TestStageOne not found", http.StatusNotFound)
 			return
 		}
-		http.Error(w, "failed to scan test", http.StatusInternalServerError)
+		http.Error(w, "failed to scan test"+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -352,7 +352,6 @@ func HandleInsertStageTwo(w http.ResponseWriter, r *http.Request) {
 // --------------------------------- Grade Test Results -------------------------------------
 
 type GradeTest struct {
-	TestID          int  `json:"testID"`
 	ClockNumberRes  bool `json:"clockNumberRes"`
 	ClockHandsRes   bool `json:"clockHandsRes"`
 	DateQuestionRes bool `json:"dateQuestionRes"`
@@ -362,6 +361,19 @@ type GradeTest struct {
 
 func HandleGradeStageOne(w http.ResponseWriter, r *http.Request) {
 	var req GradeTest
+
+	idStr := r.URL.Query().Get("id")
+	if idStr == "" {
+		http.Error(w, "id is required", http.StatusBadRequest)
+		return
+	}
+
+	// Convert the ID string to an integer
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
 
 	// Decode JSON body
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -380,10 +392,10 @@ func HandleGradeStageOne(w http.ResponseWriter, r *http.Request) {
             clockNumberRes=$1,
             clockHandsRes=$2,
             dateQuestionRes=$3,
-            newsScore=$4,
+            newsRes=$4,
             recallRes=$5
         WHERE testID=$6
-    `, req.ClockNumberRes, req.ClockHandsRes, req.DateQuestionRes, req.NewsRes, req.RecallRes, req.TestID)
+    `, req.ClockNumberRes, req.ClockHandsRes, req.DateQuestionRes, req.NewsRes, req.RecallRes, id)
 	if err != nil {
 		http.Error(w, "DB update error: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -415,9 +427,9 @@ func HandleGradeStageOne(w http.ResponseWriter, r *http.Request) {
 	if score == 9 {
 		_, err := tx.Exec(`
 				UPDATE Test SET
-					stageOneStatus=$1,
+					stageOneStatus=$1
 				WHERE testID=$2
-			`, 2, req.TestID)
+			`, 2, id)
 		if err != nil {
 			http.Error(w, "DB update error: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -426,9 +438,9 @@ func HandleGradeStageOne(w http.ResponseWriter, r *http.Request) {
 	if 5 <= score && score < 9 {
 		_, err := tx.Exec(`
 				UPDATE Test SET
-					stageOneStatus=$1,
+					stageOneStatus=$1
 				WHERE testID=$2
-			`, 3, req.TestID)
+			`, 3, id)
 		if err != nil {
 			http.Error(w, "DB update error: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -436,9 +448,9 @@ func HandleGradeStageOne(w http.ResponseWriter, r *http.Request) {
 	} else {
 		_, err := tx.Exec(`
 				UPDATE Test SET
-					stageOneStatus=$1,
+					stageOneStatus=$1
 				WHERE testID=$2
-			`, 4, req.TestID)
+			`, 4, id)
 		if err != nil {
 			http.Error(w, "DB update error: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -455,72 +467,6 @@ func HandleGradeStageOne(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]any{
 		"message":       "Stage One graded",
 		"stageOneScore": score,
-	})
-}
-
-type TestStageTwoGrade struct {
-	PatientID      int `json:"patientID"`
-	MemoryScore    int `json:"memoryScore"`
-	RecallScore    int `json:"recallScore"`
-	SpeakingScore  int `json:"speakingScore"`
-	FinancialScore int `json:"financialScore"`
-	MedicineScore  int `json:"medicineScore"`
-	TransportScore int `json:"transportScore"`
-}
-
-func HandleGradeStageTwo(w http.ResponseWriter, r *http.Request) {
-	var req TestStageTwoGrade
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid JSON", 400)
-		return
-	}
-
-	// Identify the correct test automatically
-	tx, err := db.Begin()
-	if err != nil {
-		http.Error(w, "Failed to start transaction: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	var testID int
-	err = tx.QueryRow(`
-        SELECT testID
-        FROM Test
-        WHERE patientID = $1
-    `, req.PatientID).Scan(&testID)
-	if err != nil {
-		http.Error(w, "No active test found for Stage Two", 404)
-		return
-	}
-
-	// Update Stage Two row
-	_, err = tx.Exec(`
-        UPDATE TestStageTwo SET
-            memoryScore=$1, recallRes=$2, speakingScore=$3,
-            financialScore=$4, medicineScore=$5, transportScore=$6
-        WHERE testID=$7
-    `, req.MemoryScore, req.RecallScore, req.SpeakingScore,
-		req.FinancialScore, req.MedicineScore, req.TransportScore,
-		testID)
-	if err != nil {
-		http.Error(w, "DB error: "+err.Error(), 500)
-		return
-	}
-
-	// Mark Stage Two complete
-	_, _ = tx.Exec(`
-        UPDATE Test SET stageTwoStatus=$1
-        WHERE testID=$2
-    `, 2, testID)
-
-	if err := tx.Commit(); err != nil {
-		http.Error(w, "Failed to commit transaction", http.StatusInternalServerError)
-		return
-	}
-
-	json.NewEncoder(w).Encode(map[string]any{
-		"message": "Stage Two graded",
-		"testID":  testID,
 	})
 }
 
