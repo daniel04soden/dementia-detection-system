@@ -102,7 +102,7 @@ type TestStageTwo struct {
 	TestID         int    `json:"testID"`
 	TestDate       string `json:"testDate"`
 	MemoryScore    int    `json:"memoryScore"`
-	RecallRes      int    `json:"recallRes"`
+	RecallScore    int    `json:"recallRes"`
 	SpeakingScore  int    `json:"speakingScore"`
 	FinancialScore int    `json:"financialScore"`
 	MedicineScore  int    `json:"medicineScore"`
@@ -131,7 +131,7 @@ func HandleGetTestStageTwo(w http.ResponseWriter, r *http.Request) {
             tst.testID,
             tst.testDate,
             tst.memoryScore,
-            tst.recallRes,
+            tst.recallScore,
             tst.speakingScore,
             tst.financialScore,
             tst.medicineScore,
@@ -146,7 +146,7 @@ func HandleGetTestStageTwo(w http.ResponseWriter, r *http.Request) {
 		&ts.TestID,
 		&ts.TestDate,
 		&ts.MemoryScore,
-		&ts.RecallRes,
+		&ts.RecallScore,
 		&ts.SpeakingScore,
 		&ts.FinancialScore,
 		&ts.MedicineScore,
@@ -162,7 +162,7 @@ func HandleGetTestStageTwo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Calculate the total score
-	ts.TotalScore = ts.MemoryScore + ts.RecallRes + ts.SpeakingScore + ts.FinancialScore + ts.MedicineScore + ts.TransportScore
+	ts.TotalScore = ts.MemoryScore + ts.RecallScore + ts.SpeakingScore + ts.FinancialScore + ts.MedicineScore + ts.TransportScore
 
 	// Set the response header for JSON and encode the struct to JSON
 	w.Header().Set("Content-Type", "application/json")
