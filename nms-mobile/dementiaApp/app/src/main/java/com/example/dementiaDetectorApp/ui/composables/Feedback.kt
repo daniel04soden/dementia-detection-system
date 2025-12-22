@@ -63,7 +63,7 @@ fun FeedbackPanel(
             modifier = modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .padding(top = 150.dp, bottom = 200.dp)
+                .padding(top = 150.dp, bottom = 100.dp)
                 .background(DarkPurple)
                 .border(width = 5.dp, color = LightPurple),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -136,14 +136,14 @@ fun FeedbackPanel(
                     ),
                     shape = RectangleShape,
                     modifier = Modifier
-                        .width(175.dp)
+                        .width(135.dp)
                         .height(40.dp)
                 ) {
                     Text(
                         text = "Submit",
                         color = DarkPurple,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
+                        fontSize = 14.sp
                     )
                 }
                 Button(
@@ -155,14 +155,14 @@ fun FeedbackPanel(
                     ),
                     shape = RectangleShape,
                     modifier = Modifier
-                        .width(175.dp)
+                        .width(150.dp)
                         .height(40.dp)
                 ){
                     Text(
                         text = "Maybe Later",
                         color = DarkPurple,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
+                        fontSize = 14.sp
                     )
                 }
             }

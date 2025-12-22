@@ -57,7 +57,7 @@ fun QuestionnaireScreen(qVM: QViewModel, pVM: PaymentVM, sharedVM: SharedVM, nc:
             Modifier.padding(bottom = 50.dp)
         ){
             if(qVM.prefaceVisi.collectAsState().value){
-                Spacer(Modifier.height(100.dp))
+                Spacer(Modifier.height(70.dp))
             }
             else{
                 Spacer(Modifier.height(35.dp))

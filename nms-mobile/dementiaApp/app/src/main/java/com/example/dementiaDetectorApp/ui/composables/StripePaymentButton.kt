@@ -36,7 +36,6 @@ fun StripePaymentButton(
             }
         },
         colors = buttonColours(),
-        shape = RoundedCornerShape(24.dp),
         modifier = Modifier
             .fillMaxWidth(0.75f)
             .padding(bottom = 25.dp)

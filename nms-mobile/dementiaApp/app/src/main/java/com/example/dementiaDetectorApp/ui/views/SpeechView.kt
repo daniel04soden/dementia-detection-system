@@ -67,7 +67,7 @@ fun SpeechScreen(
     ) {
         Column(Modifier.padding(bottom = 50.dp)) {
             if (sVM.prefaceVisi.collectAsState().value) {
-                Spacer(Modifier.height(100.dp))
+                Spacer(Modifier.height(70.dp))
             } else {
                 Spacer(Modifier.height(35.dp))
             }
@@ -76,7 +76,9 @@ fun SpeechScreen(
             PaymentPrompt(sVM, sharedVM, pVM, nc)
             SuccessSection(sVM, sharedVM, nc)
         }
-        Footer(Modifier.align(Alignment.BottomCenter))
+        if(!sVM.paymentVisi.collectAsState().value){
+            Footer(Modifier.align(Alignment.BottomCenter))
+        }
     }
 }
 
@@ -402,13 +404,13 @@ private fun PaymentPrompt(
             Text(
                 text = "By paying €5, you gain access to the use of our AI for grading the Lifestyle-Questionnaire and the Speech Test\n\nUsing the AI will get you an immediate response with a high but not perfect level of accuracy",
                 color = Color.White,
-                fontSize = 20.sp
+                fontSize = 18.sp
             )
 
             StripePaymentButton(pVM, sharedVM) {
                 Text(
                     text = "Use the AI\n(Pay €5)",
-                    fontSize = 25.sp,
+                    fontSize = 20.sp,
                     color = Color.White,
                     textAlign = TextAlign.Center
                 )
@@ -420,7 +422,7 @@ private fun PaymentPrompt(
                 colors = buttonColours(),
                 modifier = Modifier.fillMaxWidth(0.75f)
             ) {
-                Text("No thanks\n(Don't submit test)", fontSize = 25.sp, color = Color.White)
+                Text("No thanks\n(Don't submit test)", fontSize = 20.sp, color = Color.White)
             }
         }
     }
