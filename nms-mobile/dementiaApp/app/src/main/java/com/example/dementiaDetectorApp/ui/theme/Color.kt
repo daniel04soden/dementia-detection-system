@@ -8,6 +8,13 @@ val LightPurple = Color(0XFFB38DD9)
 val MidPurple = Color(0XFF9B66BD)
 val DarkPurple = Color(0XFF833EA1)
 
+//RA Colours
+val rGreen = Color(0xFF00FF00)
+val rGreenL = Color(0xFF66CC00)
+val rYellow = Color(0xFFCCCC00)
+val rOrange = Color(0xFFFF9900)
+val rRed = Color(0xFFFF0000)
+
 val Gray = Color(0XFFDDDDDD)
 
 val Yellow = Color(0XFFE1D021)

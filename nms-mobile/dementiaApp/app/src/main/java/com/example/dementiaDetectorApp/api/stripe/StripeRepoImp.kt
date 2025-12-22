@@ -21,4 +21,10 @@ class StripeRepoImp @Inject constructor(
         }
     }
 
+    override suspend fun checkIfPremium(): Boolean {
+        val token = prefs.getString("jwt", null)
+            ?: throw Exception("Unauthorized")
+
+        return api.getMe("Bearer $token").premium
+    }
 }

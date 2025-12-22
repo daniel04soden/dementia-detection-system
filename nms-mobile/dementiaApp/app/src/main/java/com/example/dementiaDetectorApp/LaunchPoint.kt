@@ -28,6 +28,7 @@ import com.example.dementiaDetectorApp.ui.views.SpeechScreen
 import com.example.dementiaDetectorApp.ui.views.Stage1Screen
 import com.example.dementiaDetectorApp.ui.views.Stage2Screen
 import com.example.dementiaDetectorApp.ui.views.StatusScreen
+import com.example.dementiaDetectorApp.ui.views.SubmitQuestionnaireScreen
 import com.example.dementiaDetectorApp.viewModels.AuthViewModel
 import com.example.dementiaDetectorApp.viewModels.ContactVM
 import com.example.dementiaDetectorApp.viewModels.HomeVM
@@ -74,6 +75,7 @@ class LaunchPoint : ComponentActivity() {
                     composable("registration"){ RegistrationScreen(authVM,sharedVM, nc) }
                     composable("home"){ HomeScreen(homeVM, sharedVM, nc) }
                     composable("questionnaire"){QuestionnaireScreen(qVM, pVM, sharedVM, nc)}
+                    composable("submitQuestionnaire"){ SubmitQuestionnaireScreen(qVM, pVM, sharedVM, nc) }
                     composable("test1"){ Stage1Screen(t1VM, sharedVM, nc)}
                     composable("test2"){ Stage2Screen(t2VM, sharedVM, nc)}
                     composable("speech"){SpeechScreenWithPermission(sVM, sharedVM, pVM, nc, ::requestMicPermission)}

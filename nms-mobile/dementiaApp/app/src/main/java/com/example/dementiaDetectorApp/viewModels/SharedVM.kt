@@ -35,9 +35,9 @@ class SharedVM @Inject constructor(
         _id.intValue = newID
     }
 
-    private val _hasPaid = mutableStateOf(false)
-    val hasPaid: State<Boolean> = _hasPaid
-    fun PaidChange() { _hasPaid.value = !_hasPaid.value }
+    // --------------------------------------------
+    // Navigation
+    // --------------------------------------------
 
     val nav = listOf(
         NavBarContent("Home", R.drawable.home, "home"),
@@ -51,7 +51,13 @@ class SharedVM @Inject constructor(
 
     private val _navIndex = mutableIntStateOf(0)
     val navIndex: State<Int> = _navIndex
-    fun onNavIndexChange(newIDX: Int) { _navIndex.intValue = newIDX }
+    fun onNavIndexChange(newIDX: Int) {
+        _navIndex.intValue = newIDX
+    }
+
+    // --------------------------------------------
+    // Tests & Status
+    // --------------------------------------------
 
     private val _tests = mutableStateOf<List<Test>>(emptyList())
     val tests: State<List<Test>> = _tests
@@ -67,9 +73,14 @@ class SharedVM @Inject constructor(
     private val _riskScore = mutableIntStateOf(0)
     val riskScore: State<Int> = _riskScore
 
+    // --------------------------------------------
+    // Status fetching
+    // --------------------------------------------
+
     fun getStatus() {
         viewModelScope.launch {
             isLoading = true
+
             val result = repository.getStatus(StatusRequest(id.value))
 
             questionnaireStatus.intValue = result.data?.lifestyleStatus ?: 0
@@ -86,6 +97,8 @@ class SharedVM @Inject constructor(
 
             _riskScore.intValue = _tests.value.sumOf { getTestScore(it.state) }
             _testsDone.intValue = _tests.value.count { it.state > 1 }
+
+            isLoading = false
         }
     }
 
@@ -93,8 +106,10 @@ class SharedVM @Inject constructor(
         _tests.value = _tests.value.toMutableList().also {
             it[idx] = it[idx].copy(state = 1)
         }
+
         _riskScore.intValue = _tests.value.sumOf { getTestScore(it.state) }
         _testsDone.intValue = _tests.value.count { it.state > 1 }
+
         getStatus()
     }
 
@@ -105,16 +120,49 @@ class SharedVM @Inject constructor(
         }
     }
 
-    fun CheckCompleted(route: String, todo: () -> Unit) {
+    // --------------------------------------------
+    // Navigation checks
+    // --------------------------------------------
+
+    fun CheckCompleted(
+        route: String,
+        todo: () -> Unit,
+        aiTodo: (() -> Unit)? = null
+    ) {
         when (route) {
-            "questionnaire" -> if (questionnaireStatus.intValue != 0)
-                ToastManager.showToast("Questionnaire already completed") else todo()
-            "test1" -> if (stage1Status.intValue != 0)
-                ToastManager.showToast("Test stage 1 already completed") else todo()
-            "test2" -> if (stage2Status.intValue != 0)
-                ToastManager.showToast("Test stage 2 already completed") else todo()
-            "speech" -> if (speechStatus.intValue != 0)
-                ToastManager.showToast("Speech test already completed") else todo()
+            "questionnaire" -> {
+                if ((questionnaireStatus.intValue != 0) && questionnaireStatus.intValue != 5) {
+                    ToastManager.showToast("Questionnaire already completed")
+                } else {
+                    if (questionnaireStatus.intValue == 5) {
+                        aiTodo?.invoke()
+                    } else {
+                        todo()
+                    }
+                }
+            }
+
+            "test1" -> {
+                if (stage1Status.intValue != 0)
+                    ToastManager.showToast("Test stage 1 already completed")
+                else todo()
+            }
+
+            "test2" -> {
+                if (stage1Status.intValue == 0) {
+                    ToastManager.showToast("Complete Stage 1 before Stage 2")
+                } else if (stage2Status.intValue != 0) {
+                    ToastManager.showToast("Test stage 2 already completed")
+                } else {
+                    todo()
+                }
+            }
+
+            "speech" -> {
+                if (speechStatus.intValue != 0)
+                    ToastManager.showToast("Speech test already completed")
+                else todo()
+            }
         }
     }
 

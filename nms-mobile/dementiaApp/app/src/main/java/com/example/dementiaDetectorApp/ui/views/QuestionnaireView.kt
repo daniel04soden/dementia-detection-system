@@ -23,8 +23,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -55,14 +57,14 @@ fun QuestionnaireScreen(qVM: QViewModel, pVM: PaymentVM, sharedVM: SharedVM, nc:
             Modifier.padding(bottom = 50.dp)
         ){
             if(qVM.prefaceVisi.collectAsState().value){
-                Spacer(Modifier.height(120.dp))
+                Spacer(Modifier.height(70.dp))
             }
             else{
                 Spacer(Modifier.height(35.dp))
             }
             PrefaceSection(qVM)
             FormSection(qVM,sharedVM,nc)
-            PaymentPrompt(qVM, sharedVM, pVM, nc)
+            //PaymentPrompt(qVM, sharedVM, pVM, nc)
             SuccessSection(qVM,nc)
         }
         if(!(qVM.prefaceVisi.collectAsState().value)){
@@ -274,11 +276,12 @@ private fun S3Section(qVM: QViewModel, sharedVM: SharedVM){
             )
         }
         Button(
-            onClick = {
+            /*onClick = {
                 Log.d("BTN", "PRESSED")
                 if (!sharedVM.hasPaid.value) qVM.isPaymentReq(true) else qVM.onSuccessChange(true)
                 qVM.onS3Change(false)
-            },
+            },*/
+            onClick = {qVM.onSuccessChange(true)},
             enabled = qVM.s3Complete.value,
             colors = buttonColours(),
             shape = RoundedCornerShape(24.dp),
@@ -340,7 +343,6 @@ private fun PaymentPrompt(
 
             Button(
                 onClick = {
-                    qVM.submitAnswers(sharedVM.id.value)
                     nc.navigate("home")
                           },
                 colors = buttonColours(),
@@ -373,6 +375,33 @@ private fun SuccessSection(qVM: QViewModel, nc: NavController) {
             Text("Questionnaire Complete", fontSize = 32.5.sp, fontWeight = FontWeight.Bold, color = Color.White)
             HorizontalDivider(thickness = 2.dp, color = Color.White)
             Text(
+                text = "Your anwsers have been submitted\n\nA medical professional will look over them shortly",
+                color = Color.White,
+                fontSize = 20.sp
+            )
+            Button(onClick = {nc.navigate("home")}, colors = buttonColours(), modifier = Modifier.width(300.dp)) {
+                Text("Return to Home", fontSize = 25.sp, color = Color.White)
+            }
+        }
+    }
+}
+
+@Composable
+private fun AISuccessSection(qVM: QViewModel, nc: NavController) {
+    AnimatedVisibility(
+        visible = qVM.aiSuccessVisi.collectAsState().value,
+        enter = slideInHorizontally() + fadeIn(),
+        exit = slideOutHorizontally() + fadeOut()
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize().background(MidPurple).padding(horizontal = 15.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(35.dp)
+        ) {
+            Spacer(Modifier.height(35.dp))
+            Text("Questionnaire Complete", fontSize = 32.5.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            HorizontalDivider(thickness = 2.dp, color = Color.White)
+            Text(
                 text = "Would you like to submit the questionnaire you have just taken for analysis, or would you like to submit it later?",
                 color = Color.White,
                 fontSize = 20.sp
@@ -390,5 +419,17 @@ private fun SuccessSection(qVM: QViewModel, nc: NavController) {
                 Text("Cancel", fontSize = 25.sp, color = Color.White)
             }
         }
+    }
+}
+
+@Composable
+fun SubmitQuestionnaireScreen(qVM: QViewModel, pVM: PaymentVM, sharedVM: SharedVM, nc: NavController){
+    qVM.isPaymentReq(true)
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(MidPurple)
+    ){
+        AISuccessSection(qVM, nc)
+        PaymentPrompt(qVM, sharedVM, pVM, nc)
     }
 }

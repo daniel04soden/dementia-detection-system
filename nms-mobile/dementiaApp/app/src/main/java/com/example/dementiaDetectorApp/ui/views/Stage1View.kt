@@ -61,7 +61,7 @@ fun Stage1Screen(tVM: Stage1VM, sVM: SharedVM, nc: NavController){
             Modifier.padding(bottom = 50.dp)
         ){
             if(tVM.prefaceVisi.collectAsState().value){
-                Spacer(Modifier.height(120.dp))
+                Spacer(Modifier.height(70.dp))
             }
             else{
                 Spacer(Modifier.height(35.dp))
