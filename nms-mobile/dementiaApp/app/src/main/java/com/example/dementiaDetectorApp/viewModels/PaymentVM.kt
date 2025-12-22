@@ -35,6 +35,18 @@ class PaymentVM @Inject constructor(
         }
     }
 
+    fun checkPaymentStatus() {
+        viewModelScope.launch {
+            try {
+                if (stripeRepo.checkIfPremium()) {
+                    _paymentState.value = PaymentState.Success
+                }
+            } catch (_: Exception) {
+                // Silent: user probably hasn't paid yet
+            }
+        }
+    }
+
     fun onPaymentConfirmed() {
         _paymentState.value = PaymentState.Success
     }

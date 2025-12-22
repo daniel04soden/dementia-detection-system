@@ -27,12 +27,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -48,9 +50,9 @@ import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.Gray
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.ui.theme.buttonColours
-import com.example.dementiaDetectorApp.viewModels.PaymentVM
 import com.example.dementiaDetectorApp.viewModels.SharedVM
 import com.example.dementiaDetectorApp.viewModels.SpeechViewModel
+import com.example.dementiaDetectorApp.viewModels.PaymentVM
 import kotlin.math.max
 
 @Composable
@@ -76,7 +78,7 @@ fun SpeechScreen(
             PaymentPrompt(sVM, sharedVM, pVM, nc)
             SuccessSection(sVM, sharedVM, nc)
         }
-        if(!sVM.paymentVisi.collectAsState().value){
+        if (!sVM.paymentVisi.collectAsState().value) {
             Footer(Modifier.align(Alignment.BottomCenter))
         }
     }
@@ -310,7 +312,7 @@ private fun RecordingCompleteSection(sVM: SpeechViewModel, sharedVM: SharedVM, n
             Button(
                 onClick = {
                     sVM.onRecChange()
-                    if (!sharedVM.hasPaid.value) sVM.isPaymentReq(true) else sVM.onSuccess()
+                    if (true) sVM.isPaymentReq(true) else sVM.onSuccess()
                 },
                 colors = buttonColours(),
                 modifier = Modifier.fillMaxWidth()
@@ -381,6 +383,8 @@ private fun PaymentPrompt(
 ) {
     val paymentState by pVM.paymentState.collectAsState()
 
+    val context = LocalContext.current
+
     AnimatedVisibility(
         visible = sVM.paymentVisi.collectAsState().value,
         enter = slideInHorizontally() + fadeIn(),
@@ -417,8 +421,7 @@ private fun PaymentPrompt(
             }
 
             Button(
-                //onClick = { nc.navigate("home") },
-                onClick = {sVM.uploadAudioFile()},
+                onClick = { sVM.uploadAudioFile() },
                 colors = buttonColours(),
                 modifier = Modifier.fillMaxWidth(0.75f)
             ) {
@@ -427,9 +430,12 @@ private fun PaymentPrompt(
         }
     }
 
+    // Wrap onSuccess in LaunchedEffect to avoid calling it during recomposition
     if (paymentState is PaymentState.Success) {
-        sVM.isPaymentReq(false)
-        sVM.onSuccess()
+        LaunchedEffect(Unit) {
+            sVM.isPaymentReq(false)
+            sVM.onSuccess()
+        }
     }
 }
 
@@ -453,13 +459,14 @@ private fun SuccessSection(sVM: SpeechViewModel, sharedVM: SharedVM, nc: NavCont
                 color = Color.White,
                 fontSize = 20.sp
             )
-            Button(onClick = {sVM.uploadAudioFile()}, colors = buttonColours(), modifier = Modifier.width(300.dp)) {
+            Button(onClick = { sVM.uploadAudioFile() }, colors = buttonColours(), modifier = Modifier.width(300.dp)) {
                 Text("Submit Recording", fontSize = 25.sp, color = Color.White)
             }
             Button(
                 onClick = {
                     sVM.onSuccess()
                     sVM.onRecChange()
+                    sharedVM.onTestSubmission(3)
                 },
                 colors = buttonColours(),
                 modifier = Modifier.width(300.dp)
