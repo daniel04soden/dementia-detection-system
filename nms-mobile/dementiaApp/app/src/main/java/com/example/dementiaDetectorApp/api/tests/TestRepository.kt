@@ -1,5 +1,7 @@
 package com.example.dementiaDetectorApp.api.tests
 
+import java.io.File
+
 interface TestRepository {
     suspend fun reportStage1(
         patientID: Int,
@@ -26,4 +28,6 @@ interface TestRepository {
     suspend fun reportQuestionnaire(request: LifestyleRequest): TestResult<Unit>
 
     suspend fun getStatus(request: StatusRequest): StatusResult<StatusResponse>
+
+    suspend fun uploadAudio(file: File): TestResult<Unit>
 }

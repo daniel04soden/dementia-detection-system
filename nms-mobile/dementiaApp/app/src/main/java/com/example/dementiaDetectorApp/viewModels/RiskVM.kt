@@ -5,7 +5,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.dementiaDetectorApp.R
-import com.example.dementiaDetectorApp.api.risk.RiskRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
@@ -15,7 +14,6 @@ import kotlinx.coroutines.flow.StateFlow
 @HiltViewModel
 class RiskVM @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val repo: RiskRepo
 ) : ViewModel() {
 
     private val _riskResult = mutableStateOf("")
