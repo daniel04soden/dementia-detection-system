@@ -1,0 +1,170 @@
+.page {
+  background-color: #0f0f14;
+  color: #eaeaf0;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+}
+
+/* Hero */
+.hero {
+  position: relative;
+  height: 30vh;
+  background: linear-gradient(
+      135deg,
+      rgba(20, 10, 40, 0.9),
+      rgba(60, 20, 90, 0.85)
+    ),
+    url("/images/brain-waveform.jpg") center / cover no-repeat;
+  display: flex;
+  align-items: center;
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(140, 90, 255, 0.25),
+    transparent 60%
+  );
+}
+
+.heroContent {
+  position: relative;
+  max-width: 800px;
+  padding: 0 60px;
+}
+
+.hero h1 {
+  font-family: Arial, sans-serif;
+  font-size: 42px;
+  margin-bottom: 20px;
+}
+
+.hero p {
+  font-size: 20px;
+  color: #cfcfe3;
+  line-height: 1.7;
+}
+
+/* Main */
+.main {
+  background: #f9f9fb;
+  color: #1c1c28;
+  padding: 80px 60px;
+}
+
+/* Narrative */
+.narrative {
+  max-width: 700px;
+  margin-bottom: 120px;
+}
+
+.sectionLabel {
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #6a1b9a;
+  font-weight: 600;
+}
+
+.narrative h2 {
+  font-size: 36px;
+  margin: 15px 0;
+  color: #2e0f4d;
+}
+
+.narrative p {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #444;
+}
+
+/* Split */
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 60px;
+  margin-bottom: 140px;
+}
+
+.splitText h3,
+.splitHighlight h3 {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+.splitText p {
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.splitHighlight {
+  background: linear-gradient(135deg, #6a1b9a, #8e24aa);
+  color: #ffffff;
+  padding: 40px;
+  border-radius: 14px;
+  box-shadow: 0 30px 60px rgba(106, 27, 154, 0.35);
+}
+
+.splitHighlight p {
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* Feature Strip */
+.featureStrip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  margin-bottom: 140px;
+}
+
+.featureStrip h4 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: #4a148c;
+}
+
+.featureStrip p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #444;
+}
+
+/* Vision */
+.vision {
+  max-width: 700px;
+}
+
+.vision h2 {
+  font-size: 34px;
+  margin-bottom: 15px;
+  color: #2e0f4d;
+}
+
+.vision p {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #444;
+}
+
+.onPurp{
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .hero h1 {
+    font-size: 38px;
+  }
+
+  .main {
+    padding: 60px 25px;
+  }
+
+  .split,
+  .featureStrip {
+    grid-template-columns: 1fr;
+  }
+}

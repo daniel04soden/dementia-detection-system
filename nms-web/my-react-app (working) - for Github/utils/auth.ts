@@ -1,4 +1,3 @@
-// src/utils/auth.ts
 export type User = {
   userID: string;
   role: string;

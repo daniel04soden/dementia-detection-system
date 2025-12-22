@@ -27,6 +27,7 @@ const LoginPopUp: React.FC = () => {
         const data = await response.json();
         console.log("Logged in:", data);
         navigate("/dashboard");
+        window.location.reload();
       } else {
         const txt = await response.text();
         alert(txt);
@@ -42,6 +43,8 @@ const LoginPopUp: React.FC = () => {
   };
 
   return (
+    <div className={styles.page}>
+    <main className={styles.main}>
     <div className={styles.screen}>
       <div className={styles.accountPopup}>
         <img className={styles.logoPopup} src={logo} alt="Logo" />
@@ -59,8 +62,6 @@ const LoginPopUp: React.FC = () => {
 
           <button type="submit" className={styles.accountBtn}>Login</button>
 
-          <a className={styles.forgot}>Forgot password?</a>
-
           <p className={styles.accountText}>Don't have an account?</p>
           <button type="button" className={styles.accountBtn} onClick={handleSignUp}>
             Sign up
@@ -68,6 +69,8 @@ const LoginPopUp: React.FC = () => {
         </form>
       </div>
     </div>
+    </main>
+  </div>
   );
 };
 

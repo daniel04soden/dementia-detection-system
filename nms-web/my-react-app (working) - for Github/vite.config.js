@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8080/', // your Go server
+        target: 'https://magestle.dev/',
         changeOrigin: true,
       }
     }

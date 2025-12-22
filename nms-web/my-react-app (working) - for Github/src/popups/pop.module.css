@@ -8,6 +8,16 @@
   border-top-right-radius: 20px;
 }
 
+.page {
+  min-height: 100vh;          /* FULL screen height */
+  display: flex;
+  flex-direction: column;     /* Header → Main → Footer */
+}
+.main {
+  flex: 1;                    /* Pushes footer to bottom */
+  display: flex;
+}
+
 .screen{
   width: 100%;
   display: flex;

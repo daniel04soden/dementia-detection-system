@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Header from "../dashboard/header/Header";
-import Footer from "../dashboard/footer/Footer";
+import { withAuth } from "../../utils/withAuth";
 
 // Define the Clinic interface
 interface Clinic {
-  clinicID?: number;  // optional for creation
+  clinicID?: number;
   name: string;
   phone: string;
   county: string;
@@ -13,7 +12,7 @@ interface Clinic {
 }
 
 const EditClinic: React.FC = () => {
-  const { id } = useParams(); // Get clinic ID (if editing)
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [clinic, setClinic] = useState<Clinic>({
@@ -23,9 +22,8 @@ const EditClinic: React.FC = () => {
     phone: "",
   });
 
-  // Fetch clinic only in edit mode
   useEffect(() => {
-    if (!id) return; // creation mode → skip fetch
+    if (!id) return;
 
     const fetchClinic = async () => {
       const res = await fetch(`/api/clinic?id=${id}`, {
@@ -70,7 +68,6 @@ const EditClinic: React.FC = () => {
     }
   };
 
-  // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setClinic((prev) => ({
@@ -81,7 +78,7 @@ const EditClinic: React.FC = () => {
 
   return (
     <div>
-      <Header />
+      
       <h2>{id ? "Edit Clinic" : "Create Clinic"}</h2>
 
       <form onSubmit={handleSubmit}>
@@ -126,9 +123,9 @@ const EditClinic: React.FC = () => {
           {id ? "Update Clinic" : "Create Clinic"}
         </button>
       </form>
-      <Footer />
+      
     </div>
   );
 };
 
-export default EditClinic;
+export default withAuth(EditClinic, ["admin"]);

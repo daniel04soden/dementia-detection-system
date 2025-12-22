@@ -2,6 +2,7 @@ import React, { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from '../assets/logo.png';
 import styles from "../popups/pop.module.css";
+import { withAuth } from "../../utils/withAuth";
 
 const AdminSignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -19,7 +20,6 @@ const AdminSignUp: React.FC = () => {
     const formData = new FormData(form);
     const formJson: Record<string, any> = Object.fromEntries(formData.entries());
 
-    // Set the user as an admin
     formJson.isAdmin = true;
 
     try {
@@ -32,7 +32,7 @@ const AdminSignUp: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         console.log("Admin created:", data);
-        goToLogin(); // Redirect to login page after successful sign-up
+        goToLogin();
       } else {
         const errorText = await response.text();
         setError(errorText);
@@ -73,9 +73,6 @@ const AdminSignUp: React.FC = () => {
             <input type="password" name="confirmPassword" placeholder="Confirm Password" className={styles.inputField} required />
           </label>
 
-          {/* Hidden input to mark the user as admin */}
-          <input type="hidden" name="isAdmin" value="true" />
-
           <button type="submit" className={styles.accountBtn}>Sign up</button>
 
           {error && <p className={styles.error}>{error}</p>}
@@ -88,4 +85,4 @@ const AdminSignUp: React.FC = () => {
   );
 };
 
-export default AdminSignUp;
+export default withAuth(AdminSignUp, ["admin"]);

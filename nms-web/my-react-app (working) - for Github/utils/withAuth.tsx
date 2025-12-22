@@ -1,13 +1,8 @@
-// src/utils/withAuth.tsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authorize } from "./auth";
+import LoadingScreen from "../src/reusable/Loading/loadingScreen";
 
-/**
- * Wraps a component and restricts access based on allowedRoles.
- * @param WrappedComponent React component to wrap
- * @param allowedRoles array of roles allowed to view the component
- */
 export function withAuth<P extends object>(
   WrappedComponent: React.ComponentType<P>,
   allowedRoles: string[]
@@ -20,14 +15,14 @@ export function withAuth<P extends object>(
       (async () => {
         const hasAccess = await authorize(allowedRoles);
         if (!hasAccess) {
-          navigate("/login"); // redirect if unauthorized
+          navigate("/login");
         } else {
           setLoading(false);
         }
       })();
     }, [navigate]);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <LoadingScreen />;
 
     return <WrappedComponent {...props} />;
   };
