@@ -61,11 +61,14 @@ import kotlinx.coroutines.delay
 @Composable
 fun HomeScreen(homeVM: HomeVM, sharedVM: SharedVM, nc: NavController){
     LaunchedEffect(Unit) {
-        repeat(3){
-            sharedVM.getStatus()
-            delay(1000)
-        }
+        sharedVM.getStatus()
     }
+
+    // Refresh when navigating back
+    LaunchedEffect(sharedVM.testsDone.value) {
+        sharedVM.getStatus()
+    }
+
     Box(modifier = Modifier
         .background(Color.White)
         .fillMaxSize()

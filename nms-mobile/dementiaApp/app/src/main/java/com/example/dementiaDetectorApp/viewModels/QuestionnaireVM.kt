@@ -73,7 +73,7 @@ class QViewModel @Inject constructor(
         isS1Complete()
     }
 
-    private val eduOptions = listOf("Primary Level", "Secondary Level", "Tertiary Level")
+    private val eduOptions = listOf("Primary", "Secondary", "Tertiary")
 
     val s1Survey = listOf(
         SurveyModel(
@@ -532,6 +532,30 @@ class QViewModel @Inject constructor(
                 Log.e("QViewModel", "submitAnswers: ", e)
             }
             isLoading = false
+        }
+    }
+
+    fun sendDataToAI() {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val result = repository.sendToAI()
+                resultChannel.send(result)
+
+                // Optionally update a UI state for success/failure
+                if (result is TestResult.Success) {
+                    Log.d("QViewModel", "AI request succeeded")
+                    _aiSuccessVisi.value = true
+                } else {
+                    Log.e("QViewModel", "AI request failed")
+                    _aiSuccessVisi.value = false
+                }
+            } catch (e: Exception) {
+                Log.e("QViewModel", "Exception while sending to AI", e)
+                _aiSuccessVisi.value = false
+            } finally {
+                isLoading = false
+            }
         }
     }
 }

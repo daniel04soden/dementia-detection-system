@@ -280,9 +280,9 @@ private fun S3Section(qVM: QViewModel, sharedVM: SharedVM){
                 qVM.onS3Change(false)
             },*/
             onClick = {
+                sharedVM.onTestSubmission(0)
                 qVM.onS3Change(false)
                 qVM.submitAnswers(sharedVM.id.value)
-                sharedVM.onTestSubmission(0)
                 qVM.onSuccessChange(true)
                       },
             enabled = qVM.s3Complete.value,
@@ -412,7 +412,7 @@ private fun AISuccessSection(qVM: QViewModel, sharedVM: SharedVM, nc: NavControl
                 fontSize = 20.sp
             )
             Button(onClick = {
-                //LAST REPO CALL HERE
+                qVM.sendDataToAI()
                 sharedVM.onTestSubmission(0)
                              }, colors = buttonColours(), modifier = Modifier.width(300.dp)) {
                 Text("Submit Answers", fontSize = 25.sp, color = Color.White)

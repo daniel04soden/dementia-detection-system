@@ -52,7 +52,10 @@ class SpeechViewModel @Inject constructor(
 
     private val _successVisi = MutableStateFlow(false)
     val successVisi: StateFlow<Boolean> = _successVisi
-    fun onSuccess() { _successVisi.value = !_successVisi.value }
+    fun onSuccess() {
+        _successVisi.value = !_successVisi.value
+        Log.d("S Change", "${_successVisi.value}")
+    }
 
     private val _img = MutableStateFlow(R.drawable.beach)
     val img: StateFlow<Int> = _img

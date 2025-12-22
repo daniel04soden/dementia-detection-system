@@ -15,7 +15,6 @@ import com.example.dementiaDetectorApp.ui.util.ToastManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -24,7 +23,6 @@ class SharedVM @Inject constructor(
 ) : ViewModel() {
 
     private val resultChannel = Channel<TestResult<Unit>>()
-    val testResults = resultChannel.receiveAsFlow()
 
     var isLoading = false
         private set
@@ -85,7 +83,7 @@ class SharedVM @Inject constructor(
 
             questionnaireStatus.intValue = result.data?.lifestyleStatus ?: 0
             stage1Status.intValue = result.data?.stageOneStatus ?: 0
-            stage2Status.intValue = result.data?.stageTwoStatus ?: 0
+            stage2Status.intValue = result.data?.stageTwoStatus ?: 2
             speechStatus.intValue = result.data?.speechTestStatus ?: 0
 
             _tests.value = listOf(
@@ -151,7 +149,11 @@ class SharedVM @Inject constructor(
             "test2" -> {
                 if (stage1Status.intValue == 0) {
                     ToastManager.showToast("Complete Stage 1 before Stage 2")
-                } else if (stage2Status.intValue != 0) {
+                }
+                else if(stage2Status.intValue == 0){
+                    ToastManager.showToast("Stage 2 not required")
+                }
+                else if (stage2Status.intValue != 3) {
                     ToastManager.showToast("Test stage 2 already completed")
                 } else {
                     todo()

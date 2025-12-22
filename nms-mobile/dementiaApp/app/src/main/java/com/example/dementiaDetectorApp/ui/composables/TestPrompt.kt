@@ -79,9 +79,20 @@ fun TestPrompt(
 }
 
 private fun deriveState(test: Test): String {
-    return when {
-        test.state == 1 -> "Awaiting grading"
-        test.state >= 2 -> "Graded"
-        else -> "To be completed"
+    return when (test.route) {
+        "test2" -> when {
+            test.state == 1 -> "Graded"
+            test.state == 2 -> "Not Required"
+            test.state == 3 -> "Ready to complete"  // Changed from "To be completed"
+            test.state >= 4 -> "Graded"
+            else -> "Not Required"
+        }
+        else -> when {
+            test.state == 0 -> "To be completed"
+            test.state == 1 -> "Awaiting grading"
+            test.state in 2..4 -> "Graded"
+            test.state == 5 -> "Awaiting AI grade"
+            else -> "To be completed"
+        }
     }
 }

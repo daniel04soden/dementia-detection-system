@@ -30,4 +30,6 @@ interface TestRepository {
     suspend fun getStatus(request: StatusRequest): StatusResult<StatusResponse>
 
     suspend fun uploadAudio(file: File): TestResult<Unit>
+
+    suspend fun sendToAI():TestResult<Unit>
 }
