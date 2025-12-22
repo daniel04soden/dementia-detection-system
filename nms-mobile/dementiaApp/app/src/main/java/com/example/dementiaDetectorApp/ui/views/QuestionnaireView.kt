@@ -339,7 +339,7 @@ private fun PaymentPrompt(
 
             StripePaymentButton(pVM, sharedVM) {
                 Text(
-                    text = "Use the AI\n(Pay €5)",
+                    text = "Use the AI\n(Requires Premium)",
                     fontSize = 20.sp,
                     color = Color.White,
                     textAlign = TextAlign.Center
@@ -392,7 +392,7 @@ private fun SuccessSection(qVM: QViewModel, nc: NavController) {
 }
 
 @Composable
-private fun AISuccessSection(qVM: QViewModel, nc: NavController) {
+private fun AISuccessSection(qVM: QViewModel, sharedVM: SharedVM, nc: NavController) {
     AnimatedVisibility(
         visible = qVM.aiSuccessVisi.collectAsState().value,
         enter = slideInHorizontally() + fadeIn(),
@@ -411,7 +411,10 @@ private fun AISuccessSection(qVM: QViewModel, nc: NavController) {
                 color = Color.White,
                 fontSize = 20.sp
             )
-            Button(onClick = {}, colors = buttonColours(), modifier = Modifier.width(300.dp)) {
+            Button(onClick = {
+                //LAST REPO CALL HERE
+                sharedVM.onTestSubmission(0)
+                             }, colors = buttonColours(), modifier = Modifier.width(300.dp)) {
                 Text("Submit Answers", fontSize = 25.sp, color = Color.White)
             }
             Button(
@@ -434,7 +437,7 @@ fun SubmitQuestionnaireScreen(qVM: QViewModel, pVM: PaymentVM, sharedVM: SharedV
         .fillMaxSize()
         .background(MidPurple)
     ){
-        AISuccessSection(qVM, nc)
+        AISuccessSection(qVM, sharedVM, nc)
         PaymentPrompt(qVM, sharedVM, pVM, nc)
     }
 }

@@ -82,7 +82,13 @@ private fun HeaderSection(){
 private fun TestCard(test:Test, sharedVM: SharedVM, nc: NavController){
     Card(
         colors = CardDefaults.cardColors(containerColor = LightPurple),
-        modifier = Modifier.clickable {sharedVM.CheckCompleted(test.route, {nc.navigate(test.route)})}
+        modifier = Modifier.clickable {
+            if(test.route=="questionnaire"){
+                sharedVM.CheckCompleted(test.route, {nc.navigate(test.route)}, {nc.navigate("submitQuestionnaire")})
+            }else{
+                sharedVM.CheckCompleted(test.route, {nc.navigate(test.route)})
+            }
+        }
     ){
         Column(modifier = Modifier
             .fillMaxWidth()
@@ -99,12 +105,14 @@ private fun TestCard(test:Test, sharedVM: SharedVM, nc: NavController){
             val status = when (test.state){
                 0 -> {"Not Completed"}
                 1 -> {"Awaiting Grade"}
+                5 -> {"Can be graded with AI"}
                 else -> {"Graded"}
             }
 
             val col = when (test.state){
                 0 -> {Color.Red}
-                1 -> { Yellow}
+                1 -> {Yellow}
+                5 -> {Yellow}
                 else -> {Color.Green}
             }
 

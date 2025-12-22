@@ -56,11 +56,15 @@ import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.ui.util.standardQuadFromTo
 import com.example.dementiaDetectorApp.viewModels.HomeVM
 import com.example.dementiaDetectorApp.viewModels.SharedVM
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomeScreen(homeVM: HomeVM, sharedVM: SharedVM, nc: NavController){
     LaunchedEffect(Unit) {
-        sharedVM.getStatus()
+        repeat(3){
+            sharedVM.getStatus()
+            delay(1000)
+        }
     }
     Box(modifier = Modifier
         .background(Color.White)
