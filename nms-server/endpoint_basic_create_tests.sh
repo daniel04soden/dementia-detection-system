@@ -15,7 +15,7 @@ curl -X POST "$URL/admin/signup" \
     "email": "admin@test.ie",
     "password": "'"$TEST_PASSWORD"'",
     "firstName": "Gary",
-    "lastName": "Whirlwind",
+    "lastName": "Whirlpool",
     "phone": "0125439453"
   }'
 
