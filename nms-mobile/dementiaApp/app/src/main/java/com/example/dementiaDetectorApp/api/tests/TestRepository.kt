@@ -1,8 +1,5 @@
 package com.example.dementiaDetectorApp.api.tests
 
-import android.net.http.UrlRequest.StatusListener
-
-
 interface TestRepository {
     suspend fun reportStage1(
         patientID: Int,
@@ -19,7 +16,7 @@ interface TestRepository {
     suspend fun reportStage2(
         patientID: Int,
         memoryScore: Int,
-        recallRes: Int,
+        recallScore: Int,
         speakingScore: Int,
         financialScore: Int,
         medicineScore: Int,

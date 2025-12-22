@@ -157,7 +157,7 @@ class Stage2VM @Inject constructor(
             val result = repository.reportStage2(
                 patientID = patientID,
                 memoryScore = _memory.value,
-                recallRes = _conversation.value,
+                recallScore = _conversation.value,
                 speakingScore = _speaking.value,
                 financialScore = _financial.value,
                 medicineScore = _medication.value,
@@ -175,7 +175,7 @@ class Stage2VM @Inject constructor(
                     ToastManager.showToast("There was an authorization error, please logout and log back in again")
                 }
                 is TestResult.UnknownError -> {
-                    Log.d("Stage2VM", "Submit unknown error: $result")
+                    Log.d("Stage2VM", "Submit unknown error: ${result.data}")
                     ToastManager.showToast("There was an error submitting the results, please try again later.")
                 }
             }

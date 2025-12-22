@@ -166,7 +166,6 @@ fun LoginInfoSection(authVM: AuthViewModel, sharedVM:SharedVM, nc: NavController
             onClick = {
                 val id =  authVM.signIn { nc.navigate("home") }
                 sharedVM.onIdChange(id)
-                sharedVM.updateTestList()
             },
             colors = buttonColours(),
             shape = RoundedCornerShape(24.dp),

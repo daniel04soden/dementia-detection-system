@@ -63,7 +63,7 @@ fun QuestionnaireScreen(qVM: QViewModel, pVM: PaymentVM, sharedVM: SharedVM, nc:
             PrefaceSection(qVM)
             FormSection(qVM,sharedVM,nc)
             PaymentPrompt(qVM, sharedVM, pVM, nc)
-            QSuccessSection(qVM,nc)
+            SuccessSection(qVM,nc)
         }
         if(!(qVM.prefaceVisi.collectAsState().value)){
             Footer(Modifier.align(Alignment.BottomCenter))
@@ -339,11 +339,14 @@ private fun PaymentPrompt(
             }
 
             Button(
-                onClick = { nc.navigate("home") },
+                onClick = {
+                    qVM.submitAnswers(sharedVM.id.value)
+                    nc.navigate("home")
+                          },
                 colors = buttonColours(),
                 modifier = Modifier.fillMaxWidth(0.75f)
             ) {
-                Text("No thanks\n(Don't submit test)", fontSize = 25.sp, color = Color.White)
+                Text("No thanks\n(Don't grade test)", fontSize = 25.sp, color = Color.White)
             }
         }
     }
@@ -355,7 +358,7 @@ private fun PaymentPrompt(
 }
 
 @Composable
-private fun QSuccessSection(qVM: QViewModel, nc: NavController) {
+private fun SuccessSection(qVM: QViewModel, nc: NavController) {
     AnimatedVisibility(
         visible = qVM.successVisi.collectAsState().value,
         enter = slideInHorizontally() + fadeIn(),

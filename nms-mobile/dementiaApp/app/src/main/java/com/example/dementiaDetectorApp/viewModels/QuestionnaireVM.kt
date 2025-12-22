@@ -62,40 +62,9 @@ class QViewModel @Inject constructor(
 
     private val _education = MutableStateFlow("")
     private val education: StateFlow<String> = _education
-    private fun onEducationChange(newEdu: String)
-    {
+    private fun onEducationChange(newEdu: String){
         _education.value = newEdu
-        if (newEdu == "Primary Level"){
-            onPrimaryChange(true)
-            onSecondaryChange(false)
-            onDegreeChange(false)
-        }
-        else if (newEdu == "Secondary Level"){
-            onPrimaryChange(true)
-            onSecondaryChange(true)
-            onDegreeChange(false)
-        }
-        else if (newEdu == "Tertiary Level"){
-            onPrimaryChange(true)
-            onSecondaryChange(true)
-            onDegreeChange(true)
-        }
-        else{
-            onPrimaryChange(false)
-            onSecondaryChange(false)
-            onDegreeChange(false)
-        }
-        isS1Complete()
     }
-
-    private val _cumulativePrimary = MutableStateFlow("")
-    private fun onPrimaryChange(change:Boolean){_cumulativePrimary.value = change.toString().uppercase()}
-
-    private val _cumulativeSecondary = MutableStateFlow("")
-    private fun onSecondaryChange(change:Boolean){_cumulativeSecondary.value = change.toString().uppercase()}
-
-    private val _cumulativeDegree = MutableStateFlow("")
-    private fun onDegreeChange(change:Boolean){_cumulativeDegree.value = change.toString().uppercase()}
 
     private val _familyHistory = MutableStateFlow(-1)
     private val familyHistory: StateFlow<Int> = _familyHistory
@@ -530,7 +499,7 @@ class QViewModel @Inject constructor(
             bodyTemperature = bodyTemperature.value,
             heartRate = heartRate.value,
             bloodOxygen = bloodOxygen.value,
-            apoeE4 = apoeE4.value,
+            apoe4 = apoeE4.value,
             diabetic = diabetic.value,
             alcoholLevel = alcoholLevel.value,
             bloodPressure = bloodPressure.value,
@@ -547,9 +516,7 @@ class QViewModel @Inject constructor(
             nutritionDiet = nutritionDiet.value,
             dementiaStatus = dementiaStatus.value,
 
-            cumulativePrimary = _cumulativePrimary.value,
-            cumulativeSecondary = _cumulativeSecondary.value,
-            cumulativeDegree = _cumulativeDegree.value
+            education = education.value
         )
 
         viewModelScope.launch {

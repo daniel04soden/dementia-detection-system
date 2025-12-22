@@ -79,8 +79,6 @@ class SharedVM @Inject constructor(
     private val _tests = mutableStateOf<List<Test>>(emptyList())
     val tests: State<List<Test>> = _tests
 
-    private val questionnaireStatus = mutableIntStateOf(0)
-
     fun CheckCompleted(route:String, todo: () -> Unit) {
         when (route){
             "questionnaire" -> {
@@ -117,6 +115,7 @@ class SharedVM @Inject constructor(
         }
     }
 
+    private val questionnaireStatus = mutableIntStateOf(0)
     private val stage1Status = mutableIntStateOf(0)
     private val stage2Status = mutableIntStateOf(0)
     private val speechStatus = mutableIntStateOf(0)
@@ -125,11 +124,11 @@ class SharedVM @Inject constructor(
         viewModelScope.launch{
             isLoading = true
             val result = repository.getStatus(StatusRequest(id.value))
-            questionnaireStatus.intValue = result.data?.LifestyleStatus?:0
-            stage1Status.intValue = result.data?.StageOneStatus?:0
-            stage2Status.intValue = result.data?.StageTwoStatus?:0
-            val speechVal = result.data?.SpeechStatus?:false
-            if (speechVal){speechStatus.intValue=2}else speechStatus.intValue=0
+            questionnaireStatus.intValue = result.data?.lifestyleStatus?:0
+            stage1Status.intValue = result.data?.stageOneStatus?:0
+            stage2Status.intValue = result.data?.stageTwoStatus?:0
+            speechStatus.intValue = result.data?.speechTestStatus?:0
+            Log.d("Stage1 Status", stage1Status.intValue.toString())
         }
     }
 
@@ -177,11 +176,11 @@ class SharedVM @Inject constructor(
 
     private fun getTestScore(state:Int):Int{
         when (state){
-            2 ->{return 1}
+            2 ->{return 1}     //Graded - Fail/=?
             3 -> {return 1}
             4 -> {return 1}
             5 -> {return 1}
-            else -> {return 0}
+            else -> {return 0} //Not done
         }
     }
 
@@ -191,5 +190,9 @@ class SharedVM @Inject constructor(
             if(test.state>1){count++}
         }
         return count
+    }
+
+    init {
+        getStatus()
     }
 }

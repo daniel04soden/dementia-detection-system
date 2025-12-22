@@ -5,7 +5,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 
 interface StripeAPI {
-    @POST("api/mobile/payment")
+    @POST("mobile/payment")
     suspend fun paymentIntent(
         @Header("Authorization") token: String,
         @Body request: StripeRequest

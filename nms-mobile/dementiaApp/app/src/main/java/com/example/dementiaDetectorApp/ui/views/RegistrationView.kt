@@ -455,7 +455,7 @@ private fun Section3(aVM: AuthViewModel, sharedVM: SharedVM, nc: NavController){
                     if (aVM.clinic.value != -1){
                         val id = aVM.signUp{nc.navigate("login")}
                         sharedVM.onIdChange(id)
-                        sharedVM.updateTestList()
+                        sharedVM.getStatus()
                     }else{
                         ToastManager.showToast("Please pick a clinic")
                     }

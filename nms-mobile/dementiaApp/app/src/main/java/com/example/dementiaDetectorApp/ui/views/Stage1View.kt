@@ -564,7 +564,7 @@ private fun Question4(tVM:Stage1VM, sharedVM: SharedVM){
         ){
             Button(
                 onClick = {
-                    tVM.submitAnswers(sharedVM.id.value)
+                    tVM.submitAnswers(sharedVM.id.value,{sharedVM.onTestSubmission(1)})
                 },
                 enabled = tVM.q4FullyAnswered.value,
                 colors = buttonColours(),
