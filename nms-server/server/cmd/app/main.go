@@ -80,6 +80,7 @@ func main() {
 
 	http.HandleFunc("POST /api/lifestyle/insert", handlers.HandleInsertLifestyle)
 	http.HandleFunc("GET /api/lifestyle/review", handlers.HandleGetLifestyle)
+	http.HandleFunc("POST /api/lifestyle/update", handlers.HandleDoctorReviewLifestyle)
 
 	// testing - // AssemblyAI / Speech
 	http.HandleFunc("POST /api/assembly/webhook", handlers.HandleAssemblyWebHook)
@@ -168,7 +169,7 @@ func main() {
 		w.Write([]byte("Hello, world!"))
 	})
 
-	http.HandleFunc("GET /api/testmodel", handlers.AiAnalyseHandler)
+	//	http.HandleFunc("GET /api/testmodel", handlers.AiAnalyseHandler)
 
 	port := ":8080"
 	log.Printf("Server running at http://localhost%s/", port)

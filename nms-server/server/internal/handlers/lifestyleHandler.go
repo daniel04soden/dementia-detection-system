@@ -337,3 +337,4 @@ func HandleDoctorReviewLifestyle(w http.ResponseWriter, r *http.Request) {
 		"message": "success",
 	})
 }
+
