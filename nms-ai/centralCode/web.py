@@ -2,7 +2,13 @@ from prompt import run_test
 import json
 from speech_ai import accept_speech
 from flask import Flask, request, jsonify
-import keras
+import os
+
+# Force TensorFlow to use CPU only - must be set BEFORE importing keras/tensorflow
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Reduce TensorFlow logging
+
+from tensorflow import keras
 import joblib
 from sklearn.preprocessing import LabelEncoder
 from aggregation import aggregate_new_patient_data
@@ -22,11 +28,16 @@ try:
 
     GLOBAL_LE = LabelEncoder()
     GLOBAL_LE.fit(["No Dementia", "Dementia"])
+    
+    print("Successfully loaded all ML artifacts.")
 
 except FileNotFoundError as e:
     print(f"CRITICAL ERROR: Failed to load ML artifacts. Check your paths: {e}")
+    raise SystemExit(f"Cannot start application without required model files: {e}")
 except Exception as e:
     print(f"AN UNEXPECTED ERROR OCCURRED during model loading: {e}")
+    raise SystemExit(f"Cannot start application due to model loading error: {e}")
+
 
 
 @app.route("/articles", methods=["GET"])

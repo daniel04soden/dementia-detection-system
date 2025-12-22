@@ -1,4 +1,4 @@
-import keras
+from tensorflow import keras
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 import joblib
@@ -217,7 +217,7 @@ def run_test(answers: list, loaded_model, scaler, model_features, global_le) -> 
     print(f"Predicted Likelihood of Dementia: {percentage_likelihood:.2f}%")
     print(f"Predicted Class (Decoded): {predicted_label[0]}")
 
-    return f"{percentage_likelihood:.2f}"
+    return str(y_pred_binary.flatten()[0])
 
 
 def main():

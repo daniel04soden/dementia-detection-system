@@ -1,12 +1,12 @@
 import numpy as np
 import pandas as pd
-from keras.layers import Dense, Dropout
-from keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.keras.models import Sequential
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
-from keras.regularizers import l2
+from tensorflow.keras.regularizers import l2
 from sklearn.utils import class_weight
-from keras.callbacks import EarlyStopping, ReduceLROnPlateau
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 import joblib
 import warnings
 
