@@ -77,7 +77,6 @@ func main() {
 	http.HandleFunc("POST /api/mobile/stagetwo/insert", handlers.HandleInsertStageTwo)
 
 	http.HandleFunc("POST /api/web/stageone/grade", handlers.HandleGradeStageOne)
-	http.HandleFunc("POST /api/web/stagetwo/grade", handlers.HandleGradeStageTwo)
 
 	http.HandleFunc("POST /api/lifestyle/insert", handlers.HandleInsertLifestyle)
 	http.HandleFunc("GET /api/lifestyle/review", handlers.HandleGetLifestyle)
