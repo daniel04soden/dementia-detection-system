@@ -17,6 +17,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,7 +44,9 @@ import org.osmdroid.views.overlay.Marker
 
 @Composable
 fun ContactScreen(cVM: ContactVM, sharedVM: SharedVM, nc: NavController){
-    cVM.initClinic(sharedVM.id.value)
+    LaunchedEffect(sharedVM.id.value) {
+        cVM.initClinic(sharedVM.id.value)
+    }
     Box(modifier = Modifier
         .fillMaxSize()
         .background(Color.White)
@@ -119,33 +122,40 @@ fun ClinicMap(cVM: ContactVM) {
     val clinic = cVM.clinic.collectAsState().value
     val context = LocalContext.current
 
-    coords.value?.let { (lat, lon) -> //If coordinates are available (not null)
-        AndroidView(factory = { ctx -> //Use traditional AndroidView to embed an AndroidMapView
-            Configuration.getInstance().load(ctx, ctx.getSharedPreferences("osmdroid", 0)) //Load osmdroid config
-            MapView(ctx).apply { //The map is created
-                setTileSource(TileSourceFactory.MAPNIK) //Use OpenStreetMap standard tiles
-                setMultiTouchControls(true) //Allow for pinch zoom and etc
-                controller.setZoom(16.0) //Default zoom
-                controller.setCenter(GeoPoint(lat, lon)) //Centre on the clinic's coordinates
+    AndroidView(factory = { ctx -> //Use traditional AndroidView to embed an AndroidMapView
+        Configuration.getInstance().load(ctx, ctx.getSharedPreferences("osmdroid", 0)) //Load osmdroid config
+        MapView(ctx).apply { //The map is created
+            setTileSource(TileSourceFactory.MAPNIK) //Use OpenStreetMap standard tiles
+            setMultiTouchControls(true) //Allow for pinch zoom and etc
+            controller.setZoom(16.0) //Default zoom
+            controller.setCenter(GeoPoint(53.349805, -6.26031)) //Initial center
 
-                val marker = Marker(this)
+            val marker = Marker(this)
+            marker.position = GeoPoint(53.349805, -6.26031) //Initial marker
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            marker.title = "Loading..."
+            overlays.add(marker)
+        }
+    },
+        update = { mapView ->
+            coords.value?.let { (lat, lon) -> //If coordinates are available (not null)
+                mapView.overlays.clear()
+                val marker = Marker(mapView)
                 marker.position = GeoPoint(lat, lon) //Add marker above clinic
                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                marker.title = clinic.name
-                overlays.add(marker)
+                marker.title = clinic?.name ?: "Clinic"
+                mapView.overlays.add(marker)
+                mapView.controller.setCenter(GeoPoint(lat, lon)) //Centre on the clinic's coordinates
+                mapView.invalidate()
             }
         },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(250.dp)
-                .padding(horizontal = 16.dp)
-        )
-    } ?: Text(
-        text = "Map loading...", //Fallback if waiting for response
-        modifier = Modifier.padding(16.dp),
-        color = DarkPurple
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(250.dp)
+            .padding(horizontal = 16.dp)
     )
 }
+
 
 @Composable
 fun InfoRow(label: String, value: String) {

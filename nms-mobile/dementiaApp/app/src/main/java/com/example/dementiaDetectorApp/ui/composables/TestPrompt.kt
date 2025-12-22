@@ -22,12 +22,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.R
 import com.example.dementiaDetectorApp.models.Test
+import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.LightPurple
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
+import com.example.dementiaDetectorApp.viewModels.SharedVM
 
 @Composable
 fun TestPrompt(
     test: Test,
+    sharedVM: SharedVM,
     nc: NavController
 ){
     Row(modifier = Modifier
@@ -36,21 +39,22 @@ fun TestPrompt(
         .background(MidPurple)//CHANGE
         .padding(horizontal = 15.dp , vertical = 20.dp)
         .fillMaxWidth()
-        .clickable {nc.navigate(test.route)},
+        .clickable {sharedVM.CheckCompleted(test.route,{nc.navigate(test.route)})},
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ){
         Box(
             modifier = Modifier
                 .size(50.dp)
-                .background(LightPurple)//CHANGE
+                .background(LightPurple)
                 .padding(5.dp),
             contentAlignment = Alignment.Center
         ){
             Icon(
-                painter = painterResource(R.drawable.logo),
+                painter = painterResource(R.drawable.todo),
                 contentDescription = "Test Icon",
-                Modifier.size(30.dp)
+                tint = DarkPurple,
+                modifier = Modifier.size(30.dp)
             )
         }
         Column(modifier = Modifier
@@ -74,7 +78,6 @@ private fun deriveState(test: Test): String{
     else if (stateVal>=2){
         test.route = "status"
         return "Graded"
-
     }
     else{
         return "To be completed"

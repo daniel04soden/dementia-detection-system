@@ -25,7 +25,7 @@ fun ClinicDropdown(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val selectedName = clinics.find { it.id == selectedClinicId }?.name ?: "Select Clinic"
+    val selectedName = clinics.find { it.clinicID == selectedClinicId }?.name ?: "Select Clinic"
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -49,7 +49,7 @@ fun ClinicDropdown(
                 DropdownMenuItem(
                     text = { Text(clinic.name) },
                     onClick = {
-                        onClinicSelected(clinic.id)
+                        onClinicSelected(clinic.clinicID)
                         expanded = false
                     }
                 )

@@ -3,8 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-	"nms-server/server/internal/services"
 	"strconv"
+	"strings"
+
+	"nms-server/server/internal/auth"
+	"nms-server/server/internal/services"
 )
 
 type SignupPatientRequest struct {
@@ -59,7 +62,6 @@ func HandleSignupPatient(w http.ResponseWriter, r *http.Request) {
 		ORDER BY COUNT(p.patientID) ASC
 		LIMIT 1;
     `, req.ClinicID).Scan(&doctorID)
-
 	if err != nil {
 		http.Error(w, "No doctors found for the given clinic", http.StatusBadRequest)
 		return
@@ -148,6 +150,50 @@ func HandleGetPatient(w http.ResponseWriter, r *http.Request) {
 	var p Patient
 
 	err = row.Scan(&p.PatientID, &p.DoctorID, &p.FirstName, &p.LastName, &p.Phone, &p.Eircode)
+	if err != nil {
+		http.Error(w, "failed to scan patient", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(p)
+}
+
+type Me struct {
+	PatientID int    `json:"patientID"`
+	DoctorID  int    `json:"doctorID"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Phone     string `json:"phone"`
+	Eircode   string `json:"eircode"`
+	Premium   bool   `json:"premium"`
+}
+
+func MobileHandleMe(w http.ResponseWriter, r *http.Request) {
+	authHeader := r.Header.Get("Authorization")
+	var token string
+	token, ok := strings.CutPrefix(authHeader, "Bearer ")
+	if !ok {
+		http.Error(w, "Missing or invalid Authorization header", http.StatusUnauthorized)
+		return
+	}
+
+	claims, err := auth.ValidateJWT(token)
+	if err != nil {
+		http.Error(w, "Invalid or expired token", http.StatusUnauthorized)
+		return
+	}
+
+	row := db.QueryRow(`
+		SELECT patientID, doctorID, firstName, lastName, phone, premium, eircode 
+		FROM Patient
+		INNER JOIN Users ON Patient.patientID = Users.userID 
+		WHERE patientID = $1
+		`, claims.UserID)
+
+	var p Me
+
+	err = row.Scan(&p.PatientID, &p.DoctorID, &p.FirstName, &p.LastName, &p.Phone, &p.Premium, &p.Eircode)
 	if err != nil {
 		http.Error(w, "failed to scan patient", http.StatusInternalServerError)
 		return

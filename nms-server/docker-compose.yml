@@ -7,9 +7,9 @@ services:
     container_name: postgres_db
     restart: always
     environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: mydb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: ${PG_PASS}
+      POSTGRES_DB: ddsdb
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./CREATE.sql:/docker-entrypoint-initdb.d/CREATE.sql
@@ -23,9 +23,13 @@ services:
     environment:
       DB_HOST: db
       DB_PORT: 5432
-      DB_USER: myuser
-      DB_PASSWORD: password
-      DB_NAME: mydb
+      DB_USER: admin
+      DB_PASSWORD: ${PG_PASS}
+      DB_NAME: ddsdb
+      WEBHOOK_KEY: ${STRIPE_WEBHOOK_SECRET}
+      STRIPE_KEY: ${STRIPE_SECRET}
+      ASSEMBLY_AI_KEY: ${ASSEMBLY_AI_KEY_SECRET}
+
     ports:
       - "8080:8080"
   cloudflared:
@@ -33,7 +37,7 @@ services:
     container_name: cloudflared
     environment:
       - TZ=Europe/Dublin # Change this to your timezone
-      - TUNNEL_TOKEN=
+      - TUNNEL_TOKEN=${CF_TUNNEL_SECRET}
     restart: unless-stopped
     command: tunnel --no-autoupdate run
     network_mode: "host"                              # Use the host network (no isolation between host and container)

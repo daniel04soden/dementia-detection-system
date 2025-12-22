@@ -41,13 +41,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.dementiaDetectorApp.ui.composables.ProgressDots
+import com.example.dementiaDetectorApp.ui.composables.Footer
+import com.example.dementiaDetectorApp.ui.composables.SubmittedSection
 import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.Gray
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.ui.theme.buttonColours
 import com.example.dementiaDetectorApp.ui.theme.outLinedTFColours
-import com.example.dementiaDetectorApp.ui.composables.SubmittedSection
 import com.example.dementiaDetectorApp.viewModels.SharedVM
 import com.example.dementiaDetectorApp.viewModels.Stage1VM
 
@@ -61,7 +61,7 @@ fun Stage1Screen(tVM: Stage1VM, sVM: SharedVM, nc: NavController){
             Modifier.padding(bottom = 50.dp)
         ){
             if(tVM.prefaceVisi.collectAsState().value){
-                Spacer(Modifier.height(200.dp))
+                Spacer(Modifier.height(120.dp))
             }
             else{
                 Spacer(Modifier.height(35.dp))
@@ -70,7 +70,7 @@ fun Stage1Screen(tVM: Stage1VM, sVM: SharedVM, nc: NavController){
             FormSection(tVM, sVM, nc)
         }
         if(!tVM.timedVisi.collectAsState().value && !tVM.prefaceVisi.collectAsState().value){
-            ProgressDots(Modifier.align(Alignment.BottomCenter))
+            Footer(Modifier.align(Alignment.BottomCenter))
         }
     }
 }
@@ -109,7 +109,7 @@ private fun PrefaceSection(tVM: Stage1VM){
                     Text(
                         text = "The following is a questionnaire that will ask you 4 questions\n\n" +
                                 "The test will begin by displaying information that will remain on screen for 10 seconds that you must remember for a later question\n\n"+
-                                "If you don't have an answer for a quesiton, leave it blank",
+                                "If you don't have an answer for a question, leave it blank",
                         fontSize = 20.sp,
                         color = Gray,
                         textAlign = TextAlign.Center,
@@ -124,7 +124,8 @@ private fun PrefaceSection(tVM: Stage1VM){
                             tVM.onTimedVisiChange(true)}
                     ){
                         Text(
-                            text = "Continue"
+                            text = "Continue",
+                            fontSize = 20.sp
                         )
                     }
                 }
@@ -146,7 +147,7 @@ private fun FormSection(tVM: Stage1VM, sVM: SharedVM, nc: NavController){
             AnimatedVisibility(
                 visible = tVM.timedVisi.collectAsState().value
             ){
-                TimedSection(tVM)
+                TimedSection()
             }
             AnimatedVisibility(
                 visible = tVM.q1Visi.collectAsState().value,
@@ -183,7 +184,7 @@ private fun FormSection(tVM: Stage1VM, sVM: SharedVM, nc: NavController){
 }
 
 @Composable
-private fun TimedSection(tVM: Stage1VM){
+private fun TimedSection() {
     Column(Modifier
         .fillMaxSize()
         .background(MidPurple),
@@ -266,7 +267,7 @@ private fun Question1(tVM: Stage1VM){
         ){
             OutlinedTextField(
                 value = answer,
-                onValueChange = {tVM.onDateChange(it)},
+                onValueChange = {if(it.length<=10){tVM.onDateChange(it)}},
                 placeholder = {Text(text = "dd/mm/yyyy")},
                 singleLine = true,
                 colors = outLinedTFColours(),
@@ -283,6 +284,7 @@ private fun Question1(tVM: Stage1VM){
                     tVM.onQ1VisiChange(false)
                     tVM.onQ2VisiChange(true)
                 },
+                enabled = tVM.date.collectAsState().value.length==10,
                 colors = buttonColours(),
                 shape = RoundedCornerShape(24.dp),
                 modifier = Modifier
@@ -311,7 +313,9 @@ private fun Question2(tVM: Stage1VM){
             Text(
                 text = "2) Select the Correct Clock",
                 fontSize = 30.sp,
-                color = DarkPurple
+                color = DarkPurple,
+                lineHeight = 32.5.sp,
+                modifier = Modifier.padding(horizontal = 7.5.dp)
             )
         }
         Spacer(Modifier.height(35.dp))
@@ -404,6 +408,7 @@ private fun Question3(tVM:Stage1VM){
                     tVM.onQ3VisiChange(false)
                     tVM.onQ4VisiChange(true)
                 },
+                enabled = tVM.newsEntry.collectAsState().value.isNotEmpty(),
                 colors = buttonColours(),
                 shape = RoundedCornerShape(24.dp),
                 modifier = Modifier
@@ -559,8 +564,9 @@ private fun Question4(tVM:Stage1VM, sharedVM: SharedVM){
         ){
             Button(
                 onClick = {
-                    tVM.submitAnswers(sharedVM.id.value)
+                    tVM.submitAnswers(sharedVM.id.value,{sharedVM.onTestSubmission(1)})
                 },
+                enabled = tVM.q4FullyAnswered.value,
                 colors = buttonColours(),
                 shape = RoundedCornerShape(24.dp),
                 modifier = Modifier
@@ -598,7 +604,7 @@ private fun ClockImage(drawingName: String, tVM: Stage1VM, index: Int){
 }
 
 @Composable
-fun ConfirmationSection(tVM: Stage1VM){
+private fun ConfirmationSection(tVM: Stage1VM){
     Box(modifier = Modifier
         .fillMaxSize()
         .background(Color.White)
@@ -618,7 +624,8 @@ fun ConfirmationSection(tVM: Stage1VM){
                 text = "Are you sure you want to select clock ${tVM.clock.collectAsState().value+1}?",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = MidPurple
+                color = MidPurple,
+                modifier = Modifier.padding(horizontal = 7.5.dp)
             )
 
             val context = LocalContext.current

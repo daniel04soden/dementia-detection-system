@@ -1,62 +1,100 @@
 package com.example.dementiaDetectorApp.viewModels
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.dementiaDetectorApp.api.feedback.FeedbackRepo
+import com.example.dementiaDetectorApp.api.feedback.FeedbackResult
+import com.example.dementiaDetectorApp.api.news.NewsRepo
+import com.example.dementiaDetectorApp.api.news.NewsResult
 import com.example.dementiaDetectorApp.models.NewsPiece
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import jakarta.inject.Inject
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
-class HomeVM: ViewModel(){
+@HiltViewModel
+class HomeVM @Inject constructor(
+    private val newsRepo: NewsRepo,
+    private val feedbackRepo: FeedbackRepo,
+    @ApplicationContext private val context: Context
+): ViewModel() {
+
+    private val newsResChannel = Channel<NewsResult<Unit>>()
+    val newsResults = newsResChannel.receiveAsFlow()
+
+    private val feedbackResChannel = Channel<FeedbackResult<Unit>>()
+    val feedbackResults = feedbackResChannel.receiveAsFlow()
+
+    private var isLoading = false
+
     private val _fName = mutableStateOf("")
     val fName: State<String> = _fName
 
-    //News Pieces
-    private val _news = mutableStateOf<List<NewsPiece>>(newsList())
+    // News Pieces
+    private val _news = mutableStateOf<List<NewsPiece>>(emptyList())
     val news: State<List<NewsPiece>> = _news
 
-    fun newsList(): List<NewsPiece>{
-        val newsList = listOf(
-            NewsPiece(
-                headline = "New Oral Treatment Shows Promise Against Dementia",
-                description = "Researchers have developed a new oral treatment that has shown promising results in clinical trials for dementia patients.",
-                link = "https://medicalxpress.com/news/2025-11-oral-treatment-dementia.html"
-            ),
-            NewsPiece(
-                headline = "Alzheimer's Risk Calculator Developed",
-                description = "A new tool can estimate a person's risk of developing Alzheimer's years before symptoms appear.",
-                link = "https://medicalxpress.com/news/2025-11-alzheimers-risk-calculator.html"
-            ),
-            NewsPiece(
-                headline = "Heart Health in Midlife Predicts Dementia Risk",
-                description = "A study finds heart health during middle age is linked to dementia risk in later life.",
-                link = "https://medicalxpress.com/news/2025-11-heart-health-dementia-risk.html"
-            ),
-            NewsPiece(
-                headline = "The Silent Threat: Hearing Loss and Memory Decline",
-                description = "New research highlights the connection between hearing loss, loneliness, and memory decline in older adults.",
-                link = "https://sciencedaily.com/releases/2025/07/hearing-loss-memory-decline.html"
-            ),
-            NewsPiece(
-                headline = "Faster MRI Scans Offer New Hope for Dementia Diagnosis",
-                description = "Innovative MRI techniques could significantly reduce scan times for dementia diagnosis.",
-                link = "https://alzheimers.org.uk/news/faster-mri-scans-dementia-hope"
-            ),
-            NewsPiece(
-                headline = "FDA Approves First Digital Therapeutic for Dementia Symptoms",
-                description = "Prescription digital therapeutic using cognitive training exercises shows efficacy in improving memory and executive function in mild cognitive impairment.",
-                link = "https://www.fda.gov/medical-devices/digital-health/dementia-digital-therapeutic-approval"
-            ),
-            NewsPiece(
-                headline = "Blood Test for Alzheimer's Biomarkers Reaches 95% Accuracy",
-                description = "New plasma-based biomarker test detects tau and amyloid proteins with high precision, offering accessible early diagnosis for Alzheimer's disease.",
-                link = "https://www.nature.com/articles/s41591-023-02456-8"
-            ),
-            NewsPiece(
-                headline = "New Alzheimer's Drug Shows Promise in Slowing Cognitive Decline",
-                description = "Lecanemab demonstrates significant reduction in amyloid plaques and slowing of cognitive decline in early Alzheimer's patients in Phase 3 clinical trial.",
-                link = "https://www.alz.org/research/2023/lecanemab-phase3-results"
-            )
-        )
-        return newsList
+    private fun getNews() {
+        viewModelScope.launch {
+            isLoading = true
+            _news.value = newsRepo.getNews().data ?: emptyList()
+        }
     }
 
+    // Ratings
+    private val _rating = mutableIntStateOf(0)
+    val rating: State<Int> = _rating
+    fun onRatingChange(newRating: Int) { _rating.intValue = newRating }
+
+    private val _feedback = mutableStateOf("")
+    val feedback: State<String> = _feedback
+    fun onFeedbackChange(newFeedback: String) { _feedback.value = newFeedback }
+
+    private val _feedbackVisi = mutableStateOf(false)
+    val feedbackVisi: State<Boolean> = _feedbackVisi
+    fun onFeedbackVisiChange(newVisi: Boolean) { _feedbackVisi.value = newVisi }
+
+    // REVIEW FLAG
+    private val _reviewAsked = mutableStateOf(false)
+    val reviewAsked: State<Boolean> = _reviewAsked
+
+    private val _testsDone = mutableIntStateOf(0)
+
+    fun submitReview(id: Int) {
+        viewModelScope.launch {
+            isLoading = true
+            val result = feedbackRepo.submitReview(
+                id = id.toString(),
+                score = _rating.intValue,
+                critique = _feedback.value,
+            )
+            if (result is FeedbackResult.Authorized) {
+                onFeedbackVisiChange(false)
+                val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                prefs.edit {
+                    putBoolean("review_asked", true)
+                    apply()
+                }
+                _reviewAsked.value = true
+                Log.d("Review submit", "Prefs edited and reviewAsked set")
+            }
+        }
+    }
+
+    init {
+        // Load review flag from shared prefs
+        viewModelScope.launch {
+            val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+            _reviewAsked.value = prefs.getBoolean("review_asked", false)
+        }
+        getNews()
+    }
 }

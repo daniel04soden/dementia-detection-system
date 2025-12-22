@@ -1,5 +1,6 @@
 package com.example.dementiaDetectorApp.ui.views
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,10 +20,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -31,38 +34,42 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.R
+import com.example.dementiaDetectorApp.api.auth.AuthResult
+import com.example.dementiaDetectorApp.ui.composables.WaveBGBox
 import com.example.dementiaDetectorApp.ui.theme.buttonColours
 import com.example.dementiaDetectorApp.ui.theme.outLinedTFColours
-import com.example.dementiaDetectorApp.ui.composables.WaveBGBox
 import com.example.dementiaDetectorApp.viewModels.AuthViewModel
 import com.example.dementiaDetectorApp.viewModels.SharedVM
-/* Auth Toast stuff:
 
- val context = LocalContext.current
-    LaunchedEffect(viewModel, context){
-        viewModel.authResults.collect{result ->
-            when(result){
-                is AuthResult.Authorized ->{
-                    navController.navigate("home")
+@Composable
+fun LoginScreen(authVM: AuthViewModel, sharedVM: SharedVM, nc: NavController) {
+    val context = LocalContext.current
+
+    // Handle auth results with toasts and navigation
+    LaunchedEffect(authVM) {
+        authVM.authResults.collect { result ->
+            when (result) {
+                is AuthResult.Authorized -> {
+                    result.data?.let { loginResponse ->
+                       sharedVM.onIdChange(loginResponse.ID)
+                        nc.navigate("home")
+                    }
                 }
-                is AuthResult.Unauthorized ->{
-                    Toast.makeText(context, "Not authorized", Toast.LENGTH_LONG).show()
+                is AuthResult.Unauthorized -> {
+                    Toast.makeText(context, "Invalid credentials", Toast.LENGTH_LONG).show()
                 }
-                is AuthResult.UnknownError ->{
+                is AuthResult.UnknownError -> {
                     Toast.makeText(context, "An unknown error occurred", Toast.LENGTH_LONG).show()
                 }
             }
         }
     }
-*/
 
-@Composable
-fun LoginScreen(authVM: AuthViewModel, sharedVM: SharedVM, nc: NavController){
     Box(modifier = Modifier
         .background(Color.White)
         .fillMaxSize()
-    ){
-        Column{
+    ) {
+        Column {
             WaveBGBox(
                 content = {
                     Spacer(Modifier.height(35.dp))
@@ -78,11 +85,12 @@ fun LoginScreen(authVM: AuthViewModel, sharedVM: SharedVM, nc: NavController){
 }
 
 @Composable
-fun LogoSection(){
-    Column(modifier = Modifier
-        .fillMaxWidth(),
+fun LogoSection() {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally){
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Icon(
             painterResource(R.drawable.logo),
             contentDescription = "DA Logo",
@@ -95,21 +103,23 @@ fun LogoSection(){
 }
 
 @Composable
-fun LoginInfoSection(authVM: AuthViewModel, sharedVM: SharedVM, nc: NavController){
+fun LoginInfoSection(authVM: AuthViewModel, sharedVM:SharedVM, nc: NavController) {
     val email = authVM.email.collectAsState().value
     val pswd = authVM.pswd.collectAsState().value
+
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .padding(start = 7.5.dp, end = 7.5.dp)
             .fillMaxWidth()
-    ){
-        Row(modifier = Modifier
-            .padding(start = 85.dp)
-            .fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(start = 85.dp)
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.Start
-        ){
+        ) {
             Text(
                 text = "Email",
                 fontWeight = FontWeight.Bold,
@@ -119,20 +129,20 @@ fun LoginInfoSection(authVM: AuthViewModel, sharedVM: SharedVM, nc: NavControlle
         }
         OutlinedTextField(
             value = email,
-            onValueChange = {newVal: String -> authVM.onEmailChange(newVal)},
-            //label = {Text("Email")},
-            placeholder = {Text("YourEmail@exmaple.com")},
+            onValueChange = { newVal -> authVM.onEmailChange(newVal) },
+            placeholder = { Text("YourEmail@example.com") },
             singleLine = true,
             shape = RoundedCornerShape(24.dp),
             colors = outLinedTFColours(),
             modifier = Modifier.width(300.dp)
         )
 
-        Row(modifier = Modifier
-            .padding(start = 85.dp)
-            .fillMaxWidth(),
+        Row(
+            modifier = Modifier
+                .padding(start = 85.dp)
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.Start
-        ){
+        ) {
             Text(
                 text = "Password",
                 fontWeight = FontWeight.Bold,
@@ -142,9 +152,8 @@ fun LoginInfoSection(authVM: AuthViewModel, sharedVM: SharedVM, nc: NavControlle
         }
         OutlinedTextField(
             value = pswd,
-            onValueChange = {newVal: String -> authVM.onPswdChange(newVal)},
-            //label = {Text("Password")},
-            placeholder = {Text("********")},
+            onValueChange = { newVal -> authVM.onPswdChange(newVal) },
+            placeholder = { Text("********") },
             singleLine = true,
             shape = RoundedCornerShape(24.dp),
             colors = outLinedTFColours(),
@@ -155,12 +164,12 @@ fun LoginInfoSection(authVM: AuthViewModel, sharedVM: SharedVM, nc: NavControlle
         Spacer(Modifier.height(20.dp))
         Button(
             onClick = {
-                sharedVM.onIdChange(authVM.signIn { nc.navigate("home")})
-                      },
+                val id =  authVM.signIn { nc.navigate("home") }
+                sharedVM.onIdChange(id)
+            },
             colors = buttonColours(),
             shape = RoundedCornerShape(24.dp),
-            modifier = Modifier
-                .width(300.dp)
+            modifier = Modifier.width(300.dp)
         ) {
             Text(text = "Login", fontSize = 25.sp, color = Color.White)
         }
@@ -168,14 +177,14 @@ fun LoginInfoSection(authVM: AuthViewModel, sharedVM: SharedVM, nc: NavControlle
 }
 
 @Composable
-fun RegisterSection(nc: NavController){
+fun RegisterSection(nc: NavController) {
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .padding(start = 7.5.dp, end = 7.5.dp)
             .fillMaxWidth()
-    ){
+    ) {
         Text(
             text = "Don't have an account?",
             fontSize = 20.sp,
@@ -184,11 +193,10 @@ fun RegisterSection(nc: NavController){
         )
         Spacer(Modifier.height(20.dp))
         Button(
-            onClick = {nc.navigate("registration")},
+            onClick = { nc.navigate("registration") },
             colors = buttonColours(),
             shape = RoundedCornerShape(24.dp),
-            modifier = Modifier
-                .width(300.dp)
+            modifier = Modifier.width(300.dp)
         ) {
             Text(text = "Sign Up", fontSize = 25.sp, color = Color.White)
         }

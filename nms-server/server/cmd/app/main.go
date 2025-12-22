@@ -54,6 +54,12 @@ func main() {
 	//									HANDLERS
 	// ------------------------------------------------------------------------------------------------------
 
+	// Payment
+
+	http.HandleFunc("POST /api/mobile/payment", handlers.HandleCreatePayment)
+	http.HandleFunc("POST /api/stripe/webhook", handlers.HandleStripeWebhook)
+
+	// news
 	http.HandleFunc("GET /api/web/news", handlers.HandleGetDoctorNews)
 	http.HandleFunc("GET /api/mobile/news", handlers.HandleGetPatientNews)
 
@@ -61,6 +67,7 @@ func main() {
 	http.HandleFunc("POST /api/login", handlers.HandleLogin)
 	http.HandleFunc("GET /api/web/me", handlers.WebHandleMe)
 	http.HandleFunc("POST /api/web/logout", handlers.WebHandleLogout)
+	http.HandleFunc("GET /api/mobile/me", handlers.MobileHandleMe)
 
 	// testing
 	http.HandleFunc("GET /api/web/stageone/review", handlers.HandleGetTestStageOne)
@@ -70,12 +77,14 @@ func main() {
 	http.HandleFunc("POST /api/mobile/stagetwo/insert", handlers.HandleInsertStageTwo)
 
 	http.HandleFunc("POST /api/web/stageone/grade", handlers.HandleGradeStageOne)
-	http.HandleFunc("POST /api/web/stagetwo/grade", handlers.HandleGradeStageTwo)
 
 	http.HandleFunc("POST /api/lifestyle/insert", handlers.HandleInsertLifestyle)
-	http.HandleFunc("POST /api/lifestyle/review", handlers.HandleGetLifestyle)
+	http.HandleFunc("GET /api/lifestyle/review", handlers.HandleGetLifestyle)
+	http.HandleFunc("POST /api/lifestyle/update", handlers.HandleDoctorReviewLifestyle)
 
-	http.HandleFunc("POST /api/speech/insert", handlers.HandleSpeechInsert)
+	// testing - // AssemblyAI / Speech
+	http.HandleFunc("POST /api/assembly/webhook", handlers.HandleAssemblyWebHook)
+	http.HandleFunc("POST /api/mobile/uploadaudio", handlers.HandleUpload)
 
 	// Reviews
 	http.HandleFunc("POST /api/review/insert", handlers.HandleInsertReview)
@@ -159,6 +168,8 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Hello, world!"))
 	})
+
+	//	http.HandleFunc("GET /api/testmodel", handlers.AiAnalyseHandler)
 
 	port := ":8080"
 	log.Printf("Server running at http://localhost%s/", port)

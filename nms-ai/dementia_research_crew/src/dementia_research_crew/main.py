@@ -10,15 +10,18 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Access the environment variable
-deep_api_key = os.getenv("DEEPSEEK_API_KEY")
-ollama_base_url = "http://localhost:11434"
+# deep_api_key = os.getenv("DEEPSEEK_API_KEY")
+# ollama_base_url = "http://localhost:11434"
+deepseek_base_url = "https://api.deepseek.com/v1"
 
-# Defining deepseek LLM 
+# Defining LLM 
 my_ai = LLM(
-    model="ollama/llama3:8b",
-    base_url=ollama_base_url,
-     # api_key=os.getenv("DEEPSEEK_API_KEY"),
-     temperature=0.6
+    model="deepseek-reasoner",
+    # model="ollama/llama3:8b",
+    #base_url=ollama_base_url,
+    base_url=deepseek_base_url,
+    api_key=os.getenv("DEEPSEEK_API_KEY"),
+     # temperature=0.6
  )
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")

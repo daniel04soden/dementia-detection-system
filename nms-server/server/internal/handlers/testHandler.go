@@ -3,12 +3,12 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
 )
 
-// --------------------------------- Get Graded Details -------------------------------------
 type TestStageOne struct {
 	TestID        int    `json:"testID"`
 	TestDate      string `json:"testDate"`
@@ -89,7 +89,7 @@ func HandleGetTestStageOne(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "TestStageOne not found", http.StatusNotFound)
 			return
 		}
-		http.Error(w, "failed to scan test", http.StatusInternalServerError)
+		http.Error(w, "failed to scan test"+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -209,6 +209,7 @@ func HandleInsertStageOne(w http.ResponseWriter, r *http.Request) {
     `, req.PatientID).Scan(&DoctorID)
 	if err != nil {
 		tx.Rollback()
+		log.Println("Select Doctor Error" + err.Error())
 		http.Error(w, "Could not find doctor for patient: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -221,6 +222,7 @@ func HandleInsertStageOne(w http.ResponseWriter, r *http.Request) {
     `, 1, req.PatientID, DoctorID).Scan(&testID)
 	if err != nil {
 		tx.Rollback()
+		log.Println("Select Create Test Row" + err.Error())
 		http.Error(w, "Could not create test: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -239,12 +241,16 @@ func HandleInsertStageOne(w http.ResponseWriter, r *http.Request) {
 		req.RecallName, req.RecallSurname, req.RecallNumber, req.RecallStreet, req.RecallCity)
 	if err != nil {
 		tx.Rollback()
+
+		log.Println("Insert Test Data Row" + err.Error())
 		http.Error(w, "Could not insert TestStageOne: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// Commit transaction
 	if err := tx.Commit(); err != nil {
+
+		log.Println("Commit Transaction Error" + err.Error())
 		http.Error(w, "Failed to commit transaction: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -274,6 +280,8 @@ func HandleInsertStageTwo(w http.ResponseWriter, r *http.Request) {
 
 	tx, err := db.Begin()
 	if err != nil {
+
+		log.Println("Start Transaction Error" + err.Error())
 		http.Error(w, "Failed to start transaction: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -293,6 +301,7 @@ func HandleInsertStageTwo(w http.ResponseWriter, r *http.Request) {
     `, req.PatientID).Scan(&testID)
 	if err != nil {
 		tx.Rollback()
+		log.Println("No active test found for Stage Two" + err.Error())
 		http.Error(w, "No active test found for Stage Two", http.StatusNotFound)
 		return
 	}
@@ -308,6 +317,8 @@ func HandleInsertStageTwo(w http.ResponseWriter, r *http.Request) {
 		req.FinancialScore, req.MedicineScore, req.TransportScore)
 	if err != nil {
 		tx.Rollback()
+
+		log.Println("Failed to insert into stage two" + err.Error())
 		http.Error(w, "Could not insert TestStageTwo: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -319,11 +330,15 @@ func HandleInsertStageTwo(w http.ResponseWriter, r *http.Request) {
     `, 1, testID)
 	if err != nil {
 		tx.Rollback()
+
+		log.Println("Failed to mark stage two as complete" + err.Error())
 		http.Error(w, "DB error: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if err := tx.Commit(); err != nil {
+
+		log.Println("Failed to commit" + err.Error())
 		http.Error(w, "Failed to commit transaction", http.StatusInternalServerError)
 		return
 	}
@@ -337,7 +352,6 @@ func HandleInsertStageTwo(w http.ResponseWriter, r *http.Request) {
 // --------------------------------- Grade Test Results -------------------------------------
 
 type GradeTest struct {
-	TestID          int  `json:"testID"`
 	ClockNumberRes  bool `json:"clockNumberRes"`
 	ClockHandsRes   bool `json:"clockHandsRes"`
 	DateQuestionRes bool `json:"dateQuestionRes"`
@@ -347,6 +361,19 @@ type GradeTest struct {
 
 func HandleGradeStageOne(w http.ResponseWriter, r *http.Request) {
 	var req GradeTest
+
+	idStr := r.URL.Query().Get("id")
+	if idStr == "" {
+		http.Error(w, "id is required", http.StatusBadRequest)
+		return
+	}
+
+	// Convert the ID string to an integer
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
 
 	// Decode JSON body
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -365,10 +392,10 @@ func HandleGradeStageOne(w http.ResponseWriter, r *http.Request) {
             clockNumberRes=$1,
             clockHandsRes=$2,
             dateQuestionRes=$3,
-            newsScore=$4,
+            newsRes=$4,
             recallRes=$5
         WHERE testID=$6
-    `, req.ClockNumberRes, req.ClockHandsRes, req.DateQuestionRes, req.NewsRes, req.RecallRes, req.TestID)
+    `, req.ClockNumberRes, req.ClockHandsRes, req.DateQuestionRes, req.NewsRes, req.RecallRes, id)
 	if err != nil {
 		http.Error(w, "DB update error: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -401,8 +428,9 @@ func HandleGradeStageOne(w http.ResponseWriter, r *http.Request) {
 		_, err := tx.Exec(`
 				UPDATE Test SET
 					stageOneStatus=$1,
-				WHERE testID=$2
-			`, 2, req.TestID)
+					stageTwoStatus=$2
+				WHERE testID=$3
+			`, 2, 2, id)
 		if err != nil {
 			http.Error(w, "DB update error: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -412,8 +440,9 @@ func HandleGradeStageOne(w http.ResponseWriter, r *http.Request) {
 		_, err := tx.Exec(`
 				UPDATE Test SET
 					stageOneStatus=$1,
-				WHERE testID=$2
-			`, 3, req.TestID)
+					stageTwoStatus=$2
+				WHERE testID=$3
+			`, 3, 3, id)
 		if err != nil {
 			http.Error(w, "DB update error: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -422,8 +451,9 @@ func HandleGradeStageOne(w http.ResponseWriter, r *http.Request) {
 		_, err := tx.Exec(`
 				UPDATE Test SET
 					stageOneStatus=$1,
-				WHERE testID=$2
-			`, 4, req.TestID)
+					stageTwoStatus=$2
+				WHERE testID=$3
+			`, 4, 4, id)
 		if err != nil {
 			http.Error(w, "DB update error: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -443,78 +473,11 @@ func HandleGradeStageOne(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-type TestStageTwoGrade struct {
-	PatientID      int `json:"patientID"`
-	MemoryScore    int `json:"memoryScore"`
-	RecallScore    int `json:"recallScore"`
-	SpeakingScore  int `json:"speakingScore"`
-	FinancialScore int `json:"financialScore"`
-	MedicineScore  int `json:"medicineScore"`
-	TransportScore int `json:"transportScore"`
-}
-
-func HandleGradeStageTwo(w http.ResponseWriter, r *http.Request) {
-	var req TestStageTwoGrade
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid JSON", 400)
-		return
-	}
-
-	// Identify the correct test automatically
-	tx, err := db.Begin()
-	if err != nil {
-		http.Error(w, "Failed to start transaction: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	var testID int
-	err = tx.QueryRow(`
-        SELECT testID
-        FROM Test
-        WHERE patientID = $1
-    `, req.PatientID).Scan(&testID)
-	if err != nil {
-		http.Error(w, "No active test found for Stage Two", 404)
-		return
-	}
-
-	// Update Stage Two row
-	_, err = tx.Exec(`
-        UPDATE TestStageTwo SET
-            memoryScore=$1, recallRes=$2, speakingScore=$3,
-            financialScore=$4, medicineScore=$5, transportScore=$6
-        WHERE testID=$7
-    `, req.MemoryScore, req.RecallScore, req.SpeakingScore,
-		req.FinancialScore, req.MedicineScore, req.TransportScore,
-		testID)
-	if err != nil {
-		http.Error(w, "DB error: "+err.Error(), 500)
-		return
-	}
-
-	// Mark Stage Two complete
-	_, _ = tx.Exec(`
-        UPDATE Test SET stageTwoStatus=$1
-        WHERE testID=$2
-    `, 2, testID)
-
-	if err := tx.Commit(); err != nil {
-		http.Error(w, "Failed to commit transaction", http.StatusInternalServerError)
-		return
-	}
-
-	json.NewEncoder(w).Encode(map[string]any{
-		"message": "Stage Two graded",
-		"testID":  testID,
-	})
-}
-
-// ------------------------ Get Overall Status -----------------------------
 type TestStatus struct {
-	StageOneStatus  int  `json:"stageOneStatus"`
-	StageTwoStatus  int  `json:"stageTwoStatus"`
-	LifestyleStatus int  `json:"lifestyleStatus"`
-	SpeechStatus    bool `json:"speechStatus"`
+	StageOneStatus  int `json:"stageOneStatus"`
+	StageTwoStatus  int `json:"stageTwoStatus"`
+	LifestyleStatus int `json:"lifestyleStatus"`
+	SpeechStatus    int `json:"speechTestStatus"`
 }
 
 func HandleGetPatientTestStatus(w http.ResponseWriter, r *http.Request) {
@@ -530,85 +493,89 @@ func HandleGetPatientTestStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	row := db.QueryRow(`
-		SELECT testID, stageOneStatus, stageTwoStatus
-		FROM Test
-		WHERE patientID = $1
-		`, id)
-
 	var ts TestStatus
-	if err := row.Scan(&ts.StageOneStatus, &ts.StageTwoStatus); err != nil {
-		http.Error(w, "failed to scan test status", http.StatusInternalServerError)
-		return
-	}
 
-	row = db.QueryRow(`
-		SELECT speechTestID
-		FROM SpeechResponse
-		WHERE patientID = $1
-		`, id)
-
-	var speechTestID int
-	err = row.Scan(&speechTestID)
-	if err == sql.ErrNoRows {
-		ts.SpeechStatus = false
-	} else if err != nil {
-		ts.SpeechStatus = false
-	} else {
-		ts.SpeechStatus = true
-	}
-
-	var lifestyleStatusRead int
 	err = db.QueryRow(`
-		SELECT lifestyleStatus
-		FROM Lifestyle
-		WHERE patientID = $1
-	`, id).Scan(&lifestyleStatusRead)
-
-	if err == sql.ErrNoRows {
-		ts.LifestyleStatus = 0
-	} else if err != nil {
-		ts.LifestyleStatus = 0
-	} else {
-		ts.LifestyleStatus = lifestyleStatusRead
+        SELECT 
+            t.stageOneStatus, 
+            t.stageTwoStatus, 
+            COALESCE(l.lifestyleStatus, 0) AS lifestyleStatus, 
+            COALESCE(s.speechTestStatus, 0) AS speechTestStatus
+        FROM Test t
+        LEFT JOIN Lifestyle l ON t.patientID = l.patientID
+        LEFT JOIN SpeechTest s ON t.patientID = s.patientID
+        WHERE t.patientID = $1;
+    `, id).Scan(&ts.StageOneStatus, &ts.StageTwoStatus, &ts.LifestyleStatus, &ts.SpeechStatus)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "patient not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(ts)
 }
 
-// Set Speech
-// ------------------------ Get Overall Status -----------------------------
-type SpeechInsert struct {
-	LlmResponse string `json:"llmResponse"`
+type RiskScore struct {
+	RiskScore int `json:"riskScore"`
 }
 
-func HandleSpeechInsert(w http.ResponseWriter, r *http.Request) {
-	var req SpeechInsert
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid JSON", 400)
-		return
-	}
+type RiskStatus struct {
+	StageOneStatus  int
+	StageTwoStatus  int
+	LifestyleStatus sql.NullInt32
+	SpeechStatus    sql.NullInt32
+}
+
+func HandleGetPatientRisk(w http.ResponseWriter, r *http.Request) {
+	var rs RiskStatus
+	var score RiskScore
 
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
 		http.Error(w, "id is required", http.StatusBadRequest)
 		return
 	}
-
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		http.Error(w, "invalid id", http.StatusBadRequest)
 		return
 	}
 
-	_, err = db.Exec(`
-		INSERT INTO SpeechResponse (
-			testDate, patientID, llmResponse
-		) VALUES ($1,$2,$3)
-		`, time.Now().Format("02/01/2006"), id, req.LlmResponse)
+	err = db.QueryRow(`
+        SELECT 
+            t.stageOneStatus, 
+            t.stageTwoStatus, 
+            l.lifestyleStatus, 
+            s.speechTestStatus
+        FROM Test t
+        LEFT JOIN Lifestyle l ON t.patientID = l.patientID
+        LEFT JOIN SpeechTest s ON t.patientID = s.patientID
+        WHERE t.patientID = $1;
+    `, id).Scan(&rs.StageOneStatus, &rs.StageTwoStatus, &rs.LifestyleStatus, &rs.SpeechStatus)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if err == sql.ErrNoRows {
+			http.Error(w, "patient not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	if rs.StageOneStatus == 2 {
+		score.RiskScore++
+	}
+	if rs.StageTwoStatus == 2 {
+		score.RiskScore++
+	}
+	if rs.LifestyleStatus.Valid && rs.LifestyleStatus.Int32 == 2 {
+		score.RiskScore++
+	}
+	if rs.SpeechStatus.Valid && rs.SpeechStatus.Int32 == 2 {
+		score.RiskScore++
+	}
+	json.NewEncoder(w).Encode(score)
 }

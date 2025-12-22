@@ -10,7 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.json.JSONArray
+import org.json.JSONObject
 import java.net.URLEncoder
 import java.net.URL
 
@@ -22,8 +22,8 @@ class ContactVM @Inject constructor(
     var isLoading = false
         private set
 
-    val dummyClinic = Clinic(
-        id = 1,
+    private val dummyClinic = Clinic(
+        clinicID = 1,
         name = "Greenwood Health Center",
         phone = "01234 567890",
         county = "Dublin",
@@ -55,42 +55,32 @@ class ContactVM @Inject constructor(
             }
         }
     }
-
     private fun geocodeEircode(eircode: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                // Encode eircode for URL
                 val encoded = URLEncoder.encode("$eircode, Ireland", "UTF-8")
-                val url = "https://nominatim.openstreetmap.org/search?format=json&q=$encoded"
+                val url = "https://geocode.search.hereapi.com/v1/geocode?q=$encoded&apiKey=p2of8s3Sclzoqcwxvy2a9i7X4A_H_HgaZzZLD-Xo1lQ&country=IRL"
 
-                // Open connection with proper User-Agent
                 val connection = URL(url).openConnection() as java.net.HttpURLConnection
-                connection.setRequestProperty(
-                    "User-Agent",
-                    "DementiaDetectorApp/1.0 (youremail@example.com)"
-                )
+                connection.setRequestProperty("User-Agent", "DementiaDetectorApp/1.0")
                 connection.connectTimeout = 5000
                 connection.readTimeout = 5000
 
-                // Read response
                 val response = connection.inputStream.bufferedReader().readText()
-                val jsonArray = JSONArray(response)
+                val jsonObject = JSONObject(response)
+                val items = jsonObject.getJSONArray("items")
 
-                // Parse coordinates if available
-                if (jsonArray.length() > 0) {
-                    val first = jsonArray.getJSONObject(0)
-                    val lat = first.getString("lat").toDouble()
-                    val lon = first.getString("lon").toDouble()
+                if (items.length() > 0) {
+                    val first = items.getJSONObject(0)
+                    val position = first.getJSONObject("position")
+                    val lat = position.getDouble("lat")
+                    val lon = position.getDouble("lng")
                     _coords.value = lat to lon
                 } else {
-                    // fallback to Dublin city center
-                    _coords.value = 53.349805 to -6.26031
+                    _coords.value = null
                 }
-
             } catch (e: Exception) {
-                e.printStackTrace()
-                // fallback coords on error
-                _coords.value = 53.349805 to -6.26031
+                _coords.value = null
             }
         }
     }
