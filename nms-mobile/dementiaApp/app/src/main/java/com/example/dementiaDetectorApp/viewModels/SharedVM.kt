@@ -1,13 +1,12 @@
 package com.example.dementiaDetectorApp.viewModels
 
-import android.accounts.Account
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dementiaDetectorApp.api.clinics.ClinicRepository
+import com.example.dementiaDetectorApp.R
 import com.example.dementiaDetectorApp.api.tests.StatusRequest
 import com.example.dementiaDetectorApp.api.tests.TestRepository
 import com.example.dementiaDetectorApp.api.tests.TestResult
@@ -19,7 +18,6 @@ import jakarta.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlin.enums.enumEntries
 
 @HiltViewModel
 class SharedVM @Inject constructor(
@@ -39,29 +37,33 @@ class SharedVM @Inject constructor(
         Log.d("Id change", "${_id.intValue}")
     }
 
+    private val _hasPaid = mutableStateOf(false)
+    val hasPaid:State<Boolean> = _hasPaid
+    fun PaidChange(){_hasPaid.value = !_hasPaid.value}
+
     //NavBar
     val nav = listOf(
         NavBarContent(
             title = "Home",
-            iconId = 0,
+            iconId = R.drawable.home,
             "home"
         ),
 
         NavBarContent(
             title = "Test Status",
-            iconId = 0,
+            iconId = R.drawable.test,
             "status"
         ),
 
         NavBarContent(
             title = "Risk Assessment",
-            iconId = 0,
+            iconId = R.drawable.ra,
             "risk"
         ),
 
         NavBarContent(
             title = "Contact",
-            iconId = 0,
+            iconId = R.drawable.contact,
             "contact"
         )
     )
@@ -76,8 +78,6 @@ class SharedVM @Inject constructor(
     //Tests
     private val _tests = mutableStateOf<List<Test>>(emptyList())
     val tests: State<List<Test>> = _tests
-
-    private val questionnaireStatus = mutableIntStateOf(0)
 
     fun CheckCompleted(route:String, todo: () -> Unit) {
         when (route){
@@ -115,19 +115,20 @@ class SharedVM @Inject constructor(
         }
     }
 
+    private val questionnaireStatus = mutableIntStateOf(0)
     private val stage1Status = mutableIntStateOf(0)
     private val stage2Status = mutableIntStateOf(0)
     private val speechStatus = mutableIntStateOf(0)
 
-    private fun getStatus(){
+    fun getStatus(){
         viewModelScope.launch{
             isLoading = true
             val result = repository.getStatus(StatusRequest(id.value))
-            questionnaireStatus.intValue = result.data?.LifestyleStatus?:0
-            stage1Status.intValue = result.data?.StageOneStatus?:0
-            stage2Status.intValue = result.data?.StageTwoStatus?:0
-            val speechVal = result.data?.SpeechStatus?:false
-            if (speechVal){speechStatus.intValue=2}else speechStatus.intValue=0
+            questionnaireStatus.intValue = result.data?.lifestyleStatus?:0
+            stage1Status.intValue = result.data?.stageOneStatus?:0
+            stage2Status.intValue = result.data?.stageTwoStatus?:0
+            speechStatus.intValue = result.data?.speechTestStatus?:0
+            Log.d("Stage1 Status", stage1Status.intValue.toString())
         }
     }
 
@@ -154,10 +155,44 @@ class SharedVM @Inject constructor(
 
             Test(
                 name = "Speech Test",
-                route = "test2",
+                route = "speech",
                 state = speechStatus.intValue,
             )
         )
         _tests.value = testList
+    }
+
+    private val _riskScore = mutableIntStateOf(0)
+    val riskScore:State<Int> = _riskScore
+    fun getRiskScore():Int{return _riskScore.intValue}
+
+    fun onTestSubmission(idx: Int){
+        _tests.value[idx].state = 1
+        var riskScore = 0
+        for (test in _tests.value){
+            riskScore += getTestScore(test.state)
+        }
+    }
+
+    private fun getTestScore(state:Int):Int{
+        when (state){
+            2 ->{return 1}     //Graded - Fail/=?
+            3 -> {return 1}
+            4 -> {return 1}
+            5 -> {return 1}
+            else -> {return 0} //Not done
+        }
+    }
+
+    fun getTestsDone():Int{
+        var count=0
+        for (test in _tests.value){
+            if(test.state>1){count++}
+        }
+        return count
+    }
+
+    init {
+        getStatus()
     }
 }

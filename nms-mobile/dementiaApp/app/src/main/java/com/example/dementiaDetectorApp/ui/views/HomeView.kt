@@ -57,7 +57,7 @@ import com.example.dementiaDetectorApp.viewModels.SharedVM
 
 @Composable
 fun HomeScreen(homeVM: HomeVM, sharedVM: SharedVM, nc: NavController){
-    homeVM.countTestsDone(sharedVM.tests.value)
+    sharedVM.updateTestList()
     Box(modifier = Modifier
         .background(Color.White)
         .fillMaxSize()
@@ -68,7 +68,7 @@ fun HomeScreen(homeVM: HomeVM, sharedVM: SharedVM, nc: NavController){
             HeaderPrompts(sharedVM, nc)
             NewsSection(homeVM)
         }
-        FeedbackPanel(homeVM, sharedVM)
+        FeedbackPanel(homeVM,sharedVM)
         ReusableToast()
         NavMenu(
             sharedVM = sharedVM,

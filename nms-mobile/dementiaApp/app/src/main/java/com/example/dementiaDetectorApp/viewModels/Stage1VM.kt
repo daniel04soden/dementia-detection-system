@@ -35,7 +35,7 @@ class Stage1VM @Inject constructor(
 
     fun visiTimer(){
         viewModelScope.launch {
-            delay(1_000L)
+            delay(10_000L)
             onTimedVisiChange(false)
             onQ1VisiChange(true)
         }
@@ -145,7 +145,7 @@ class Stage1VM @Inject constructor(
     }
 
     // Submit function - matches AuthViewModel pattern with Channel results and loading state
-    fun submitAnswers(patientID: Int) {
+    fun submitAnswers(patientID: Int, todo:() -> Unit) {
         viewModelScope.launch {
             isLoading = true
 
@@ -166,6 +166,7 @@ class Stage1VM @Inject constructor(
                     Log.d("Stage1VM", "Submit success: $result")
                     onQ4VisiChange(false)
                     onSuccessChange(true)
+                    todo()
                 }
                 is TestResult.Unauthorized -> {
                     Log.d("Stage1VM", "Submit unauthorized: $result")

@@ -7,16 +7,15 @@ data class LifestyleRequest(
     val age: Int,
     val dominantHand: Int,
     val familyHistory: Int,
-    val cumulativePrimary: String,
-    val cumulativeSecondary: String,
-    val cumulativeDegree: String,
+
+    val education: String,
 
     // S2: Medical / Measurements
     val weight: Float,
     val bodyTemperature: Float,
     val heartRate: Int,
     val bloodOxygen: Float,
-    val apoeE4: Int,
+    val apoe4: Int,
     val diabetic: Int,
     val alcoholLevel: Float,
     val bloodPressure: Int,

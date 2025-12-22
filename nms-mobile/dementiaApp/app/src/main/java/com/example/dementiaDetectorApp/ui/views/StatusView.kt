@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -125,8 +126,13 @@ private fun TestSection(sharedVM: SharedVM, nc: NavController){
         .padding(bottom = 100.dp),
         verticalArrangement = Arrangement.spacedBy(35.dp)
     ){
-        for (test in sharedVM.tests.value){
-            TestCard(test, sharedVM, nc)
+        LazyColumn(
+            Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(35.dp)
+        ){
+            items(sharedVM.tests.value.size){idx ->
+                TestCard(sharedVM.tests.value[idx], sharedVM, nc)
+            }
         }
     }
 }

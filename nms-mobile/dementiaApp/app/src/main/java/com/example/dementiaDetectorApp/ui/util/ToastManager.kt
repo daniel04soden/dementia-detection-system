@@ -16,7 +16,7 @@ object ToastManager {
     val isVisible: StateFlow<Boolean> = _isVisible.asStateFlow()
 
     fun showToast(str: String) {
-        _message.value = "$str has already been completed"
+        _message.value = str
         _isVisible.value = true
         CoroutineScope(Dispatchers.Main).launch {
             delay(2000)

@@ -57,7 +57,7 @@ class TestRepoImp(
     override suspend fun reportStage2(
         patientID: Int,
         memoryScore: Int,
-        recallRes: Int,
+        recallScore: Int,
         speakingScore: Int,
         financialScore: Int,
         medicineScore: Int,
@@ -72,7 +72,7 @@ class TestRepoImp(
                 Stage2Request(
                     patientID = patientID,
                     memoryScore = memoryScore,
-                    recallRes = recallRes,
+                    recallScore = recallScore,
                     speakingScore = speakingScore,
                     financialScore = financialScore,
                     medicineScore = medicineScore,
@@ -119,20 +119,31 @@ class TestRepoImp(
             val token = prefs.getString("jwt", null)
                 ?: return StatusResult.Unauthorized()
 
-            val response = api.getStatus("Bearer $token", request.toString())
+            val response = api.getStatus("Bearer $token", request.id.toString())
 
             if (response.isSuccessful && response.body() != null) {
+                Log.d("Status Call", "Success")
                 StatusResult.Authorized(response.body()!!)
             } else if (response.code() == 401) {
+                Log.d("Status Call", "401 fail")
                 StatusResult.Unauthorized()
             } else {
+                Log.d("Status Call", "unknown fail")
                 StatusResult.UnknownError()
             }
         } catch (e: HttpException) {
-            if (e.code() == 401) StatusResult.Unauthorized() else StatusResult.UnknownError()
+            if (e.code() == 401){
+                Log.d("Status Call", "401 fail")
+                StatusResult.Unauthorized()
+            } else {
+                Log.d("Status Call", "Unknown fail")
+                StatusResult.UnknownError()
+            }
         } catch (e: UnknownHostException) {
+            Log.d("Status Call", "Unknown host exception")
             StatusResult.UnknownError()
         } catch (e: Exception) {
+            Log.d("Status Call", "${e.message}")
             StatusResult.UnknownError()
         }
     }

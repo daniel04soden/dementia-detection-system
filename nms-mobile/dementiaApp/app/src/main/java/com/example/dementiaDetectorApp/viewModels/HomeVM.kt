@@ -63,6 +63,7 @@ class HomeVM @Inject constructor(
     fun onFeedbackVisiChange(){_feedbackVisi.value = !_feedbackVisi.value}
 
     private val _testsDone = mutableIntStateOf(0)
+
     fun countTestsDone(tests:List<Test>){
         var count=0
         for (test in tests){
@@ -75,10 +76,10 @@ class HomeVM @Inject constructor(
     }
 
     private fun checkReviewConditions(){
-            val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-            val reviewAsked = prefs.getBoolean("review_asked", false)
-            Log.d("RevAsked", "$reviewAsked")
-            if (_testsDone.intValue>2 && !reviewAsked){onFeedbackVisiChange()}
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val reviewAsked = prefs.getBoolean("review_asked", false)
+        Log.d("RevAsked", "$reviewAsked")
+        if (_testsDone.intValue>-2 && !reviewAsked){onFeedbackVisiChange()}
     }
 
     fun submitReview(id:Int){
@@ -92,7 +93,11 @@ class HomeVM @Inject constructor(
             if (result is FeedbackResult.Authorized){
                 onFeedbackVisiChange()
                 val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-                prefs.edit { putBoolean("review_asked", true) }
+                prefs.edit {
+                    putBoolean("review_asked", true)
+                    apply()
+                    checkReviewConditions()
+                }
                 Log.d("Review submit", "Prefs edited")
             }
         }
@@ -100,6 +105,5 @@ class HomeVM @Inject constructor(
 
     init {
         getNews()
-        checkReviewConditions()
     }
 }

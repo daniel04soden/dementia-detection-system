@@ -1,5 +1,6 @@
 package com.example.dementiaDetectorApp.ui.views
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,15 +25,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.ui.composables.ClinicDropdown
 import com.example.dementiaDetectorApp.ui.composables.CountyDropdown
+import com.example.dementiaDetectorApp.ui.composables.ReusableToast
 import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.ui.theme.buttonColours
 import com.example.dementiaDetectorApp.ui.theme.outLinedTFColours
+import com.example.dementiaDetectorApp.ui.util.ToastManager
 import com.example.dementiaDetectorApp.viewModels.AuthViewModel
 import com.example.dementiaDetectorApp.viewModels.SharedVM
 
@@ -48,6 +52,7 @@ fun RegistrationScreen(aVM: AuthViewModel, sharedVM: SharedVM, nc: NavController
             Spacer(Modifier.height(35.dp))
             FormSection(aVM, sharedVM, nc)
         }
+        ReusableToast(alignment = Alignment.BottomCenter)
     }
 }
 
@@ -208,6 +213,12 @@ private fun Section1(aVM: AuthViewModel){
                     if(aVM.validateS1()){
                         aVM.onS1VisiChange(false)
                         aVM.onS2VisiChange(true)
+                    }else{
+                        if(!aVM.validateEircode()){
+                            ToastManager.showToast("Invalid Eircode entry")
+                        }else{
+                            ToastManager.showToast("Invalid phone number")
+                        }
                     }
                 },
                 colors = buttonColours(),
@@ -277,8 +288,8 @@ private fun Section2(aVM: AuthViewModel){
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
         }
+        Spacer(Modifier.height(15.dp))
 
-        Spacer(Modifier.height(10.dp))
         val pswd = aVM.pswd.collectAsState().value
         Text(
             text = "Password",
@@ -324,6 +335,18 @@ private fun Section2(aVM: AuthViewModel){
             )
         }
 
+        Spacer(Modifier.height(35.dp))
+
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+            Text(
+                text = "Your password must be at least 8 characters long\n\nIn addition to this it must contain 1 uppercase and 1 lowercase letter, 1 number, and 1 special character.",
+                fontSize = 18.sp,
+                color = MidPurple,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(start = 15.dp, end = 15.dp)
+            )
+        }
+
         Row(modifier = Modifier
             .fillMaxSize(),
             verticalAlignment = Alignment.Bottom,
@@ -334,6 +357,16 @@ private fun Section2(aVM: AuthViewModel){
                     if(aVM.validateS2()){
                         aVM.onS2VisiChange(false)
                         aVM.onS3VisiChange(true)
+                    }else{
+                        if(!aVM.validateEmail()){
+                            ToastManager.showToast("Invalid email address")
+                        }
+                        else if(aVM.pswd.value != aVM.confPswd.value){
+                            ToastManager.showToast("Passwords do not match")
+                        }
+                        else{
+                            ToastManager.showToast("Invalid password")
+                        }
                     }
                 },
                 colors = buttonColours(),
@@ -408,7 +441,7 @@ private fun Section3(aVM: AuthViewModel, sharedVM: SharedVM, nc: NavController){
             selectedClinicId = selectedClinic,
             onClinicSelected = {clinic -> aVM.onClinicChange(clinic)},
             modifier = Modifier.padding(horizontal = 50.dp)
-            )
+        )
 
         Spacer(Modifier.height(10.dp))
 
@@ -419,9 +452,13 @@ private fun Section3(aVM: AuthViewModel, sharedVM: SharedVM, nc: NavController){
         ){
             Button(
                 onClick = {
-                    val id = aVM.signUp{nc.navigate("login")}
-                    sharedVM.onIdChange(id)
-                    sharedVM.updateTestList()
+                    if (aVM.clinic.value != -1){
+                        val id = aVM.signUp{nc.navigate("login")}
+                        sharedVM.onIdChange(id)
+                        sharedVM.getStatus()
+                    }else{
+                        ToastManager.showToast("Please pick a clinic")
+                    }
                 },
                 colors = buttonColours(),
                 shape = RoundedCornerShape(24.dp),

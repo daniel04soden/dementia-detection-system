@@ -8,13 +8,13 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface TestAPI {
-    @POST("mobile/stage1/insert")
+    @POST("mobile/stageone/insert")
     suspend fun reportStage1(
         @Header("Authorization") token: String,
         @Body body: Stage1Request
     ): Response<Unit>
 
-    @POST("mobile/stage2/insert")
+    @POST("mobile/stagetwo/insert")
     suspend fun reportStage2(
         @Header("Authorization") token: String,
         @Body body: Stage2Request

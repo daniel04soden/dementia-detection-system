@@ -45,12 +45,12 @@ fun TestPrompt(
         Box(
             modifier = Modifier
                 .size(50.dp)
-                .background(LightPurple)//CHANGE
+                .background(LightPurple)
                 .padding(5.dp),
             contentAlignment = Alignment.Center
         ){
             Icon(
-                painter = painterResource(R.drawable.logo),
+                painter = painterResource(R.drawable.todo),
                 contentDescription = "Test Icon",
                 Modifier.size(30.dp)
             )
