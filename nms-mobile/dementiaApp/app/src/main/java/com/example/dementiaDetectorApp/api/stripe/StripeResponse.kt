@@ -1,5 +1,5 @@
 package com.example.dementiaDetectorApp.api.stripe
 
 data class StripeResponse(
-    val clientSecret: String
+    val url: String
 )

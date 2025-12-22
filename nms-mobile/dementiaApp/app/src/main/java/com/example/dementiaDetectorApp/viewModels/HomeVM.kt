@@ -13,7 +13,6 @@ import com.example.dementiaDetectorApp.api.feedback.FeedbackResult
 import com.example.dementiaDetectorApp.api.news.NewsRepo
 import com.example.dementiaDetectorApp.api.news.NewsResult
 import com.example.dementiaDetectorApp.models.NewsPiece
-import com.example.dementiaDetectorApp.models.Test
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
@@ -26,7 +25,8 @@ class HomeVM @Inject constructor(
     private val newsRepo: NewsRepo,
     private val feedbackRepo: FeedbackRepo,
     @ApplicationContext private val context: Context
-): ViewModel(){
+): ViewModel() {
+
     private val newsResChannel = Channel<NewsResult<Unit>>()
     val newsResults = newsResChannel.receiveAsFlow()
 
@@ -38,72 +38,63 @@ class HomeVM @Inject constructor(
     private val _fName = mutableStateOf("")
     val fName: State<String> = _fName
 
-    //News Pieces
+    // News Pieces
     private val _news = mutableStateOf<List<NewsPiece>>(emptyList())
     val news: State<List<NewsPiece>> = _news
 
-    private fun getNews(){
-        viewModelScope.launch{
-            isLoading=true
-            _news.value = newsRepo.getNews().data?: emptyList()
+    private fun getNews() {
+        viewModelScope.launch {
+            isLoading = true
+            _news.value = newsRepo.getNews().data ?: emptyList()
         }
     }
 
-    //Ratings
+    // Ratings
     private val _rating = mutableIntStateOf(0)
     val rating: State<Int> = _rating
-    fun onRatingChange(newRating: Int){_rating.intValue = newRating}
+    fun onRatingChange(newRating: Int) { _rating.intValue = newRating }
 
     private val _feedback = mutableStateOf("")
     val feedback: State<String> = _feedback
-    fun onFeedbackChange(newFeedback:String){_feedback.value = newFeedback}
+    fun onFeedbackChange(newFeedback: String) { _feedback.value = newFeedback }
 
     private val _feedbackVisi = mutableStateOf(false)
     val feedbackVisi: State<Boolean> = _feedbackVisi
-    fun onFeedbackVisiChange(){_feedbackVisi.value = !_feedbackVisi.value}
+    fun onFeedbackVisiChange(newVisi: Boolean) { _feedbackVisi.value = newVisi }
+
+    // REVIEW FLAG
+    private val _reviewAsked = mutableStateOf(false)
+    val reviewAsked: State<Boolean> = _reviewAsked
 
     private val _testsDone = mutableIntStateOf(0)
 
-    fun countTestsDone(tests:List<Test>){
-        var count=0
-        for (test in tests){
-            if (test.state!=0){
-                count++
-            }
-        }
-        _testsDone.intValue=count
-        Log.d("Test count", "${_testsDone.intValue}")
-    }
-
-    private fun checkReviewConditions(){
-        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        val reviewAsked = prefs.getBoolean("review_asked", false)
-        Log.d("RevAsked", "$reviewAsked")
-        if (_testsDone.intValue>-2 && !reviewAsked){onFeedbackVisiChange()}
-    }
-
-    fun submitReview(id:Int){
-        viewModelScope.launch{
-            isLoading=true
+    fun submitReview(id: Int) {
+        viewModelScope.launch {
+            isLoading = true
             val result = feedbackRepo.submitReview(
                 id = id.toString(),
                 score = _rating.intValue,
                 critique = _feedback.value,
             )
-            if (result is FeedbackResult.Authorized){
-                onFeedbackVisiChange()
+            if (result is FeedbackResult.Authorized) {
+                onFeedbackVisiChange(false)
                 val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
                 prefs.edit {
                     putBoolean("review_asked", true)
                     apply()
-                    checkReviewConditions()
                 }
-                Log.d("Review submit", "Prefs edited")
+                _reviewAsked.value = true
+                Log.d("Review submit", "Prefs edited and reviewAsked set")
             }
         }
     }
 
     init {
+        // Load review flag from shared prefs
+        viewModelScope.launch {
+            val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+            _reviewAsked.value = prefs.getBoolean("review_asked", false)
+        }
         getNews()
     }
 }

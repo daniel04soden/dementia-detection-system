@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
@@ -30,14 +32,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dementiaDetectorApp.R
 import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.LightPurple
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
+import com.example.dementiaDetectorApp.ui.theme.Yellow
+import com.example.dementiaDetectorApp.ui.util.ToastManager
 import com.example.dementiaDetectorApp.viewModels.HomeVM
 import com.example.dementiaDetectorApp.viewModels.SharedVM
 
@@ -122,7 +129,7 @@ fun FeedbackPanel(
                 Button(
                     onClick = {
                         homeVM.submitReview(sharedVM.id.value)
-                        homeVM.onFeedbackVisiChange()
+                        homeVM.onFeedbackVisiChange(false)
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White
@@ -141,7 +148,7 @@ fun FeedbackPanel(
                 }
                 Button(
                     onClick = {
-                        homeVM.onFeedbackVisiChange()
+                        homeVM.onFeedbackVisiChange(false)
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White
@@ -179,6 +186,52 @@ private fun StarRatingBar(
                     .clickable { homeVM.onRatingChange(index + 1)},
                 tint = if (index < homeVM.rating.value) Color(0xFFFFD700) else Color.LightGray
             )
+        }
+    }
+}
+
+@Composable
+fun ReviewPrompt(homeVM: HomeVM)
+{
+    Row(modifier = Modifier
+        .padding(15.dp)
+        .clip(RoundedCornerShape(10.dp))
+        .background(MidPurple)//CHANGE
+        .padding(horizontal = 15.dp , vertical = 20.dp)
+        .clickable {
+            if(homeVM.reviewAsked.value==false){ homeVM.onFeedbackVisiChange(true)}
+                   else{
+                       ToastManager.showToast("You have already submitted a review")
+                   }},
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(20.dp)
+    ){
+        Box(
+            modifier = Modifier
+                .size(50.dp)
+                .background(LightPurple)
+                .padding(5.dp),
+            contentAlignment = Alignment.Center
+        ){
+            Icon(
+                imageVector = Icons.Default.Star,
+                tint = DarkPurple,
+                contentDescription = "Test Icon",
+                modifier = Modifier.size(30.dp)
+            )
+        }
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            Text(
+                text = "Leave a Review",
+                color = Color.White
+            )
+
+            Text("")
         }
     }
 }

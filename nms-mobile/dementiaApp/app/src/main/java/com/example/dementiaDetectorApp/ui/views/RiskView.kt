@@ -1,22 +1,13 @@
 package com.example.dementiaDetectorApp.ui.views
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,7 +27,13 @@ import com.example.dementiaDetectorApp.viewModels.SharedVM
 
 @Composable
 fun RiskScreen(rVM: RiskVM, sharedVM: SharedVM, nc: NavController) {
-    rVM.onRiskChange(sharedVM.getRiskScore())
+
+    val score = sharedVM.riskScore.value
+
+    LaunchedEffect(score) {
+        rVM.onRiskChange(score)
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -68,7 +65,7 @@ private fun HeaderSection() {
     ) {
         Icon(
             painter = painterResource(R.drawable.logo),
-            contentDescription = "Logo",
+            contentDescription = null,
             tint = Color.Unspecified,
             modifier = Modifier.height(45.dp)
         )
@@ -82,79 +79,55 @@ private fun HeaderSection() {
 @Composable
 private fun ImageSection(rVM: RiskVM) {
     val img = rVM.img.collectAsState().value
+    Image(
+        painter = painterResource(img),
+        contentDescription = null,
+        modifier = Modifier
+            .padding(horizontal = 15.dp)
+            .fillMaxWidth()
+            .fillMaxHeight(0.35f),
+        contentScale = ContentScale.FillBounds
+    )
+}
+
+@Composable
+private fun RiskBreakdownSection(rVM: RiskVM) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(15.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
-        Image(
-            painter = painterResource(img),
-            contentDescription = "Image to describe",
-            modifier = Modifier
-                .padding(horizontal = 15.dp)
-                .fillMaxWidth()
-                .fillMaxHeight(0.35f),
-            contentScale = ContentScale.FillBounds
+        Text(
+            text = rVM.riskResult.value,
+            fontSize = 27.5.sp,
+            fontWeight = FontWeight.Bold,
+            color = DarkPurple
+        )
+        HorizontalDivider(thickness = 2.dp, color = MidPurple)
+        Text(
+            text = rVM.riskMsg.value,
+            fontSize = 22.5.sp,
+            fontWeight = FontWeight.Medium,
+            color = MidPurple
         )
     }
 }
 
 @Composable
-private fun RiskBreakdownSection(rVM: RiskVM){
-   Column(modifier = Modifier
-       .fillMaxWidth()
-       .padding(top = 15.dp)
-       .padding(horizontal = 15.dp),
-       horizontalAlignment = Alignment.CenterHorizontally,
-       verticalArrangement = Arrangement.spacedBy(15.dp)
-   ){
-       Text(
-          text=rVM.riskResult.value,
-          fontSize = 27.5.sp,
-          fontWeight = FontWeight.Bold,
-          color = DarkPurple,
-          lineHeight = 37.5.sp
-       )
-       HorizontalDivider(
-           thickness = 2.dp,
-           color = MidPurple,
-       )
-
-       Text(
-           text=rVM.riskMsg.value,
-           fontSize = 22.5.sp,
-           fontWeight = FontWeight.Medium,
-           color = MidPurple,
-           lineHeight = 30.sp
-       )
-   }
-}
-
-@Composable
-private fun TestCountSection(sharedVM: SharedVM){
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(top = 35.dp)
-        .padding(horizontal = 15.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ){
-        if(sharedVM.getTestsDone()==4){
-            Text(
-                text = "You have completed all the tests",
-                fontSize = 22.5.sp,
-                fontWeight = FontWeight.Medium,
-                color = DarkPurple,
-                lineHeight = 30.sp
-            )
-        }
-        else {
-            Text(
-                text = "You have completed ${sharedVM.getTestsDone()}/4 tests.\nThe more tests you complete the more accurate the results.",
-                fontSize = 22.5.sp,
-                fontWeight = FontWeight.Medium,
-                color = DarkPurple,
-                lineHeight = 30.sp
-            )
-        }
-    }
+private fun TestCountSection(sharedVM: SharedVM) {
+    val done = sharedVM.testsDone.value
+    Text(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(15.dp),
+        text = if (done == 4)
+            "You have completed all the tests"
+        else
+            "You have completed $done/4 tests.\nThe more tests you complete the more accurate the results.",
+        fontSize = 22.5.sp,
+        fontWeight = FontWeight.Medium,
+        color = DarkPurple
+    )
 }
