@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -11,6 +12,30 @@ import (
 
 	"nms-server/server/internal/auth"
 )
+
+type LifestyleItem struct {
+	Diabetic                int
+	AlcoholLevel            float64
+	HeartRate               int
+	BloodOxygen             float64
+	BodyTemperature         float64
+	Weight                  float64
+	MRIDelay                float64
+	Age                     int
+	DominantHand            int
+	Gender                  int
+	FamilyHistory           int
+	Smoked                  int
+	APOE4                   int
+	PhysicalActivity        string
+	DepressionStatus        int
+	CognitiveTestScores     int
+	MedicationHistory       int
+	NutritionDiet           string
+	SleepQuality            int
+	ChronicHealthConditions string
+	Education               string
+}
 
 type LifestyleInsert struct {
 	PatientID               int     `json:"patientID"`
@@ -171,30 +196,29 @@ type AnswersAnalyse struct {
 }
 
 type LifestyleAIAnalyse struct {
-	Diabetic                int     `json:"diabetic"`
-	AlcoholLevel            float64 `json:"alcoholLevel"`
-	HeartRate               int     `json:"heartRate"`
-	BloodOxygen             float64 `json:"bloodOxygen"`
-	BodyTemperature         float64 `json:"bodyTemperature"`
-	Weight                  float64 `json:"weight"`
-	MRIDelay                float64 `json:"mriDelay"`
-	Age                     int     `json:"age"`
-	DominantHand            int     `json:"dominantHand"`
-	Gender                  int     `json:"gender"`
-	FamilyHistory           int     `json:"familyHistory"`
-	Smoked                  int     `json:"smoked"`
-	APOE4                   int     `json:"apoe4"`
-	PhysicalActivity        string  `json:"physicalActivity"`
-	DepressionStatus        int     `json:"depressionStatus"`
-	CognitiveTestScores     int     `json:"cognitiveTestScores"`
-	MedicationHistory       int     `json:"medicationHistory"`
-	NutritionDiet           string  `json:"nutritionDiet"`
-	SleepQuality            int     `json:"sleepQuality"`
-	ChronicHealthConditions string  `json:"chronicHealthConditions"`
-	CumulativePrimary       string  `json:"cumulativePrimary"`
-	CumulativeSecondary     string  `json:"cumulativeSecondary"`
-	CumulativeDegree        string  `json:"cumulativeDegree"`
-	DementiaStatus          string  `json:"dementiaStatus"`
+	Diabetic                int     `json:"Diabetic"`
+	AlcoholLevel            float64 `json:"AlcoholLevel"`
+	HeartRate               int     `json:"HeartRate"`
+	BloodOxygen             float64 `json:"BloodOxygen"`
+	BodyTemperature         float64 `json:"BodyTemperature"`
+	Weight                  float64 `json:"Weight"`
+	MRIDelay                float64 `json:"MRI_Delay"`
+	Age                     int     `json:"Age"`
+	DominantHand            int     `json:"Dominant_Hand"`
+	Gender                  int     `json:"Gender"`
+	FamilyHistory           int     `json:"Family_History"`
+	Smoked                  int     `json:"Smoked"`
+	APOE4                   int     `json:"Dementia_gene"`
+	PhysicalActivity        string  `json:"Physical_Activity"`
+	DepressionStatus        int     `json:"Depression_Status"`
+	CognitiveTestScores     int     `json:"Cognitive_Test_Scores"`
+	MedicationHistory       int     `json:"Medication_History"`
+	NutritionDiet           string  `json:"Nutrition_Diet"`
+	SleepQuality            int     `json:"Sleep_Quality"`
+	ChronicHealthConditions string  `json:"Chronic_Health_Conditions"`
+	CumulativePrimary       string  `json:"Cumulative_Primary"`
+	CumulativeSecondary     string  `json:"Cumulative_Secondary"`
+	CumulativeDegree        string  `json:"Cumulative_Degree"`
 }
 
 func HandleAIReviewLifestyle(w http.ResponseWriter, r *http.Request) {
@@ -202,12 +226,15 @@ func HandleAIReviewLifestyle(w http.ResponseWriter, r *http.Request) {
 	var token string
 	token, ok := strings.CutPrefix(authHeader, "Bearer ")
 	if !ok {
+		fmt.Println("cant cut prefix")
 		http.Error(w, "Missing or invalid Authorization header", http.StatusUnauthorized)
 		return
 	}
 
 	claims, err := auth.ValidateJWT(token)
 	if err != nil {
+
+		fmt.Println("expired token")
 		http.Error(w, "Invalid or expired token", http.StatusUnauthorized)
 		return
 	}
@@ -222,6 +249,8 @@ func HandleAIReviewLifestyle(w http.ResponseWriter, r *http.Request) {
 
 	err = row.Scan(&premium)
 	if err != nil {
+
+		fmt.Println("cant scan if premium" + err.Error())
 		http.Error(w, "failed to scan patient", http.StatusInternalServerError)
 		return
 	}
@@ -230,22 +259,107 @@ func HandleAIReviewLifestyle(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Access not allowed", http.StatusUnauthorized)
 	}
 
-	var ls LifestyleAIAnalyse
+	var ls LifestyleItem
 
 	row = db.QueryRow(`
 		SELECT diabetic, alcoholLevel,
 		heartRate, bloodOxygen, bodyTemperature, weight, MRIDelay,
-		age, dominantHand, gender, familyHistory, smoked, apoe4, physicalActivity,
+		age, dominantHand, gender, familyHistory, smoked, apoe, physicalActivity,
 		depressionStatus, cognitiveTestScores, medicationHistory, nutritionDiet,
-		sleepQuality 
+		sleepQuality, chronicHealthConditions, education
 		FROM Lifestyle 
 		WHERE patientID = $1
 		`, claims.UserID)
-	err = row.Scan(ls.Diabetic, ls.AlcoholLevel, ls.HeartRate, ls.BloodOxygen, ls.BodyTemperature, ls.Weight,
-		ls.MRIDelay, ls.Age, ls.DominantHand, ls.Gender, ls.FamilyHistory, ls.Smoked, ls.APOE4, ls.PhysicalActivity,
-		ls.DepressionStatus, ls.CognitiveTestScores, ls.MedicationHistory, ls.NutritionDiet, ls.SleepQuality, ls.ChronicHealthConditions)
+	err = row.Scan(&ls.Diabetic, &ls.AlcoholLevel, &ls.HeartRate, &ls.BloodOxygen, &ls.BodyTemperature, &ls.Weight,
+		&ls.MRIDelay, &ls.Age, &ls.DominantHand, &ls.Gender, &ls.FamilyHistory, &ls.Smoked, &ls.APOE4, &ls.PhysicalActivity,
+		&ls.DepressionStatus, &ls.CognitiveTestScores, &ls.MedicationHistory, &ls.NutritionDiet, &ls.SleepQuality, &ls.ChronicHealthConditions, &ls.Education)
 	if err != nil {
+		fmt.Println("cant scan from db" + err.Error())
 		http.Error(w, "failed to scan lifestyle", http.StatusInternalServerError)
+		return
+	}
+
+	cumulativePrimary := "FALSE"
+	cumulativeSecondary := "FALSE"
+	cumulativeDegree := "FALSE"
+
+	switch ls.Education {
+	case "Primary":
+		cumulativePrimary = "TRUE"
+	case "Secondary":
+		cumulativePrimary = "TRUE"
+		cumulativeSecondary = "TRUE"
+	case "Tertiary Level":
+		cumulativePrimary = "TRUE"
+		cumulativeSecondary = "TRUE"
+		cumulativeDegree = "TRUE"
+	default:
+
+		fmt.Println("Education is wrong")
+		http.Error(w, "Incorrect education", http.StatusInternalServerError)
+		return
+	}
+
+	var lsAI LifestyleAIAnalyse
+
+	lsAI.Diabetic = ls.Diabetic
+	lsAI.AlcoholLevel = ls.AlcoholLevel
+	lsAI.HeartRate = ls.HeartRate
+	lsAI.BloodOxygen = ls.BloodOxygen
+	lsAI.BodyTemperature = ls.BodyTemperature
+	lsAI.Weight = ls.Weight
+	lsAI.MRIDelay = ls.MRIDelay
+	lsAI.Age = ls.Age
+	lsAI.DominantHand = ls.DominantHand
+	lsAI.Gender = ls.Gender
+	lsAI.FamilyHistory = ls.FamilyHistory
+	lsAI.Smoked = ls.Smoked
+	lsAI.APOE4 = ls.APOE4
+	lsAI.PhysicalActivity = ls.PhysicalActivity
+	lsAI.DepressionStatus = ls.DepressionStatus
+	lsAI.CognitiveTestScores = ls.CognitiveTestScores
+	lsAI.MedicationHistory = ls.MedicationHistory
+	lsAI.NutritionDiet = ls.NutritionDiet
+	lsAI.SleepQuality = ls.SleepQuality
+	lsAI.ChronicHealthConditions = ls.ChronicHealthConditions
+	lsAI.CumulativePrimary = cumulativePrimary
+	lsAI.CumulativeSecondary = cumulativeSecondary
+	lsAI.CumulativeDegree = cumulativeDegree
+
+	payload := AnswersAnalyse{
+		Answers: lsAI,
+	}
+
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		panic(err)
+	}
+
+	url := "http://api.magestle.dev/lifestyle"
+
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		http.Error(w, "Couldn't post to internal ai", http.StatusBadRequest)
+	}
+	defer resp.Body.Close()
+
+	fmt.Println("Response Status:", resp.Status)
+
+	var dementiaResult DementiaResult
+
+	if err := json.NewDecoder(resp.Body).Decode(&dementiaResult); err != nil {
+		fmt.Println("failed to payload" + err.Error())
+		http.Error(w, "invalid payload", http.StatusBadRequest)
+		return
+	}
+
+	if _, err := db.Exec(`
+		UPDATE Lifestyle
+		SET LifestyleStatus=$1
+		WHERE patientID=$3
+		`, dementiaResult.Classification+2, claims.UserID); err != nil {
+		http.Error(w, "Failed to update lifestyle", 500)
+		fmt.Printf("failed to update lifestyle")
 		return
 	}
 
@@ -286,7 +400,7 @@ func HandleDoctorReviewLifestyle(w http.ResponseWriter, r *http.Request) {
             gender = $11,
             familyHistory = $12,
             smoked = $13,
-            apoe4 = $14,
+            apoe = $14,
             physicalActivity = $15,
             depressionStatus = $16,
             cognitiveTestScores = $17,
@@ -337,4 +451,3 @@ func HandleDoctorReviewLifestyle(w http.ResponseWriter, r *http.Request) {
 		"message": "success",
 	})
 }
-
