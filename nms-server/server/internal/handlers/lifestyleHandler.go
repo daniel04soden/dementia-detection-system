@@ -166,6 +166,10 @@ func HandleGetLifestyle(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(lifestyle)
 }
 
+type AnswersAnalyse struct {
+	Answers LifestyleAIAnalyse `json:"answers"`
+}
+
 type LifestyleAIAnalyse struct {
 	Diabetic                int     `json:"diabetic"`
 	AlcoholLevel            float64 `json:"alcoholLevel"`
@@ -193,7 +197,7 @@ type LifestyleAIAnalyse struct {
 	DementiaStatus          string  `json:"dementiaStatus"`
 }
 
-func HandleReviewLifestyle(w http.ResponseWriter, r *http.Request) {
+func HandleAIReviewLifestyle(w http.ResponseWriter, r *http.Request) {
 	authHeader := r.Header.Get("Authorization")
 	var token string
 	token, ok := strings.CutPrefix(authHeader, "Bearer ")
@@ -212,7 +216,7 @@ func HandleReviewLifestyle(w http.ResponseWriter, r *http.Request) {
 		SELECT premium 
 		FROM Patient
 		WHERE patientID = $1
-		`, claims.ID)
+		`, claims.UserID)
 
 	var premium bool
 
@@ -236,10 +240,10 @@ func HandleReviewLifestyle(w http.ResponseWriter, r *http.Request) {
 		sleepQuality 
 		FROM Lifestyle 
 		WHERE patientID = $1
-		`, claims.ID)
+		`, claims.UserID)
 	err = row.Scan(ls.Diabetic, ls.AlcoholLevel, ls.HeartRate, ls.BloodOxygen, ls.BodyTemperature, ls.Weight,
 		ls.MRIDelay, ls.Age, ls.DominantHand, ls.Gender, ls.FamilyHistory, ls.Smoked, ls.APOE4, ls.PhysicalActivity,
-		ls.DepressionStatus, ls.CognitiveTestScores, ls.MedicationHistory, ls.NutritionDiet, ls.SleepQuality)
+		ls.DepressionStatus, ls.CognitiveTestScores, ls.MedicationHistory, ls.NutritionDiet, ls.SleepQuality, ls.ChronicHealthConditions)
 	if err != nil {
 		http.Error(w, "failed to scan lifestyle", http.StatusInternalServerError)
 		return
@@ -269,7 +273,7 @@ func HandleDoctorReviewLifestyle(w http.ResponseWriter, r *http.Request) {
 	lifestyleQuery := `
         UPDATE Lifestyle
         SET
-            lifestyleStatus = 2,
+            lifestyleStatus = 5,
             diabetic = $2,
             alcoholLevel = $3,
             heartRate = $4,

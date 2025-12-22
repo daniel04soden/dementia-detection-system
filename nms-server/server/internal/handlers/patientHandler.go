@@ -189,7 +189,7 @@ func MobileHandleMe(w http.ResponseWriter, r *http.Request) {
 		FROM Patient
 		INNER JOIN Users ON Patient.patientID = Users.userID 
 		WHERE patientID = $1
-		`, claims.ID)
+		`, claims.UserID)
 
 	var p Me
 

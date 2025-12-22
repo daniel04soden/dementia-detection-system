@@ -94,17 +94,17 @@ CREATE TABLE IF NOT EXISTS TestStageOne (
     recallNumber TEXT,
     recallStreet TEXT,
     recallCity TEXT,
-    clockNumberRes BOOLEAN, 
-    clockHandsRes BOOLEAN,
-    dateQuestionRes BOOLEAN, 
-    newsRes BOOLEAN,
-    recallRes INT
+    clockNumberRes BOOLEAN DEFAULT FALSE, 
+    clockHandsRes BOOLEAN DEFAULT FALSE,
+    dateQuestionRes BOOLEAN DEFAULT FALSE, 
+    newsRes BOOLEAN DEFAULT FALSE,
+    recallRes INT DEFAULT 0
 );
 
 -- add checks after
 CREATE TABLE IF NOT EXISTS TestStageTwo (
     testID INT PRIMARY KEY REFERENCES Test(testID) ON DELETE CASCADE,
-    testDate VARCHAR(20) NOT NULL,
+    testDate VARCHAR(20),
     memoryScore INT, 
     recallScore INT,
     speakingScore INT,
@@ -124,9 +124,8 @@ CREATE TABLE IF NOT EXISTS TestStageTwo (
 CREATE TABLE IF NOT EXISTS SpeechTest (
     speechTestID SERIAL PRIMARY KEY,
     speechTestStatus INT DEFAULT 0, -- 0 Means not done, 1 Means done, 2 means has dementia, 3 means hasn't dementia
-    assemblyAIStatus TEXT DEFAULT 'pending', -- HAS STATES, FAILED, PASSED, PENDING
-    testDate VARCHAR(20) NOT NULL,
-    patientID INT,
+    testDate VARCHAR(20),
+    patientID INT UNIQUE,
     llmResponse  TEXT,
     FOREIGN KEY (patientID) REFERENCES Patient(patientID) ON DELETE CASCADE
 );
@@ -156,7 +155,7 @@ CREATE TABLE IF NOT EXISTS Ticket (
 
 CREATE TABLE IF NOT EXISTS Payment (
     paymentID SERIAL PRIMARY KEY,
-    stripeIntentID TEXT UNIQUE NOT NULL,
+    stripePaymentID TEXT UNIQUE NOT NULL,
     patientID INT,
     status VARCHAR(20) DEFAULT 'pending',
     amount INT,
