@@ -1,0 +1,44 @@
+.background {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #e6e6e6;
+  font-family: Arial, sans-serif;
+}
+
+.card {
+  background-color: #f4f4f4;
+  border-radius: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  text-align: center;
+  max-width: 420px;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 20px;
+  border: 5px solid #ddd;
+  border-top: 5px solid #6a1b9a;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+h2 {
+  font-size: 1.5rem;
+  color: #6a1b9a;
+  margin-bottom: 10px;
+}
+
+p {
+  font-size: 1rem;
+  color: #333;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

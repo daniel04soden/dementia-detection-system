@@ -1,0 +1,108 @@
+.dashHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background-color: #833ea1;
+  color: white;
+  height: 100px;
+  box-sizing: border-box;
+  flex-wrap: nowrap;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.logoStyling {
+  width: 120px;
+  height: auto;
+  border-radius: 5px;
+}
+
+.newTitle {
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  font-size: 20px;
+  margin-right: 30%;
+}
+
+.nav {
+  flex: 1;
+}
+
+.navList {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.navBtn {
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  font-size: 25px;
+  padding: 1.5em 3em;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.navBtn:hover {
+  background-color: #9a67cc;
+}
+
+.profileSection {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.logoutBtn {
+  background-color: #9a67cc;
+  border: none;
+  color: white;
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.logoutBtn:hover {
+  background-color: #833ea1;
+}
+
+.loading {
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .dashHeader {
+    flex-direction: column;
+    height: auto;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .navList {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

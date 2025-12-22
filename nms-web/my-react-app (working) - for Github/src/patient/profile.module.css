@@ -1,0 +1,235 @@
+.cardContainer{
+    min-height: auto;
+    background-color: #e6e6e6;
+    font-family: Arial, sans-serif;
+    width: 100px;
+    background-color: #f4f4f4;
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    overflow: hidden;
+    font-size: xx-small;
+}
+
+.pfp{
+    width: 100px;
+}
+
+.headshot{
+  width: 400px;
+}
+
+.allCards{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 40px;
+  padding: 16px;
+}
+
+.heading {
+  margin-left: 20px;
+  font-family: Arial, sans-serif;
+  margin-bottom: 10;
+}
+
+.mainContent {
+  font-family: Arial, sans-serif;
+  color: #333; /* Text color */
+  background-color: #fff; /* Background color for the main content */
+  padding: 20px;
+}
+
+p {
+  font-size: 1rem;
+  margin: 10px 0;
+}
+
+h2 {
+  font-size: 1.5rem;
+  color: #6a1b9a; /* Purple color for subheadings */
+  font-weight: bold;
+}
+
+ul {
+  list-style-type: disc;
+  margin-left: 20px;
+}
+
+li {
+  font-size: 1rem;
+}
+
+ul li {
+  margin: 5px 0;
+}
+
+.background{
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #e6e6e6;
+  font-family: Arial, sans-serif;
+}
+
+/* Use clean, readable font for the whole profile page */
+.profileMain {
+  flex: 1;
+  padding: 40px 60px;
+  max-width: 100%;
+  font-family: 'Arial', sans-serif;
+  color: #333;
+}
+
+.heroSection {
+  background-color: #6a1b9a;
+  color: white;
+  text-align: center;
+  padding: 40px 20px;
+  border-radius: 16px;
+  margin-bottom: 40px;
+}
+
+.heroTitle {
+  font-size: 2rem;  /* smaller, readable */
+  font-weight: 600;
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: 1rem;  /* smaller, subtle */
+  color: #e0d4f0;   /* lighter purple */
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+/* Two-column layout */
+.profileGrid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 40px;
+  width: 100%;
+}
+
+.personalInfo, .lifestyleInfo {
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.personalInfo h2, .lifestyleInfo h2 {
+  font-size: 1.5rem;  /* smaller than before */
+  margin-bottom: 18px;
+  color: #6a1b9a;
+  font-weight: 600;
+}
+
+.infoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 1rem;
+}
+
+.lifestyleGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 12px;
+}
+
+.dataRow {
+  display: flex;
+  justify-content: space-between;
+  background-color: #f4f4f4;
+  padding: 10px 15px;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+  font-size: 0.95rem;
+}
+
+.dataKey {
+  font-weight: 600;
+  color: #333;
+}
+
+.dataValue {
+  color: #555;
+}
+
+.pdfBtn {
+  background-color: #6a1b9a;
+  color: #fff;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline;
+  margin: 40px auto 0 auto;
+  transition: background-color 0.2s ease;
+}
+
+.noPatients{
+  text-align: center;
+  font-style: italic;
+  color: #555;
+  margin-top: 40px;
+}
+
+.pdfBtn:hover {
+  background-color: #4f146f;
+}
+
+@media (max-width: 1200px) {
+  .profileGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.heroSection {
+  background-color: #6a1b9a;
+  color: white;
+  text-align: center;
+  padding: 20px 20px; /* smaller vertical padding */
+  border-radius: 12px;
+  margin-bottom: 30px;
+}
+
+.heroTitle {
+  font-size: 1.5rem;  /* much smaller */
+  font-weight: 600;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: 0.95rem; /* smaller subtitle */
+  color: #e0d4f0;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.profileGrid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 40px;
+  width: 100%;
+}
+
+.personalInfo, .lifestyleInfo {
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.dataRow {
+  display: flex;
+  justify-content: space-between;
+  background-color: #f4f4f4;
+  padding: 10px 15px;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+  font-size: 0.95rem;
+}

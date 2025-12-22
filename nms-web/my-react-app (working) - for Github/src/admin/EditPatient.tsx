@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Header from "../dashboard/header/Header";
-import Footer from "../dashboard/footer/Footer";
+import Header from "../reusable/header/Header";
+import Footer from "../reusable/footer/Footer";
+import { withAuth } from "../../utils/withAuth";
 
 interface Clinic {
   clinicID: number;
@@ -142,7 +143,7 @@ const EditPatient: React.FC = () => {
 
   return (
     <div>
-      <Header />
+      
       <h2>{isEditing ? "Edit Patient" : "Create Patient"}</h2>
 
       <form onSubmit={handleSubmit}>
@@ -201,9 +202,9 @@ const EditPatient: React.FC = () => {
 
         <button type="submit">{isEditing ? "Update Patient" : "Create Patient"}</button>
       </form>
-      <Footer />
+      
     </div>
   );
 };
 
-export default EditPatient;
+export default withAuth(EditPatient, ["admin"]);

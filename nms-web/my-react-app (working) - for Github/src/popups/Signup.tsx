@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import logo from '../assets/logo.png';
 import styles from './pop.module.css';
 
-// TypeScript interface for Clinic
 export interface Clinic {
   clinicID: number;
   name: string;
@@ -23,8 +22,7 @@ const SignUpPopUp: React.FC = () => {
   };
 
   useEffect(() => {
-    // Fetch clinics on component mount
-    fetch("/api/fetchallclinics")
+    fetch("/api/clinics")
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch clinics");
         return res.json();
@@ -46,7 +44,6 @@ const SignUpPopUp: React.FC = () => {
     const formData = new FormData(form);
     const formJson: Record<string, any> = Object.fromEntries(formData.entries());
 
-    // Ensure clinicID is a number
     formJson.clinicID = Number(formJson.clinicID);
 
     try {
@@ -69,6 +66,8 @@ const SignUpPopUp: React.FC = () => {
   };
 
   return (
+    <>
+    
     <div className={styles.screen}>
       <div className={styles.accountPopup}>
         <img className={styles.logoPopup} src={logo} alt="Logo" />
@@ -125,6 +124,8 @@ const SignUpPopUp: React.FC = () => {
         </form>
       </div>
     </div>
+          
+    </>
   );
 };
 
