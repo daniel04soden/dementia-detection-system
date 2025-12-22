@@ -44,6 +44,7 @@ import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.LightPurple
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.ui.theme.Yellow
+import com.example.dementiaDetectorApp.ui.util.ToastManager
 import com.example.dementiaDetectorApp.viewModels.HomeVM
 import com.example.dementiaDetectorApp.viewModels.SharedVM
 
@@ -197,7 +198,11 @@ fun ReviewPrompt(homeVM: HomeVM)
         .clip(RoundedCornerShape(10.dp))
         .background(MidPurple)//CHANGE
         .padding(horizontal = 15.dp , vertical = 20.dp)
-        .clickable {homeVM.onFeedbackVisiChange(true)},
+        .clickable {
+            if(homeVM.reviewAsked.value==false){ homeVM.onFeedbackVisiChange(true)}
+                   else{
+                       ToastManager.showToast("You have already submitted a review")
+                   }},
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(20.dp)
     ){
