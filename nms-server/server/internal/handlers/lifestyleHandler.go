@@ -289,7 +289,7 @@ func HandleAIReviewLifestyle(w http.ResponseWriter, r *http.Request) {
 	case "Secondary":
 		cumulativePrimary = "TRUE"
 		cumulativeSecondary = "TRUE"
-	case "Tertiary Level":
+	case "Tertiary":
 		cumulativePrimary = "TRUE"
 		cumulativeSecondary = "TRUE"
 		cumulativeDegree = "TRUE"

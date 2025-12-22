@@ -18,6 +18,7 @@ workdir /root/
 
 copy --from=builder /main .
 COPY articles ./articles/
+COPY frontend ./frontend
 
 expose 8080
 cmd ["./main"]
