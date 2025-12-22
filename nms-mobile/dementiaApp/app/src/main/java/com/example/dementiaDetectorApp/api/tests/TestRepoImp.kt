@@ -92,13 +92,27 @@ class TestRepoImp(
         return try {
             val token = prefs.getString("jwt", null) ?: return TestResult.Unauthorized()
             val response = api.reportQuestionnaire("Bearer $token", request)
-            if (response.isSuccessful) TestResult.Success(Unit)
-            else TestResult.UnknownError()
+            if (response.isSuccessful){
+                Log.d("Lifestyle", "Submitted successfully")
+                TestResult.Success(Unit)
+            }
+            else{
+                Log.d("Lifestyle", "Unknown error")
+                TestResult.UnknownError()
+            }
         } catch (e: HttpException) {
-            if (e.code() == 401) TestResult.Unauthorized() else TestResult.UnknownError()
+            if (e.code() == 401){
+                Log.d("Lifestyle", "401 error")
+                TestResult.Unauthorized()
+            } else{
+                Log.d("Lifestyle", "Unknown HTTP error")
+                TestResult.UnknownError()
+            }
         } catch (e: UnknownHostException) {
+            Log.d("Lifestyle", "Unknown host exception error")
             TestResult.UnknownError()
         } catch (e: Exception) {
+            Log.d("Lifestyle", "Unknown error")
             TestResult.UnknownError()
         }
     }
