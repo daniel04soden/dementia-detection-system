@@ -26,19 +26,8 @@ fun StripePaymentButton(
     buttonContent: @Composable () -> Unit
 ) {
     val context = LocalContext.current
-    val clientSecret by stripeViewModel.clientSecret.collectAsStateWithLifecycle()
+    val checkoutUrl by stripeViewModel.checkoutUrl.collectAsStateWithLifecycle()
     val paymentState by stripeViewModel.paymentState.collectAsStateWithLifecycle()
-
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            stripeViewModel.onPaymentConfirmed()
-            sharedVM.PaidChange()
-        } else {
-            stripeViewModel.resetPayment()
-        }
-    }
 
     Button(
         onClick = {
@@ -56,11 +45,9 @@ fun StripePaymentButton(
     }
 
     LaunchedEffect(paymentState) {
-        if (paymentState is PaymentState.Ready && clientSecret != null) {
-            // CustomTabs - NO PaymentSheet errors
+        if (paymentState is PaymentState.Ready && checkoutUrl != null) {
             val customTabsIntent = CustomTabsIntent.Builder().build()
-            val stripeUrl = "https://checkout.stripe.com/pay/${clientSecret}"
-            customTabsIntent.launchUrl(context, Uri.parse(stripeUrl))
+            customTabsIntent.launchUrl(context, Uri.parse(checkoutUrl!!))
         }
     }
 }

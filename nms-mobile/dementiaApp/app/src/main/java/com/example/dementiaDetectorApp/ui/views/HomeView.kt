@@ -46,6 +46,7 @@ import com.example.dementiaDetectorApp.models.Test
 import com.example.dementiaDetectorApp.ui.composables.FeedbackPanel
 import com.example.dementiaDetectorApp.ui.composables.NavMenu
 import com.example.dementiaDetectorApp.ui.composables.ReusableToast
+import com.example.dementiaDetectorApp.ui.composables.ReviewPrompt
 import com.example.dementiaDetectorApp.ui.composables.TestPrompt
 import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.Gray
@@ -65,7 +66,7 @@ fun HomeScreen(homeVM: HomeVM, sharedVM: SharedVM, nc: NavController){
         Column{
             Spacer(Modifier.height(35.dp))
             Header(homeVM)
-            HeaderPrompts(sharedVM, nc)
+            HeaderPrompts(sharedVM, homeVM, nc)
             NewsSection(homeVM)
         }
         FeedbackPanel(homeVM,sharedVM)
@@ -102,6 +103,7 @@ private fun Header(homeVM: HomeVM){
 @Composable
 private fun HeaderPrompts(
     sharedVM: SharedVM,
+    homeVM: HomeVM,
     nc: NavController
 ){
     val prompts: List<Test> = sharedVM.tests.value
@@ -113,6 +115,9 @@ private fun HeaderPrompts(
                 Box(Modifier.width(350.dp)){
                     TestPrompt(test=prompts[it], sharedVM, nc)
                 }
+            }
+            item{
+                ReviewPrompt(homeVM)
             }
         }
     }

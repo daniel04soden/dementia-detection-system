@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.R
 import com.example.dementiaDetectorApp.models.Test
+import com.example.dementiaDetectorApp.ui.theme.DarkPurple
 import com.example.dementiaDetectorApp.ui.theme.LightPurple
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.viewModels.SharedVM
@@ -52,7 +53,8 @@ fun TestPrompt(
             Icon(
                 painter = painterResource(R.drawable.todo),
                 contentDescription = "Test Icon",
-                Modifier.size(30.dp)
+                tint = DarkPurple,
+                modifier = Modifier.size(30.dp)
             )
         }
         Column(modifier = Modifier

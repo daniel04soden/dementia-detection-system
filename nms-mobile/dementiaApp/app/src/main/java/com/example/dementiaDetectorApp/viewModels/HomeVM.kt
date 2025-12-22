@@ -64,24 +64,6 @@ class HomeVM @Inject constructor(
 
     private val _testsDone = mutableIntStateOf(0)
 
-    fun countTestsDone(tests:List<Test>){
-        var count=0
-        for (test in tests){
-            if (test.state!=0){
-                count++
-            }
-        }
-        _testsDone.intValue=count
-        Log.d("Test count", "${_testsDone.intValue}")
-    }
-
-    private fun checkReviewConditions(){
-        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        val reviewAsked = prefs.getBoolean("review_asked", false)
-        Log.d("RevAsked", "$reviewAsked")
-        if (_testsDone.intValue>-2 && !reviewAsked){onFeedbackVisiChange()}
-    }
-
     fun submitReview(id:Int){
         viewModelScope.launch{
             isLoading=true
@@ -96,7 +78,6 @@ class HomeVM @Inject constructor(
                 prefs.edit {
                     putBoolean("review_asked", true)
                     apply()
-                    checkReviewConditions()
                 }
                 Log.d("Review submit", "Prefs edited")
             }
