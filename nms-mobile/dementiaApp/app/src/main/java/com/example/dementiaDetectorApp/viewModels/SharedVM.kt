@@ -67,6 +67,7 @@ class SharedVM @Inject constructor(
     private val _riskScore = mutableIntStateOf(0)
     val riskScore: State<Int> = _riskScore
 
+    // New functionality: keep track of when a test is actually submitted, ensure toast works
     fun getStatus() {
         viewModelScope.launch {
             isLoading = true
@@ -84,6 +85,7 @@ class SharedVM @Inject constructor(
                 Test("Speech Test", "speech", speechStatus.intValue)
             )
 
+            // Update risk score and completed tests count
             _riskScore.intValue = _tests.value.sumOf { getTestScore(it.state) }
             _testsDone.intValue = _tests.value.count { it.state > 1 }
         }
@@ -95,6 +97,8 @@ class SharedVM @Inject constructor(
         }
         _riskScore.intValue = _tests.value.sumOf { getTestScore(it.state) }
         _testsDone.intValue = _tests.value.count { it.state > 1 }
+
+        // Ensure we refresh the status from the repository to get the latest
         getStatus()
     }
 
@@ -107,14 +111,31 @@ class SharedVM @Inject constructor(
 
     fun CheckCompleted(route: String, todo: () -> Unit) {
         when (route) {
-            "questionnaire" -> if (questionnaireStatus.intValue != 0)
-                ToastManager.showToast("Questionnaire already completed") else todo()
-            "test1" -> if (stage1Status.intValue != 0)
-                ToastManager.showToast("Test stage 1 already completed") else todo()
-            "test2" -> if (stage2Status.intValue != 0)
-                ToastManager.showToast("Test stage 2 already completed") else todo()
-            "speech" -> if (speechStatus.intValue != 0)
-                ToastManager.showToast("Speech test already completed") else todo()
+            "questionnaire" -> {
+                if (questionnaireStatus.intValue != 0)
+                    ToastManager.showToast("Questionnaire already completed")
+                else todo()
+            }
+            "test1" -> {
+                if (stage1Status.intValue != 0)
+                    ToastManager.showToast("Test stage 1 already completed")
+                else todo()
+            }
+            "test2" -> {
+                // Add dependency check: stage 1 must be completed
+                if (stage1Status.intValue == 0) {
+                    ToastManager.showToast("Complete Stage 1 before Stage 2")
+                } else if (stage2Status.intValue != 0) {
+                    ToastManager.showToast("Test stage 2 already completed")
+                } else {
+                    todo()
+                }
+            }
+            "speech" -> {
+                if (speechStatus.intValue != 0)
+                    ToastManager.showToast("Speech test already completed")
+                else todo()
+            }
         }
     }
 

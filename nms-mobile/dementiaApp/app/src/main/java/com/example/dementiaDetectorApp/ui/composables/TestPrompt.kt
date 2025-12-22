@@ -32,24 +32,25 @@ fun TestPrompt(
     test: Test,
     sharedVM: SharedVM,
     nc: NavController
-){
-    Row(modifier = Modifier
-        .padding(15.dp)
-        .clip(RoundedCornerShape(10.dp))
-        .background(MidPurple)//CHANGE
-        .padding(horizontal = 15.dp , vertical = 20.dp)
-        .fillMaxWidth()
-        .clickable {sharedVM.CheckCompleted(test.route,{nc.navigate(test.route)})},
+) {
+    Row(
+        modifier = Modifier
+            .padding(15.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(MidPurple)
+            .padding(horizontal = 15.dp, vertical = 20.dp)
+            .fillMaxWidth()
+            .clickable { sharedVM.CheckCompleted(test.route) { nc.navigate(test.route) } },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
-    ){
+    ) {
         Box(
             modifier = Modifier
                 .size(50.dp)
                 .background(LightPurple)
                 .padding(5.dp),
             contentAlignment = Alignment.Center
-        ){
+        ) {
             Icon(
                 painter = painterResource(R.drawable.todo),
                 contentDescription = "Test Icon",
@@ -57,29 +58,24 @@ fun TestPrompt(
                 modifier = Modifier.size(30.dp)
             )
         }
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(5.dp),
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(5.dp),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
-        ){
+        ) {
             Text(test.name, color = Color.White)
-            val state = deriveState(test)
-            Text(state, color = Color.White)
+            Text(deriveState(test), color = Color.White)
         }
     }
 }
 
-private fun deriveState(test: Test): String{
-    val stateVal = test.state
-    if (stateVal == 1){
-        return "Awaiting grading"
-    }
-    else if (stateVal>=2){
-        test.route = "status"
-        return "Graded"
-    }
-    else{
-        return "To be completed"
+private fun deriveState(test: Test): String {
+    return when {
+        test.state == 1 -> "Awaiting grading"
+        test.state >= 2 -> "Graded"
+        else -> "To be completed"
     }
 }

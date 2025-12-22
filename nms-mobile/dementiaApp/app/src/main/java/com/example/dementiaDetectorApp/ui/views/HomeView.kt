@@ -150,7 +150,7 @@ private fun NewsSection(homeVM: HomeVM){
 @Composable
 private fun NewsBox(
     news: NewsPiece
-){
+) {
     val ctx = LocalContext.current
     val urlIntent = Intent(
         Intent.ACTION_VIEW,
@@ -162,8 +162,8 @@ private fun NewsBox(
             .aspectRatio(1F)
             .clip(RoundedCornerShape(10.dp))
             .background(DarkPurple)
-            .clickable {ctx.startActivity(urlIntent)}
-    ){
+            .clickable { ctx.startActivity(urlIntent) }
+    ) {
         //Colour waves
         val width = constraints.maxWidth
         val height = constraints.maxHeight
@@ -216,11 +216,12 @@ private fun NewsBox(
                 color = LightPurple
             )
         }
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(15.dp)
-        ){
-            Column(verticalArrangement = Arrangement.SpaceBetween){
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(15.dp)
+        ) {
+            Column(verticalArrangement = Arrangement.SpaceBetween) {
                 Text(
                     text = news.headline,
                     lineHeight = 18.sp,
@@ -236,7 +237,7 @@ private fun NewsBox(
                     color = Gray,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
-                        .offset(0.dp,10.dp)
+                        .offset(0.dp, 10.dp)
                 )
             }
         }

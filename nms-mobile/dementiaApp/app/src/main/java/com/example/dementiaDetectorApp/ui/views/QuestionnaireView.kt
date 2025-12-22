@@ -274,11 +274,12 @@ private fun S3Section(qVM: QViewModel, sharedVM: SharedVM){
             )
         }
         Button(
-            onClick = {
+            /*onClick = {
                 Log.d("BTN", "PRESSED")
                 if (!sharedVM.hasPaid.value) qVM.isPaymentReq(true) else qVM.onSuccessChange(true)
                 qVM.onS3Change(false)
-            },
+            },*/
+            onClick = {qVM.onSuccessChange(true)},
             enabled = qVM.s3Complete.value,
             colors = buttonColours(),
             shape = RoundedCornerShape(24.dp),
