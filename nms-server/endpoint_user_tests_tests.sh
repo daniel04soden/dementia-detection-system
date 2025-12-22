@@ -6,7 +6,7 @@ if [ -f .env ]; then
   export $(grep -v '^#' .env | xargs)
 fi
 
-curl -X POST "https://magestle.dev/api/mobile/stageone/insert" \
+curl -X POST "http://magestle.dev/api/mobile/stageone/insert" \
   -H "Content-Type: application/json" \
   -d '{
     "patientID": 3,
