@@ -421,7 +421,7 @@ private fun PaymentPrompt(
             }
 
             Button(
-                onClick = { sVM.uploadAudioFile() },
+                onClick = {nc.navigate("home")},
                 colors = buttonColours(),
                 modifier = Modifier.fillMaxWidth(0.75f)
             ) {
