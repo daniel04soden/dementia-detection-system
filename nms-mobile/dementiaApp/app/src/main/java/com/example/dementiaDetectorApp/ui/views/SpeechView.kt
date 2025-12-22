@@ -416,6 +416,7 @@ private fun PaymentPrompt(
 
             Button(
                 onClick = { nc.navigate("home") },
+                //onClick = {sVM.uploadAudioFile()},
                 colors = buttonColours(),
                 modifier = Modifier.fillMaxWidth(0.75f)
             ) {
@@ -450,7 +451,7 @@ private fun SuccessSection(sVM: SpeechViewModel, sharedVM: SharedVM, nc: NavCont
                 color = Color.White,
                 fontSize = 20.sp
             )
-            Button(onClick = {}, colors = buttonColours(), modifier = Modifier.width(300.dp)) {
+            Button(onClick = {sVM.uploadAudioFile()}, colors = buttonColours(), modifier = Modifier.width(300.dp)) {
                 Text("Submit Recording", fontSize = 25.sp, color = Color.White)
             }
             Button(

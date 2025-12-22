@@ -1,6 +1,5 @@
 package com.example.dementiaDetectorApp.viewModels
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -22,174 +21,101 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class SharedVM @Inject constructor(
     private val repository: TestRepository
-): ViewModel(){
+) : ViewModel() {
+
     private val resultChannel = Channel<TestResult<Unit>>()
     val testResults = resultChannel.receiveAsFlow()
 
     var isLoading = false
         private set
 
-    //User
     private val _id = mutableIntStateOf(-1)
     val id: State<Int> = _id
     fun onIdChange(newID: Int) {
         _id.intValue = newID
-        Log.d("Id change", "${_id.intValue}")
     }
 
     private val _hasPaid = mutableStateOf(false)
-    val hasPaid:State<Boolean> = _hasPaid
-    fun PaidChange(){_hasPaid.value = !_hasPaid.value}
+    val hasPaid: State<Boolean> = _hasPaid
+    fun PaidChange() { _hasPaid.value = !_hasPaid.value }
 
-    //NavBar
     val nav = listOf(
-        NavBarContent(
-            title = "Home",
-            iconId = R.drawable.home,
-            "home"
-        ),
-
-        NavBarContent(
-            title = "Test Status",
-            iconId = R.drawable.test,
-            "status"
-        ),
-
-        NavBarContent(
-            title = "Risk Assessment",
-            iconId = R.drawable.ra,
-            "risk"
-        ),
-
-        NavBarContent(
-            title = "Contact",
-            iconId = R.drawable.contact,
-            "contact"
-        )
+        NavBarContent("Home", R.drawable.home, "home"),
+        NavBarContent("Test Status", R.drawable.test, "status"),
+        NavBarContent("Risk Assessment", R.drawable.ra, "risk"),
+        NavBarContent("Contact", R.drawable.contact, "contact")
     )
 
-    private val _navItems = mutableStateOf<List<NavBarContent>>(nav)
+    private val _navItems = mutableStateOf(nav)
     val navItems: State<List<NavBarContent>> = _navItems
 
     private val _navIndex = mutableIntStateOf(0)
     val navIndex: State<Int> = _navIndex
-    fun onNavIndexChange(newIDX: Int){_navIndex.intValue=newIDX}
+    fun onNavIndexChange(newIDX: Int) { _navIndex.intValue = newIDX }
 
-    //Tests
     private val _tests = mutableStateOf<List<Test>>(emptyList())
     val tests: State<List<Test>> = _tests
 
-    fun CheckCompleted(route:String, todo: () -> Unit) {
-        when (route){
-            "questionnaire" -> {
-                if (questionnaireStatus.intValue != 0) {
-                    ToastManager.showToast("Questionnaire already completed")
-                } else {
-                    todo()
-                }
-            }
-
-            "test1" -> {
-                if (stage1Status.intValue != 0) {
-                    ToastManager.showToast("Test stage 1 already completed")
-                } else {
-                    todo()
-                }
-            }
-
-            "test2" -> {
-                if (stage2Status.intValue != 0) {
-                    ToastManager.showToast("Test stage 2 already completed")
-                } else {
-                    todo()
-                }
-            }
-
-            "speech" -> {
-                if (speechStatus.intValue != 0) {
-                    ToastManager.showToast("Speech test already completed")
-                } else {
-                    todo()
-                }
-            }
-        }
-    }
+    private val _testsDone = mutableIntStateOf(0)
+    val testsDone: State<Int> = _testsDone
 
     private val questionnaireStatus = mutableIntStateOf(0)
     private val stage1Status = mutableIntStateOf(0)
     private val stage2Status = mutableIntStateOf(0)
     private val speechStatus = mutableIntStateOf(0)
 
-    fun getStatus(){
-        viewModelScope.launch{
+    private val _riskScore = mutableIntStateOf(0)
+    val riskScore: State<Int> = _riskScore
+
+    fun getStatus() {
+        viewModelScope.launch {
             isLoading = true
             val result = repository.getStatus(StatusRequest(id.value))
-            questionnaireStatus.intValue = result.data?.lifestyleStatus?:0
-            stage1Status.intValue = result.data?.stageOneStatus?:0
-            stage2Status.intValue = result.data?.stageTwoStatus?:0
-            speechStatus.intValue = result.data?.speechTestStatus?:0
-            Log.d("Stage1 Status", stage1Status.intValue.toString())
-        }
-    }
 
-    fun updateTestList(){
-        getStatus()
-        val testList = listOf(
-            Test(
-                name = "Lifestyle questionnaire",
-                route = "questionnaire",
-                state = questionnaireStatus.intValue,
-            ),
+            questionnaireStatus.intValue = result.data?.lifestyleStatus ?: 0
+            stage1Status.intValue = result.data?.stageOneStatus ?: 0
+            stage2Status.intValue = result.data?.stageTwoStatus ?: 0
+            speechStatus.intValue = result.data?.speechTestStatus ?: 0
 
-            Test(
-                name = "GP Cognitive Test part 1",
-                route = "test1",
-                state = stage1Status.intValue,
-            ),
-
-            Test(
-                name = "GP Cognitive Test part 2",
-                route = "test2",
-                state = stage2Status.intValue,
-            ),
-
-            Test(
-                name = "Speech Test",
-                route = "speech",
-                state = speechStatus.intValue,
+            _tests.value = listOf(
+                Test("Lifestyle questionnaire", "questionnaire", questionnaireStatus.intValue),
+                Test("GP Cognitive Test part 1", "test1", stage1Status.intValue),
+                Test("GP Cognitive Test part 2", "test2", stage2Status.intValue),
+                Test("Speech Test", "speech", speechStatus.intValue)
             )
-        )
-        _tests.value = testList
-    }
 
-    private val _riskScore = mutableIntStateOf(0)
-    val riskScore:State<Int> = _riskScore
-    fun getRiskScore():Int{return _riskScore.intValue}
-
-    fun onTestSubmission(idx: Int){
-        _tests.value[idx].state = 1
-        var riskScore = 0
-        for (test in _tests.value){
-            riskScore += getTestScore(test.state)
+            _riskScore.intValue = _tests.value.sumOf { getTestScore(it.state) }
+            _testsDone.intValue = _tests.value.count { it.state > 1 }
         }
     }
 
-    private fun getTestScore(state:Int):Int{
-        when (state){
-            2 ->{return 1}     //Graded - Fail/=?
-            3 -> {return 1}
-            4 -> {return 1}
-            5 -> {return 1}
-            else -> {return 0} //Not done
+    fun onTestSubmission(idx: Int) {
+        _tests.value = _tests.value.toMutableList().also {
+            it[idx] = it[idx].copy(state = 1)
+        }
+        _riskScore.intValue = _tests.value.sumOf { getTestScore(it.state) }
+        _testsDone.intValue = _tests.value.count { it.state > 1 }
+        getStatus()
+    }
+
+    private fun getTestScore(state: Int): Int {
+        return when (state) {
+            in 0..2 -> 0
+            else -> 1
         }
     }
 
-    fun getTestsDone():Int{
-        var count=0
-        for (test in _tests.value){
-            if(test.state>1){count++}
+    fun CheckCompleted(route: String, todo: () -> Unit) {
+        when (route) {
+            "questionnaire" -> if (questionnaireStatus.intValue != 0)
+                ToastManager.showToast("Questionnaire already completed") else todo()
+            "test1" -> if (stage1Status.intValue != 0)
+                ToastManager.showToast("Test stage 1 already completed") else todo()
+            "test2" -> if (stage2Status.intValue != 0)
+                ToastManager.showToast("Test stage 2 already completed") else todo()
+            "speech" -> if (speechStatus.intValue != 0)
+                ToastManager.showToast("Speech test already completed") else todo()
         }
-        return count
     }
 
     init {

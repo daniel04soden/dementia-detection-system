@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import br.com.frazo.audio_services.recorder.AndroidAudioRecorder
 import br.com.frazo.audio_services.recorder.AudioRecordingData
 import com.example.dementiaDetectorApp.R
+import com.example.dementiaDetectorApp.api.tests.TestRepository
 import com.example.dementiaDetectorApp.api.tests.TestResult
 import com.example.dementiaDetectorApp.di.DispatcherProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,48 +24,47 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.io.File
-import java.lang.Thread.State
 import java.util.UUID
 
 @HiltViewModel
 class SpeechViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val dispatchers: DispatcherProvider,
+    private val testRepository: TestRepository
 ) : ViewModel() {
-    private val audioRecorder by lazy{AndroidAudioRecorder(context, dispatchers.Default)}
+
+    private val audioRecorder by lazy { AndroidAudioRecorder(context, dispatchers.Default) }
 
     private val resultChannel = Channel<TestResult<Unit>>()
     val testResults = resultChannel.receiveAsFlow()
 
-    private var isLoading = false
-
-    //UI
     private val _prefaceVisi = MutableStateFlow(true)
     val prefaceVisi: StateFlow<Boolean> = _prefaceVisi
     fun onVisiChange(newVisi: Boolean) { _prefaceVisi.value = newVisi }
 
     private val _recVisi = MutableStateFlow(false)
     val recVisi: StateFlow<Boolean> = _recVisi
-    fun onRecChange(){_recVisi.value = !_recVisi.value}
+    fun onRecChange() { _recVisi.value = !_recVisi.value }
 
     private val _paymentVisi = MutableStateFlow(false)
     val paymentVisi: StateFlow<Boolean> = _paymentVisi
-    fun isPaymentReq(paid:Boolean){_paymentVisi.value = paid}
+    fun isPaymentReq(paid: Boolean) { _paymentVisi.value = paid }
 
     private val _successVisi = MutableStateFlow(false)
     val successVisi: StateFlow<Boolean> = _successVisi
-    fun onSuccess(){_successVisi.value = !_successVisi.value}
+    fun onSuccess() { _successVisi.value = !_successVisi.value }
 
     private val _img = MutableStateFlow(R.drawable.beach)
     val img: StateFlow<Int> = _img
-    fun OnImgChange(){
-        if (_img.value == R.drawable.beach){_img.value = R.drawable.desert}
-        else if (_img.value == R.drawable.desert){_img.value = R.drawable.forrest}
-        else if (_img.value == R.drawable.forrest){_img.value = R.drawable.mountains}
-        else{_img.value = R.drawable.beach}
+    fun OnImgChange() {
+        _img.value = when (_img.value) {
+            R.drawable.beach -> R.drawable.desert
+            R.drawable.desert -> R.drawable.forrest
+            R.drawable.forrest -> R.drawable.mountains
+            else -> R.drawable.beach
+        }
     }
 
-    //Recording vals
     enum class AudioNoteStatus { HAVE_TO_RECORD, RECORDING, CAN_PLAY }
 
     private val _audioRecordFlow = MutableStateFlow<List<AudioRecordingData>>(emptyList())
@@ -74,29 +74,22 @@ class SpeechViewModel @Inject constructor(
     val audioStatus = _audioNoteStatus.asStateFlow()
 
     private var currentAudioFile: File? = null
-
     private var recordingJob: Job? = null
 
-
-    //Recording functions
     fun getRecordedFile(): File? = currentAudioFile
 
     fun startRecording() {
         viewModelScope.launch(dispatchers.IO) {
-            Log.d("SpeechVM", "startRecording called")
             _audioRecordFlow.value = emptyList()
             currentAudioFile?.delete()
             _audioNoteStatus.value = AudioNoteStatus.RECORDING
-            Log.d("SpeechVM", "Status changed to RECORDING")
 
             val audioDirectory = File(
                 context.getExternalFilesDir(null) ?: context.filesDir,
                 "recordings"
             ).apply { mkdirs() }
-            Log.d("SpeechVM", "Directory: ${audioDirectory.absolutePath}")
 
             currentAudioFile = File(audioDirectory, "${UUID.randomUUID()}.wav")
-            Log.d("SpeechVM", "Output file: ${currentAudioFile?.absolutePath}")
 
             currentAudioFile?.let { outputFile ->
                 recordingJob = launch(dispatchers.Default) {
@@ -107,40 +100,57 @@ class SpeechViewModel @Inject constructor(
                 val flow = audioRecorder.startRecording(outputFile)
                 flow
                     .catch { e ->
-                        Log.e("SpeechVM", "Recording error", e)
                         stopRecording()
                         resultChannel.trySend(TestResult.UnknownError())
                     }
                     .collectLatest { data ->
                         val currentList = _audioRecordFlow.value
-                        if (currentList.size >= 1000) {
-                            _audioRecordFlow.value = currentList.drop(1)
+                        _audioRecordFlow.value = if (currentList.size >= 1000) {
+                            currentList.drop(1) + data
+                        } else {
+                            currentList + data
                         }
-                        _audioRecordFlow.value = currentList + data
                     }
             }
         }
     }
 
-    private fun stopRecording() {
-        Log.d("SpeechVM", "stopRecording called")
+    fun stopRecording() {
         recordingJob?.cancel()
         recordingJob = null
         audioRecorder.stopRecording()
         currentAudioFile?.let {
-            Log.d("SpeechVM", "Recording saved: ${it.absolutePath}")
             _audioNoteStatus.value = AudioNoteStatus.CAN_PLAY
             resultChannel.trySend(TestResult.Success(Unit))
         }
     }
 
     fun resetRecording() {
-        Log.d("SpeechVM", "resetRecording called")
         stopRecording()
         _audioRecordFlow.value = emptyList()
         currentAudioFile?.delete()
         currentAudioFile = null
         _audioNoteStatus.value = AudioNoteStatus.HAVE_TO_RECORD
+    }
+
+    fun uploadAudioFile() {
+        val file = currentAudioFile
+        if (file == null) {
+            Log.d("TestUploadAudio", "No audio file to upload")
+            return
+        }
+
+        Log.d("TestUploadAudio", "Starting upload for file: ${file.name}")
+
+        viewModelScope.launch(dispatchers.IO) {
+            try {
+                val result = testRepository.uploadAudio(file)
+                Log.d("TestUploadAudio", "Upload result: $result")
+                resultChannel.trySend(result)
+            } catch (e: Exception) {
+                Log.e("TestUploadAudio", "Upload failed", e)
+            }
+        }
     }
 
     override fun onCleared() {

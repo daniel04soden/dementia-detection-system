@@ -11,11 +11,10 @@ services:
     environment:
       - GENERAL_KEY=${GENERAL_KEY:-default_key}
     volumes:
-      # Mount model files for easier updates without rebuilding
-      - ./model_store:/app/model_store:ro
-      # Mount training data
+      - ./model_store:/app/model_store
       - ./ADReSS-IS2020-data-train:/app/ADReSS-IS2020-data-train:ro
       - ./ADReSS-IS2020-data-test:/app/ADReSS-IS2020-data-test:ro
+      - ./data:/app/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/"]

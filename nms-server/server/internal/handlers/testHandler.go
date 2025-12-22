@@ -21,11 +21,11 @@ type TestStageOne struct {
 	RecallStreet  string `json:"recallStreet"`
 	RecallCity    string `json:"recallCity"`
 
-	ClockNumberRes  bool `json:"clockNumberRes"`
-	ClockHandsRes   bool `json:"clockHandsRes"`
-	DateQuestionRes bool `json:"dateQuestionRes"`
-	NewsRes         bool `json:"newsRes"`
-	RecallRes       int  `json:"recallRes"`
+	ClockNumberRes  sql.NullBool  `json:"clockNumberRes"`
+	ClockHandsRes   sql.NullBool  `json:"clockHandsRes"`
+	DateQuestionRes sql.NullBool  `json:"dateQuestionRes"`
+	NewsRes         sql.NullBool  `json:"newsRes"`
+	RecallRes       sql.NullInt32 `json:"recallRes"`
 }
 
 func HandleGetTestStageOne(w http.ResponseWriter, r *http.Request) {
@@ -431,6 +431,9 @@ func HandleGradeStageOne(w http.ResponseWriter, r *http.Request) {
 					stageTwoStatus=$2
 				WHERE testID=$3
 			`, 2, 2, id)
+					stageOneStatus=$1
+				WHERE testID=$2
+			`, 2, id)
 		if err != nil {
 			http.Error(w, "DB update error: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -443,6 +446,9 @@ func HandleGradeStageOne(w http.ResponseWriter, r *http.Request) {
 					stageTwoStatus=$2
 				WHERE testID=$3
 			`, 3, 3, id)
+					stageOneStatus=$1
+				WHERE testID=$2
+			`, 3, id)
 		if err != nil {
 			http.Error(w, "DB update error: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -454,6 +460,9 @@ func HandleGradeStageOne(w http.ResponseWriter, r *http.Request) {
 					stageTwoStatus=$2
 				WHERE testID=$3
 			`, 4, 4, id)
+					stageOneStatus=$1
+				WHERE testID=$2
+			`, 4, id)
 		if err != nil {
 			http.Error(w, "DB update error: "+err.Error(), http.StatusInternalServerError)
 			return

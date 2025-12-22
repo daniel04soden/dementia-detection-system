@@ -19,22 +19,20 @@ class PaymentVM @Inject constructor(
 ) : ViewModel() {
 
     private val _paymentState = MutableStateFlow<PaymentState>(PaymentState.Idle)
-    val paymentState: StateFlow<PaymentState> = _paymentState.asStateFlow()
+    val paymentState = _paymentState.asStateFlow()
 
-    private val _clientSecret = MutableStateFlow<String?>(null)
-    val clientSecret: StateFlow<String?> = _clientSecret.asStateFlow()
+    private val _checkoutUrl = MutableStateFlow<String?>(null)
+    val checkoutUrl = _checkoutUrl.asStateFlow()
 
     fun createPaymentIntent(patientId: Int) {
         viewModelScope.launch {
             _paymentState.value = PaymentState.Loading
             try {
-                val request = StripeRequest(patientID = patientId)
-                val response = stripeRepo.paymentIntent(request)
-                _clientSecret.value = response.clientSecret
+                val response = stripeRepo.paymentIntent(StripeRequest(patientID = patientId))
+                _checkoutUrl.value = response.url
                 _paymentState.value = PaymentState.Ready
             } catch (e: Exception) {
-                _paymentState.value =
-                    PaymentState.Error(e.message ?: "Payment intent failed")
+                _paymentState.value = PaymentState.Error("Payment failed")
             }
         }
     }
@@ -45,10 +43,6 @@ class PaymentVM @Inject constructor(
 
     fun resetPayment() {
         _paymentState.value = PaymentState.Idle
-        _clientSecret.value = null
-    }
-
-    fun createStripeIntent(clientSecret: String): Intent {
-        throw NotImplementedError()
+        _checkoutUrl.value = null
     }
 }
