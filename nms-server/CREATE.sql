@@ -46,36 +46,32 @@ CREATE TABLE IF NOT EXISTS DoctorEmployment (
 );
 
 CREATE TABLE IF NOT EXISTS Lifestyle (
-    lifestyleID SERIAL PRIMARY KEY,
-    lifestyleStatus INT DEFAULT 0,
-    patientID INT,
-    diabetic INT,                                   -- 0 for no, 1 for yes
-    alcoholLevel FLOAT,                             -- ???
-    heartRate INT,                                  -- float with heartrate
-    bloodOxygen FLOAT,                              -- float with blood oxygen
-    bodyTemperature FLOAT,                          -- float with temperature
-    weight FLOAT,                                   -- float with weight
-    mriDelay FLOAT,                                -- ???
-    age INT,                                        -- int with age
-    dominantHand INT,                               -- 0 for left, 1 for right
-    gender INT,                                     -- 0 for female, 1 for male
-    familyHistory INT,                              -- 0 for no, 1 for yes
-    smoked INT,                                     -- 0 for no, 1 for yes
-    apoe4 INT,                                     -- 0 for no, 1 for yes
-    physicalActivity VARCHAR(50),                   -- 'Sedentary', 'Moderate Activity', 'Mild Activity'
-    depressionStatus INT,                           -- 0 for no depression, 1 for mild, 2 for moderate, etc.
-    cognitiveTestScores INT,                        -- ???
-    medicationHistory INT,                          -- 0 for no, 1 for yes
-    nutritionDiet VARCHAR(50),                      -- 'Low-Carb Diet', 'Mediterranean Diet', 'Balanced Diet'
-    sleepQuality INT,                               -- Assuming scale 1-5 or some numeric scale
-    chronicHealthConditions VARCHAR(50),            -- 'N/A', 'Heart Disease', 'Hypertension', 'Diabetes'
-    cumulativePrimary VARCHAR(5),                   -- 'TRUE' or 'FALSE'
-    cumulativeSecondary VARCHAR(5),                 -- 'TRUE' or 'FALSE'
-    cumulativeDegree VARCHAR(5),                    -- 'TRUE' or 'FALSE'
-    dementiaStatus VARCHAR(50),                      -- 'N/A', 'Early', 'Moderate', 'Severe'
+	lifestyleID SERIAL PRIMARY KEY,
+	lifestyleStatus INT DEFAULT 0,
+    patientID INT UNIQUE,
+	diabetic INT,
+	alcoholLevel FLOAT,
+    heartRate INT,
+    bloodOxygen FLOAT,
+    bodyTemperature FLOAT,
+    weight FLOAT,
+    mriDelay FLOAT,
+    age INT,
+    dominantHand INT,
+    gender INT,
+    familyHistory INT,
+    smoked INT,
+    apoe INT,
+    physicalActivity TEXT,
+    depressionStatus INT,
+    cognitiveTestScores INT,
+    medicationHistory INT,
+    nutritionDiet TEXT,
+    sleepQuality INT,
+    chronicHealthConditions TEXT,
+    education TEXT,
     FOREIGN KEY (patientID) REFERENCES Patient(patientID) ON DELETE CASCADE
 );
-
 
 CREATE TABLE IF NOT EXISTS Test (
     testID SERIAL PRIMARY KEY,
@@ -98,7 +94,6 @@ CREATE TABLE IF NOT EXISTS TestStageOne (
     recallNumber TEXT,
     recallStreet TEXT,
     recallCity TEXT,
-
     clockNumberRes BOOLEAN, 
     clockHandsRes BOOLEAN,
     dateQuestionRes BOOLEAN, 
@@ -111,14 +106,14 @@ CREATE TABLE IF NOT EXISTS TestStageTwo (
     testID INT PRIMARY KEY REFERENCES Test(testID) ON DELETE CASCADE,
     testDate VARCHAR(20) NOT NULL,
     memoryScore INT, 
-    conversationScore INT,
+    recallScore INT,
     speakingScore INT,
     financialScore INT,
     medicineScore INT,
     transportScore INT,
     totalScore INT GENERATED ALWAYS AS (
         COALESCE(memoryScore,0) +
-        COALESCE(conversationScore,0) +
+        COALESCE(recallScore,0) +
         COALESCE(speakingScore,0) +
         COALESCE(financialScore,0) +
         COALESCE(medicineScore,0) +

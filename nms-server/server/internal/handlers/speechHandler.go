@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-var ASSEMBLY_SECRET = os.Getenv("DB_HOST")
+var AssemblySecret = os.Getenv("DB_HOST")
 
 func uploadAudio(apiKey string, data []byte) (string, error) {
 	req, _ := http.NewRequest("POST", "https://api.assemblyai.com/v2/upload", bytes.NewReader(data))
@@ -71,13 +71,13 @@ func HandleUpload(w http.ResponseWriter, r *http.Request) {
 
 	fileBytes, _ := io.ReadAll(file)
 
-	uploadURL, err := uploadAudio(ASSEMBLY_SECRET, fileBytes)
+	uploadURL, err := uploadAudio(AssemblySecret, fileBytes)
 	if err != nil {
 		http.Error(w, "Upload to AssemblyAI failed: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	_, err = transcribeAudio(ASSEMBLY_SECRET, uploadURL)
+	_, err = transcribeAudio(AssemblySecret, uploadURL)
 	if err != nil {
 		http.Error(w, "Transcription request failed: "+err.Error(), http.StatusInternalServerError)
 		return

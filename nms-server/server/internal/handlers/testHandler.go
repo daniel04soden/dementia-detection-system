@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -208,6 +209,7 @@ func HandleInsertStageOne(w http.ResponseWriter, r *http.Request) {
     `, req.PatientID).Scan(&DoctorID)
 	if err != nil {
 		tx.Rollback()
+		log.Println("Select Doctor Error" + err.Error())
 		http.Error(w, "Could not find doctor for patient: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -220,6 +222,7 @@ func HandleInsertStageOne(w http.ResponseWriter, r *http.Request) {
     `, 1, req.PatientID, DoctorID).Scan(&testID)
 	if err != nil {
 		tx.Rollback()
+		log.Println("Select Create Test Row" + err.Error())
 		http.Error(w, "Could not create test: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -238,12 +241,16 @@ func HandleInsertStageOne(w http.ResponseWriter, r *http.Request) {
 		req.RecallName, req.RecallSurname, req.RecallNumber, req.RecallStreet, req.RecallCity)
 	if err != nil {
 		tx.Rollback()
+
+		log.Println("Insert Test Data Row" + err.Error())
 		http.Error(w, "Could not insert TestStageOne: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// Commit transaction
 	if err := tx.Commit(); err != nil {
+
+		log.Println("Commit Transaction Error" + err.Error())
 		http.Error(w, "Failed to commit transaction: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -273,6 +280,8 @@ func HandleInsertStageTwo(w http.ResponseWriter, r *http.Request) {
 
 	tx, err := db.Begin()
 	if err != nil {
+
+		log.Println("Start Transaction Error" + err.Error())
 		http.Error(w, "Failed to start transaction: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -292,6 +301,7 @@ func HandleInsertStageTwo(w http.ResponseWriter, r *http.Request) {
     `, req.PatientID).Scan(&testID)
 	if err != nil {
 		tx.Rollback()
+		log.Println("No active test found for Stage Two" + err.Error())
 		http.Error(w, "No active test found for Stage Two", http.StatusNotFound)
 		return
 	}
@@ -307,6 +317,8 @@ func HandleInsertStageTwo(w http.ResponseWriter, r *http.Request) {
 		req.FinancialScore, req.MedicineScore, req.TransportScore)
 	if err != nil {
 		tx.Rollback()
+
+		log.Println("Failed to insert into stage two" + err.Error())
 		http.Error(w, "Could not insert TestStageTwo: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -318,11 +330,15 @@ func HandleInsertStageTwo(w http.ResponseWriter, r *http.Request) {
     `, 1, testID)
 	if err != nil {
 		tx.Rollback()
+
+		log.Println("Failed to mark stage two as complete" + err.Error())
 		http.Error(w, "DB error: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if err := tx.Commit(); err != nil {
+
+		log.Println("Failed to commit" + err.Error())
 		http.Error(w, "Failed to commit transaction", http.StatusInternalServerError)
 		return
 	}
@@ -512,7 +528,7 @@ type TestStatus struct {
 	StageOneStatus  int `json:"stageOneStatus"`
 	StageTwoStatus  int `json:"stageTwoStatus"`
 	LifestyleStatus int `json:"lifestyleStatus"`
-	SpeechStatus    int `json:"speechStatus"`
+	SpeechStatus    int `json:"speechTestStatus"`
 }
 
 func HandleGetPatientTestStatus(w http.ResponseWriter, r *http.Request) {
@@ -535,7 +551,7 @@ func HandleGetPatientTestStatus(w http.ResponseWriter, r *http.Request) {
             t.stageOneStatus, 
             t.stageTwoStatus, 
             COALESCE(l.lifestyleStatus, 0) AS lifestyleStatus, 
-            COALESCE(s.speechStatus, 0) AS speechStatus
+            COALESCE(s.speechTestStatus, 0) AS speechTestStatus
         FROM Test t
         LEFT JOIN Lifestyle l ON t.patientID = l.patientID
         LEFT JOIN SpeechTest s ON t.patientID = s.patientID
@@ -585,7 +601,7 @@ func HandleGetPatientRisk(w http.ResponseWriter, r *http.Request) {
             t.stageOneStatus, 
             t.stageTwoStatus, 
             l.lifestyleStatus, 
-            s.speechStatus
+            s.speechTestStatus
         FROM Test t
         LEFT JOIN Lifestyle l ON t.patientID = l.patientID
         LEFT JOIN SpeechTest s ON t.patientID = s.patientID

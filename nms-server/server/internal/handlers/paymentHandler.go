@@ -41,10 +41,13 @@ func HandleCreatePayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db.Exec(`
+	_, err = db.Exec(`
 		INSERT INTO Payment(patientID, stripeIntentID, amount, status)
-		VALUES ($1, $2, $3)
+		VALUES ($1, $2, $3, 'pending')
 		`, req.PatientID, intent.ID, 1000)
+	if err != nil {
+		http.Error(w, "Failed to add payment", http.StatusInternalServerError)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
