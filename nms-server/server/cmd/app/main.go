@@ -6,12 +6,34 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"nms-server/server/internal/handlers"
 
 	_ "github.com/lib/pq"
 )
+
+func spaHandler(staticPath, indexPath string) http.Handler {
+	fs := http.FileServer(http.Dir(staticPath))
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/api/") {
+			http.NotFound(w, r)
+			return
+		}
+
+		path := filepath.Join(staticPath, r.URL.Path)
+
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			http.ServeFile(w, r, filepath.Join(staticPath, indexPath))
+			return
+		}
+
+		fs.ServeHTTP(w, r)
+	})
+}
 
 var (
 	host     = os.Getenv("DB_HOST")
@@ -164,6 +186,8 @@ func main() {
 	})
 
 	// ------------------------------------------------------------------------------------------------------
+
+	http.Handle("/", spaHandler("frontend", "index.html"))
 
 	http.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
