@@ -178,4 +178,34 @@ class TestRepoImp(
         }
     }
 
+    override suspend fun sendToAI(): TestResult<Unit> {
+        return try {
+            val token = prefs.getString("jwt", null) ?: run {
+                Log.e(TAG, "JWT token not found")
+                return TestResult.Unauthorized()
+            }
+
+            Log.d(TAG, token)
+            Log.d(TAG, "Calling AI endpoint")
+
+            val response = api.sendToAI("Bearer $token")
+
+            if (response.isSuccessful) {
+                Log.d(TAG, "AI request succeeded")
+                TestResult.Success(Unit)
+            } else {
+                Log.e(TAG, "AI request failed with code ${response.code()}")
+                TestResult.UnknownError()
+            }
+        } catch (e: HttpException) {
+            Log.e(TAG, "HttpException during AI request: ${e.code()} ${e.message()}", e)
+            if (e.code() == 401) TestResult.Unauthorized() else TestResult.UnknownError()
+        } catch (e: UnknownHostException) {
+            Log.e(TAG, "UnknownHostException during AI request", e)
+            TestResult.UnknownError()
+        } catch (e: Exception) {
+            Log.e(TAG, "Unexpected exception during AI request", e)
+            TestResult.UnknownError()
+        }
+    }
 }

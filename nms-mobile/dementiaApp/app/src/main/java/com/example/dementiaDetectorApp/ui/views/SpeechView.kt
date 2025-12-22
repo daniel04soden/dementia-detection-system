@@ -383,8 +383,6 @@ private fun PaymentPrompt(
 ) {
     val paymentState by pVM.paymentState.collectAsState()
 
-    val context = LocalContext.current
-
     AnimatedVisibility(
         visible = sVM.paymentVisi.collectAsState().value,
         enter = slideInHorizontally() + fadeIn(),
@@ -411,13 +409,27 @@ private fun PaymentPrompt(
                 fontSize = 18.sp
             )
 
-            StripePaymentButton(pVM, sharedVM) {
-                Text(
-                    text = "Use the AI\n(Requires Premium)",
-                    fontSize = 20.sp,
-                    color = Color.White,
-                    textAlign = TextAlign.Center
-                )
+            if(pVM.paymentState.collectAsState().value==PaymentState.Success){
+                Button(
+                    onClick = {
+                        sVM.isPaymentReq(false)
+                        sVM.onSuccess()
+                              },
+                    colors = buttonColours(),
+                    modifier = Modifier.fillMaxWidth(0.75f)
+                ) {
+                    Text("Use the AI\n", fontSize = 20.sp, color = Color.White)
+                }
+            }else{
+                sVM.onSuccess()
+                StripePaymentButton(pVM, sharedVM) {
+                    Text(
+                     text = "Use the AI\n(Requires Premium)",
+                        fontSize = 20.sp,
+                        color = Color.White,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
 
             Button(
@@ -434,7 +446,6 @@ private fun PaymentPrompt(
     if (paymentState is PaymentState.Success) {
         LaunchedEffect(Unit) {
             sVM.isPaymentReq(false)
-            sVM.onSuccess()
         }
     }
 }
@@ -459,7 +470,11 @@ private fun SuccessSection(sVM: SpeechViewModel, sharedVM: SharedVM, nc: NavCont
                 color = Color.White,
                 fontSize = 20.sp
             )
-            Button(onClick = { sVM.uploadAudioFile() }, colors = buttonColours(), modifier = Modifier.width(300.dp)) {
+            Button(onClick = {
+                sVM.uploadAudioFile()
+                nc.navigate("home")
+                             }, colors = buttonColours(), modifier = Modifier.width(300.dp))
+            {
                 Text("Submit Recording", fontSize = 25.sp, color = Color.White)
             }
             Button(
@@ -467,6 +482,7 @@ private fun SuccessSection(sVM: SpeechViewModel, sharedVM: SharedVM, nc: NavCont
                     sVM.onSuccess()
                     sVM.onRecChange()
                     sharedVM.onTestSubmission(3)
+                    nc.navigate("home")
                 },
                 colors = buttonColours(),
                 modifier = Modifier.width(300.dp)

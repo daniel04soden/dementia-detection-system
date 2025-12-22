@@ -60,12 +60,18 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun HomeScreen(homeVM: HomeVM, sharedVM: SharedVM, nc: NavController){
-    LaunchedEffect(Unit) {
-        repeat(3){
-            sharedVM.getStatus()
-            delay(1000)
-        }
+    LaunchedEffect(sharedVM.tests.value) {
+        sharedVM.getStatus()
     }
+
+    LaunchedEffect(sharedVM.testsDone.value) {
+        sharedVM.getStatus()
+    }
+
+    LaunchedEffect(Unit) {
+        sharedVM.getStatus()
+    }
+
     Box(modifier = Modifier
         .background(Color.White)
         .fillMaxSize()

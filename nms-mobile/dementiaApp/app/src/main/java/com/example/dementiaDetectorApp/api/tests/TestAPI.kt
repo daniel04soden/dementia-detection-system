@@ -41,4 +41,9 @@ interface TestAPI {
         @Header("Authorization") token: String,
         @Part file: MultipartBody.Part
     ): Response<Unit>
+
+    @POST("lifestyle/ai/review")
+    suspend fun sendToAI(
+        @Header("Authorization")token:String,
+    ):Response<Unit>
 }

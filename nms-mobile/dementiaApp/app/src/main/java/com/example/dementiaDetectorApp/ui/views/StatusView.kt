@@ -102,45 +102,62 @@ private fun TestCard(test:Test, sharedVM: SharedVM, nc: NavController){
                 color = DarkPurple
             )
 
-            val status = when (test.state){
-                0 -> {"Not Completed"}
-                1 -> {"Awaiting Grade"}
-                5 -> {"Can be graded with AI"}
-                else -> {"Graded"}
+            var status = when (test.route) {
+                "test2" -> when (test.state) {
+                    1 -> "Graded"
+                    2 -> "Not Required"
+                    3 -> "Ready to complete"  // Fixed
+                    in 4..Int.MAX_VALUE -> "Graded"
+                    else -> "Not Required"
+                }
+                else -> when (test.state) {
+                    0 -> "Not Completed"
+                    1 -> "Awaiting Grade"
+                    2, 3, 4 -> "Graded"
+                    5 -> "Can be graded with AI"
+                    else -> "Not Completed"
+                }
             }
 
-            val col = when (test.state){
-                0 -> {Color.Red}
-                1 -> {Yellow}
-                5 -> {Yellow}
-                else -> {Color.Green}
+            val col = when (test.route) {
+                "test2" -> when (test.state) {
+                    2 -> Color.White
+                    3 -> Color.Yellow
+                    1, in 4..Int.MAX_VALUE -> Color.Green
+                    else -> Color.White
+                }
+                else -> when (test.state) {
+                    0 -> Color.Red
+                    1, 5 -> Color.Yellow
+                    else -> Color.Green
+                }
             }
 
             Text(
-                text = status,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium,
-                color = col
-            )
-        }
-    }
-}
-
-@Composable
-private fun TestSection(sharedVM: SharedVM, nc: NavController){
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp)
-        .padding(bottom = 100.dp),
-        verticalArrangement = Arrangement.spacedBy(35.dp)
-    ){
-        LazyColumn(
-            Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(35.dp)
-        ){
-            items(sharedVM.tests.value.size){idx ->
-                TestCard(sharedVM.tests.value[idx], sharedVM, nc)
+                    text = status,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = col
+                )
             }
         }
     }
-}
+
+    @Composable
+    private fun TestSection(sharedVM: SharedVM, nc: NavController){
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .padding(bottom = 100.dp),
+            verticalArrangement = Arrangement.spacedBy(35.dp)
+        ){
+            LazyColumn(
+                Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(35.dp)
+            ){
+                items(sharedVM.tests.value.size){idx ->
+                    TestCard(sharedVM.tests.value[idx], sharedVM, nc)
+                }
+            }
+        }
+    }

@@ -47,12 +47,7 @@ class PaymentVM @Inject constructor(
         }
     }
 
-    fun onPaymentConfirmed() {
-        _paymentState.value = PaymentState.Success
-    }
-
-    fun resetPayment() {
-        _paymentState.value = PaymentState.Idle
-        _checkoutUrl.value = null
+    init {
+        checkPaymentStatus()
     }
 }
