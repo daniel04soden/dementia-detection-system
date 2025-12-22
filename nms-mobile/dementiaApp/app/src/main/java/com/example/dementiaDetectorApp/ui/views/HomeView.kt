@@ -27,6 +27,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,10 +56,16 @@ import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.ui.util.standardQuadFromTo
 import com.example.dementiaDetectorApp.viewModels.HomeVM
 import com.example.dementiaDetectorApp.viewModels.SharedVM
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomeScreen(homeVM: HomeVM, sharedVM: SharedVM, nc: NavController){
-    sharedVM.getStatus()
+    LaunchedEffect(Unit) {
+        repeat(3){
+            sharedVM.getStatus()
+            delay(1000)
+        }
+    }
     Box(modifier = Modifier
         .background(Color.White)
         .fillMaxSize()

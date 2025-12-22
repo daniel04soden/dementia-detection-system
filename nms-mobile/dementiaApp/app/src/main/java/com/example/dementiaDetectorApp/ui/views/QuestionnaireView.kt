@@ -1,6 +1,5 @@
 package com.example.dementiaDetectorApp.ui.views
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -26,10 +25,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.movableContentOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -38,7 +37,6 @@ import androidx.navigation.NavController
 import com.example.dementiaDetectorApp.models.PaymentState
 import com.example.dementiaDetectorApp.ui.composables.Footer
 import com.example.dementiaDetectorApp.ui.composables.StripePaymentButton
-import com.example.dementiaDetectorApp.ui.composables.SubmittedSection
 import com.example.dementiaDetectorApp.ui.theme.Gray
 import com.example.dementiaDetectorApp.ui.theme.MidPurple
 import com.example.dementiaDetectorApp.ui.theme.buttonColours
@@ -281,7 +279,12 @@ private fun S3Section(qVM: QViewModel, sharedVM: SharedVM){
                 if (!sharedVM.hasPaid.value) qVM.isPaymentReq(true) else qVM.onSuccessChange(true)
                 qVM.onS3Change(false)
             },*/
-            onClick = {qVM.onSuccessChange(true)},
+            onClick = {
+                qVM.onS3Change(false)
+                qVM.submitAnswers(sharedVM.id.value)
+                sharedVM.onTestSubmission(0)
+                qVM.onSuccessChange(true)
+                      },
             enabled = qVM.s3Complete.value,
             colors = buttonColours(),
             shape = RoundedCornerShape(24.dp),
@@ -306,6 +309,8 @@ private fun PaymentPrompt(
 ) {
     val paymentState by pVM.paymentState.collectAsState()
 
+    val context = LocalContext.current
+
     AnimatedVisibility(
         visible = qVM.paymentVisi.collectAsState().value,
         enter = slideInHorizontally() + fadeIn(),
@@ -329,33 +334,33 @@ private fun PaymentPrompt(
             Text(
                 text = "By paying €5, you gain access to the use of our AI for grading the Lifestyle-Questionnaire and the Speech Test\n\nUsing the AI will get you an immediate response with a high but not perfect level of accuracy",
                 color = Color.White,
-                fontSize = 20.sp
+                fontSize = 18.sp
             )
 
             StripePaymentButton(pVM, sharedVM) {
                 Text(
-                    text = "Use the AI\n(Pay €5)",
-                    fontSize = 25.sp,
+                    text = "Use the AI\n(Requires Premium)",
+                    fontSize = 20.sp,
                     color = Color.White,
                     textAlign = TextAlign.Center
                 )
             }
 
             Button(
-                onClick = {
-                    nc.navigate("home")
-                          },
+                onClick = {nc.navigate("home")},
                 colors = buttonColours(),
                 modifier = Modifier.fillMaxWidth(0.75f)
             ) {
-                Text("No thanks\n(Don't grade test)", fontSize = 25.sp, color = Color.White)
+                Text("No thanks\n(Don't submit test)", fontSize = 20.sp, color = Color.White)
             }
         }
     }
-
+    // Wrap onSuccess in LaunchedEffect to avoid calling it during recomposition
     if (paymentState is PaymentState.Success) {
-        qVM.isPaymentReq(false)
-        qVM.onSuccessChange(true)
+        LaunchedEffect(Unit) {
+            qVM.isPaymentReq(false)
+            qVM.onSuccessChange(true)
+        }
     }
 }
 
@@ -387,7 +392,7 @@ private fun SuccessSection(qVM: QViewModel, nc: NavController) {
 }
 
 @Composable
-private fun AISuccessSection(qVM: QViewModel, nc: NavController) {
+private fun AISuccessSection(qVM: QViewModel, sharedVM: SharedVM, nc: NavController) {
     AnimatedVisibility(
         visible = qVM.aiSuccessVisi.collectAsState().value,
         enter = slideInHorizontally() + fadeIn(),
@@ -406,7 +411,10 @@ private fun AISuccessSection(qVM: QViewModel, nc: NavController) {
                 color = Color.White,
                 fontSize = 20.sp
             )
-            Button(onClick = {}, colors = buttonColours(), modifier = Modifier.width(300.dp)) {
+            Button(onClick = {
+                //LAST REPO CALL HERE
+                sharedVM.onTestSubmission(0)
+                             }, colors = buttonColours(), modifier = Modifier.width(300.dp)) {
                 Text("Submit Answers", fontSize = 25.sp, color = Color.White)
             }
             Button(
@@ -429,7 +437,7 @@ fun SubmitQuestionnaireScreen(qVM: QViewModel, pVM: PaymentVM, sharedVM: SharedV
         .fillMaxSize()
         .background(MidPurple)
     ){
-        AISuccessSection(qVM, nc)
+        AISuccessSection(qVM, sharedVM, nc)
         PaymentPrompt(qVM, sharedVM, pVM, nc)
     }
 }

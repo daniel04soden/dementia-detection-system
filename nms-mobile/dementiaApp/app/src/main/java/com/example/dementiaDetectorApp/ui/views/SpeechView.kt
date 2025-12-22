@@ -413,7 +413,7 @@ private fun PaymentPrompt(
 
             StripePaymentButton(pVM, sharedVM) {
                 Text(
-                    text = "Use the AI\n(Pay €5)",
+                    text = "Use the AI\n(Requires Premium)",
                     fontSize = 20.sp,
                     color = Color.White,
                     textAlign = TextAlign.Center
@@ -421,7 +421,7 @@ private fun PaymentPrompt(
             }
 
             Button(
-                onClick = { sVM.uploadAudioFile() },
+                onClick = {nc.navigate("home")},
                 colors = buttonColours(),
                 modifier = Modifier.fillMaxWidth(0.75f)
             ) {
