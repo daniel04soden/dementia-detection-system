@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -64,12 +65,12 @@ func HandleInsertLifestyle(w http.ResponseWriter, r *http.Request) {
 	// 		cumulativeDegree = "TRUE"
 	// 	}
 
-	err := db.QueryRow(`
+	_, err := db.Exec(`
 		INSERT INTO Lifestyle (
 			lifestyleStatus, patientID, diabetic, alcoholLevel, heartRate, bloodOxygen, bodyTemperature, 
 			weight, mriDelay, age, dominantHand, gender, familyHistory, smoked, apoe, 
 			physicalActivity, depressionStatus, cognitiveTestScores, medicationHistory, 
-			nutritionDiet, sleepQuality, chronicHealthConditions, education, 
+			nutritionDiet, sleepQuality, chronicHealthConditions, education 
 		) 
 		VALUES (
 			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 
@@ -81,7 +82,7 @@ func HandleInsertLifestyle(w http.ResponseWriter, r *http.Request) {
 		req.DepressionStatus, req.CognitiveTestScores, req.MedicationHistory, req.NutritionDiet,
 		req.SleepQuality, req.ChronicHealthConditions, req.Education)
 	if err != nil {
-		http.Error(w, "invalid insert", http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("insert failed: %v", err), http.StatusBadRequest)
 		return
 	}
 
@@ -232,14 +233,13 @@ func HandleReviewLifestyle(w http.ResponseWriter, r *http.Request) {
 		heartRate, bloodOxygen, bodyTemperature, weight, MRIDelay,
 		age, dominantHand, gender, familyHistory, smoked, apoe4, physicalActivity,
 		depressionStatus, cognitiveTestScores, medicationHistory, nutritionDiet,
-		sleepQuality, cumulativePrimary, cumulativeSecondary, cumulativeDegree, dementiaStatus
+		sleepQuality 
 		FROM Lifestyle 
 		WHERE patientID = $1
 		`, claims.ID)
 	err = row.Scan(ls.Diabetic, ls.AlcoholLevel, ls.HeartRate, ls.BloodOxygen, ls.BodyTemperature, ls.Weight,
 		ls.MRIDelay, ls.Age, ls.DominantHand, ls.Gender, ls.FamilyHistory, ls.Smoked, ls.APOE4, ls.PhysicalActivity,
-		ls.DepressionStatus, ls.CognitiveTestScores, ls.MedicationHistory, ls.NutritionDiet, ls.SleepQuality,
-		ls.CumulativePrimary, ls.CumulativeSecondary, ls.CumulativeDegree, ls.DementiaStatus)
+		ls.DepressionStatus, ls.CognitiveTestScores, ls.MedicationHistory, ls.NutritionDiet, ls.SleepQuality)
 	if err != nil {
 		http.Error(w, "failed to scan lifestyle", http.StatusInternalServerError)
 		return
