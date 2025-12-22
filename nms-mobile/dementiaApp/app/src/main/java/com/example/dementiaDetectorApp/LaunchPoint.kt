@@ -69,7 +69,7 @@ class LaunchPoint : ComponentActivity() {
                 val pVM:PaymentVM = hiltViewModel()
                 val rVM:RiskVM = hiltViewModel()
 
-                NavHost(navController = nc, startDestination = "home") {
+                NavHost(navController = nc, startDestination = "login") {
                     composable("login"){LoginScreen(authVM,sharedVM, nc)}
                     composable("registration"){ RegistrationScreen(authVM,sharedVM, nc) }
                     composable("home"){ HomeScreen(homeVM, sharedVM, nc) }

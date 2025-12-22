@@ -128,7 +128,7 @@ fun FeedbackPanel(
                 Button(
                     onClick = {
                         homeVM.submitReview(sharedVM.id.value)
-                        homeVM.onFeedbackVisiChange()
+                        homeVM.onFeedbackVisiChange(false)
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White
@@ -147,7 +147,7 @@ fun FeedbackPanel(
                 }
                 Button(
                     onClick = {
-                        homeVM.onFeedbackVisiChange()
+                        homeVM.onFeedbackVisiChange(false)
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White
@@ -197,7 +197,7 @@ fun ReviewPrompt(homeVM: HomeVM)
         .clip(RoundedCornerShape(10.dp))
         .background(MidPurple)//CHANGE
         .padding(horizontal = 15.dp , vertical = 20.dp)
-        .clickable {homeVM.onFeedbackVisiChange()},
+        .clickable {homeVM.onFeedbackVisiChange(true)},
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(20.dp)
     ){

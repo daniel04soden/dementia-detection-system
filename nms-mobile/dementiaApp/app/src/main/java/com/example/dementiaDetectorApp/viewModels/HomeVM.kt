@@ -60,7 +60,7 @@ class HomeVM @Inject constructor(
 
     private val _feedbackVisi = mutableStateOf(false)
     val feedbackVisi: State<Boolean> = _feedbackVisi
-    fun onFeedbackVisiChange(){_feedbackVisi.value = !_feedbackVisi.value}
+    fun onFeedbackVisiChange(newVisi: Boolean){_feedbackVisi.value = newVisi}
 
     private val _testsDone = mutableIntStateOf(0)
 
@@ -73,7 +73,7 @@ class HomeVM @Inject constructor(
                 critique = _feedback.value,
             )
             if (result is FeedbackResult.Authorized){
-                onFeedbackVisiChange()
+                onFeedbackVisiChange(false)
                 val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
                 prefs.edit {
                     putBoolean("review_asked", true)

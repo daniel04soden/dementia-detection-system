@@ -16,8 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 class RiskVM @Inject constructor(
     @ApplicationContext private val context: Context,
     private val repo: RiskRepo
-):ViewModel(){
-    private var _isLoading = false
+) : ViewModel() {
 
     private val _riskResult = mutableStateOf("")
     val riskResult: State<String> = _riskResult
@@ -26,10 +25,10 @@ class RiskVM @Inject constructor(
     val riskMsg: State<String> = _riskMsg
 
     private val _img = MutableStateFlow(R.drawable.logo)
-    val img:StateFlow<Int> = _img
+    val img: StateFlow<Int> = _img
 
-    fun onRiskChange(score:Int){
-        when(score){
+    fun onRiskChange(score: Int) {
+        when (score) {
             1 -> {
                 _riskResult.value = "Low risk"
                 _riskMsg.value = "Your risk of having dementia are quite low, a checkup with a doctor is not needed but wouldn't hurt"
@@ -38,15 +37,15 @@ class RiskVM @Inject constructor(
                 _riskResult.value = "Moderate risk"
                 _riskMsg.value = "You are at moderate risk of having dementia, a checkup with a medical professional is recommended"
             }
-            3 ->{
+            3 -> {
                 _riskResult.value = "High risk"
                 _riskMsg.value = "You are at high risk of having dementia, a checkup with a medical professional is required"
             }
-            4 ->{
+            4 -> {
                 _riskResult.value = "Extremely high risk"
                 _riskMsg.value = "You are at extremely high risk of having dementia, you should have a meeting with the medical professional as soon as possible"
             }
-            else ->{
+            else -> {
                 _riskResult.value = "No detected risk"
                 _riskMsg.value = "Our tests have not detected any signs of dementia, a checkup with a medical professional is not required"
             }

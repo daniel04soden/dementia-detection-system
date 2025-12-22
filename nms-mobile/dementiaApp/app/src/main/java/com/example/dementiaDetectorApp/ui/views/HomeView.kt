@@ -58,7 +58,7 @@ import com.example.dementiaDetectorApp.viewModels.SharedVM
 
 @Composable
 fun HomeScreen(homeVM: HomeVM, sharedVM: SharedVM, nc: NavController){
-    sharedVM.updateTestList()
+    sharedVM.getStatus()
     Box(modifier = Modifier
         .background(Color.White)
         .fillMaxSize()
