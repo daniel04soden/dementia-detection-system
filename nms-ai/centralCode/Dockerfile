@@ -15,10 +15,8 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
 COPY *.py ./
 
-# Copy model files and training data
 COPY model_store/ ./model_store/
 COPY ADReSS-IS2020-data-train/ ./ADReSS-IS2020-data-train/
 COPY ADReSS-IS2020-data-test/ ./ADReSS-IS2020-data-test/
