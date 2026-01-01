@@ -7,34 +7,16 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -74,9 +56,9 @@ fun SpeechScreen(
                 Spacer(Modifier.height(35.dp))
             }
             PrefaceSection(sVM)
-            TestSection(sVM, sharedVM, nc)
-            PaymentPrompt(sVM, sharedVM, pVM, nc)
+            TestSection(sVM, pVM)
             SuccessSection(sVM, sharedVM, nc)
+            PaymentPrompt(sVM, sharedVM, pVM, nc)
         }
         if (!sVM.paymentVisi.collectAsState().value) {
             Footer(Modifier.align(Alignment.BottomCenter))
@@ -114,7 +96,10 @@ private fun PrefaceSection(sVM: SpeechViewModel) {
                     verticalArrangement = Arrangement.spacedBy(125.dp)
                 ) {
                     Text(
-                        text = "The following is a test that will take a recording of your voice\n\nThe test will begin by displaying an image on the screen that you must then describe\n\nThe recording will last 30 seconds, please try to keep speaking for the entirety of the test, if needed there is a button for displaying a new image to allow you to say more",
+                        text = "The following is a test that will take a recording of your voice\n\n" +
+                                "The test will begin by displaying an image on the screen that you must then describe\n\n" +
+                                "The recording will last 30 seconds, please try to keep speaking for the entirety of the test, " +
+                                "if needed there is a button for displaying a new image to allow you to say more",
                         fontSize = 20.sp,
                         color = Gray,
                         textAlign = TextAlign.Center,
@@ -137,7 +122,7 @@ private fun PrefaceSection(sVM: SpeechViewModel) {
 }
 
 @Composable
-private fun TestSection(sVM: SpeechViewModel, sharedVM: SharedVM, nc: NavController) {
+private fun TestSection(sVM: SpeechViewModel, pVM: PaymentVM) {
     AnimatedVisibility(
         visible = sVM.recVisi.collectAsState().value,
         enter = slideInHorizontally() + fadeIn(),
@@ -152,7 +137,7 @@ private fun TestSection(sVM: SpeechViewModel, sharedVM: SharedVM, nc: NavControl
         ) {
             HeaderSection(sVM)
             ImageSection(sVM)
-            RecordingSection(sVM, sharedVM, nc)
+            RecordingSection(sVM, pVM)
         }
     }
 }
@@ -210,7 +195,7 @@ private fun ImageSection(sVM: SpeechViewModel) {
 }
 
 @Composable
-private fun RecordingSection(sVM: SpeechViewModel, sharedVM: SharedVM, nc: NavController) {
+private fun RecordingSection(sVM: SpeechViewModel, pVM: PaymentVM) {
     val audioStatus by sVM.audioStatus.collectAsState()
     val audioRecordingData by sVM.audioRecordFlow.collectAsState()
     val latestData = audioRecordingData.lastOrNull()
@@ -220,7 +205,7 @@ private fun RecordingSection(sVM: SpeechViewModel, sharedVM: SharedVM, nc: NavCo
     when (audioStatus) {
         SpeechViewModel.AudioNoteStatus.HAVE_TO_RECORD -> ReadyToRecordSection(sVM)
         SpeechViewModel.AudioNoteStatus.RECORDING -> RecordingActiveSection(audioRecordingData, remainingSeconds)
-        SpeechViewModel.AudioNoteStatus.CAN_PLAY -> RecordingCompleteSection(sVM, sharedVM, nc)
+        SpeechViewModel.AudioNoteStatus.CAN_PLAY -> RecordingCompleteSection(sVM, pVM)
     }
 }
 
@@ -279,7 +264,8 @@ private fun RecordingActiveSection(
 }
 
 @Composable
-private fun RecordingCompleteSection(sVM: SpeechViewModel, sharedVM: SharedVM, nc: NavController) {
+private fun RecordingCompleteSection(sVM: SpeechViewModel, pVM: PaymentVM) {
+    val paymentState by pVM.paymentState.collectAsState()
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 15.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -312,7 +298,11 @@ private fun RecordingCompleteSection(sVM: SpeechViewModel, sharedVM: SharedVM, n
             Button(
                 onClick = {
                     sVM.onRecChange()
-                    if (true) sVM.isPaymentReq(true) else sVM.onSuccess()
+                    if (paymentState != PaymentState.Success){
+                        sVM.isPaymentReq(true)
+                        sVM.setSuccess(false)
+                    }
+                    else sVM.setSuccess(true)//If paid set success to true
                 },
                 colors = buttonColours(),
                 modifier = Modifier.fillMaxWidth()
@@ -382,14 +372,18 @@ private fun PaymentPrompt(
     nc: NavController
 ) {
     val paymentState by pVM.paymentState.collectAsState()
+    val paymentVisi by sVM.paymentVisi.collectAsState()
 
     AnimatedVisibility(
-        visible = sVM.paymentVisi.collectAsState().value,
+        visible = paymentVisi,
         enter = slideInHorizontally() + fadeIn(),
         exit = slideOutHorizontally() + fadeOut()
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().background(MidPurple).padding(horizontal = 15.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MidPurple)
+                .padding(horizontal = 15.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
@@ -398,33 +392,34 @@ private fun PaymentPrompt(
             HorizontalDivider(thickness = 2.dp, color = Color.White)
 
             Text(
-                text = "Our speech test relies on the use of our AI model for returning our results.\n\nUnfortunately we cannot run said model for free and as such we require a payment from each user to access its features.",
+                text = "Our speech test relies on the use of our AI model for returning our results.\n\n" +
+                        "Unfortunately we cannot run said model for free and as such we require a payment from each user to access its features.",
                 color = Color.White,
                 fontSize = 20.sp
             )
 
             Text(
-                text = "By paying €5, you gain access to the use of our AI for grading the Lifestyle-Questionnaire and the Speech Test\n\nUsing the AI will get you an immediate response with a high but not perfect level of accuracy",
+                text = "By paying €5, you gain access to the use of our AI for grading the Lifestyle-Questionnaire and the Speech Test\n\n" +
+                        "Using the AI will get you an immediate response with a high but not perfect level of accuracy",
                 color = Color.White,
                 fontSize = 18.sp
             )
 
-            if(pVM.paymentState.collectAsState().value==PaymentState.Success){
+            if (paymentState == PaymentState.Success) {
                 Button(
                     onClick = {
                         sVM.isPaymentReq(false)
-                        sVM.onSuccess()
-                              },
+                        sVM.setSuccess(true)
+                    },
                     colors = buttonColours(),
                     modifier = Modifier.fillMaxWidth(0.75f)
                 ) {
                     Text("Use the AI\n", fontSize = 20.sp, color = Color.White)
                 }
-            }else{
-                sVM.onSuccess()
+            } else {
                 StripePaymentButton(pVM, sharedVM) {
                     Text(
-                     text = "Use the AI\n(Requires Premium)",
+                        text = "Use the AI\n(Requires Premium)",
                         fontSize = 20.sp,
                         color = Color.White,
                         textAlign = TextAlign.Center
@@ -433,19 +428,12 @@ private fun PaymentPrompt(
             }
 
             Button(
-                onClick = {nc.navigate("home")},
+                onClick = { nc.navigate("home") },
                 colors = buttonColours(),
                 modifier = Modifier.fillMaxWidth(0.75f)
             ) {
                 Text("No thanks\n(Don't submit test)", fontSize = 20.sp, color = Color.White)
             }
-        }
-    }
-
-    // Wrap onSuccess in LaunchedEffect to avoid calling it during recomposition
-    if (paymentState is PaymentState.Success) {
-        LaunchedEffect(Unit) {
-            sVM.isPaymentReq(false)
         }
     }
 }
@@ -470,16 +458,19 @@ private fun SuccessSection(sVM: SpeechViewModel, sharedVM: SharedVM, nc: NavCont
                 color = Color.White,
                 fontSize = 20.sp
             )
-            Button(onClick = {
-                sVM.uploadAudioFile()
-                nc.navigate("home")
-                             }, colors = buttonColours(), modifier = Modifier.width(300.dp))
-            {
+            Button(
+                onClick = {
+                    sVM.uploadAudioFile()
+                    nc.navigate("home")
+                },
+                colors = buttonColours(),
+                modifier = Modifier.width(300.dp)
+            ) {
                 Text("Submit Recording", fontSize = 25.sp, color = Color.White)
             }
             Button(
                 onClick = {
-                    sVM.onSuccess()
+                    sVM.setSuccess(false) //Dismiss success screen
                     sVM.onRecChange()
                     sharedVM.onTestSubmission(3)
                     nc.navigate("home")
