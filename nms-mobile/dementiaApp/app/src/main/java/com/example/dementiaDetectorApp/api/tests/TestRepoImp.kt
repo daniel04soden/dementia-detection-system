@@ -194,7 +194,7 @@ class TestRepoImp(
                 Log.d(TAG, "AI request succeeded")
                 TestResult.Success(Unit)
             } else {
-                Log.e(TAG, "AI request failed with code ${response.code()}")
+                Log.e(TAG, "AI request failed with code ${response.code()}\n ${response.body()}")
                 TestResult.UnknownError()
             }
         } catch (e: HttpException) {
