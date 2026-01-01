@@ -1,5 +1,6 @@
 package com.example.dementiaDetectorApp.viewModels
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -85,6 +86,8 @@ class SharedVM @Inject constructor(
             stage1Status.intValue = result.data?.stageOneStatus ?: 0
             stage2Status.intValue = result.data?.stageTwoStatus ?: 2
             speechStatus.intValue = result.data?.speechTestStatus ?: 0
+
+            Log.d("Status Out", "${result.data?.lifestyleStatus}")
 
             _tests.value = listOf(
                 Test("Lifestyle questionnaire", "questionnaire", questionnaireStatus.intValue),
