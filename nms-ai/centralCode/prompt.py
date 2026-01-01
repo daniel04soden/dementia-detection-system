@@ -210,7 +210,7 @@ def run_test(answers: list, loaded_model, scaler, model_features, global_le) -> 
 
     percentage_likelihood = prediction_probability * 100
 
-    y_pred_binary = (y_pred_probs > 0.5).astype(int)
+    y_pred_binary = (y_pred_probs > 0.3).astype(int)
     predicted_label = global_le.inverse_transform(y_pred_binary.flatten())
 
     print(f"\n--- Prediction Results ---")

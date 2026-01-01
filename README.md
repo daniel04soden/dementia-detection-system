@@ -1,7 +1,7 @@
-# 🧠 Dementia Detection System
+# Dementia Detection System
 The Dementia Detection System is a comprehensive application designed to detect dementia through speech analysis and machine learning models. The system consists of a web application, machine learning models,a mobile application for patients, and a dashboard for administrators and doctors to use the system. The project aims to provide an efficient and accurate way to detect dementia, improving the lives of individuals and their families.
 
-## 🚀 Features
+## Features
 * Speech analysis using OpenAI models to determine the likelihood of dementia
 * Machine learning models for classifying dementia based on a dataset
 * Web application with API endpoints for interacting with the system
@@ -9,9 +9,9 @@ The Dementia Detection System is a comprehensive application designed to detect 
 * User authentication and authorization for secure access
 * Mobile application where users can submit answers to tests and questionnaires and can pay to receive AI analysed results
 
-## 🛠️ Tech Stack
-* Frontend: React, TypeScript
+## Tech Stack
+* Frontend: React, TypeScript, CSS Modules
 * Backend: Golang
-* Machine Learning: Keras
+* Machine Learning: Keras, TensorFlow, OpenAI, Ollama & CrewAI
 * Database: PostgreSQL
 * Mobile: Kotlin (Jetpack Compose)
