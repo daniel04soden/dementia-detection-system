@@ -14,4 +14,4 @@ The Dementia Detection System is a comprehensive application designed to detect 
 * Backend: Golang
 * Machine Learning: Keras, TensorFlow, OpenAI, Ollama & CrewAI
 * Database: PostgreSQL
-* Mobile: Kotlin (Jetpack Compose)
+* Mobile: Kotlin (Jetpack  Compose)
