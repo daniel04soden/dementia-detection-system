@@ -414,7 +414,10 @@ private fun AISuccessSection(qVM: QViewModel, sharedVM: SharedVM, nc: NavControl
             Button(onClick = {
                 qVM.sendDataToAI()
                 sharedVM.onTestSubmission(0)
-                             }, colors = buttonColours(), modifier = Modifier.width(300.dp)) {
+                nc.navigate("home")},
+                colors = buttonColours(),
+                modifier = Modifier.width(300.dp))
+            {
                 Text("Submit Answers", fontSize = 25.sp, color = Color.White)
             }
             Button(
