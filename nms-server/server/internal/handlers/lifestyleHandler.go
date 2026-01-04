@@ -222,45 +222,49 @@ type LifestyleAIAnalyse struct {
 }
 
 func HandleAIReviewLifestyle(w http.ResponseWriter, r *http.Request) {
+	log.Println("Do i even get called?")
 	authHeader := r.Header.Get("Authorization")
-	var token string
 	token, ok := strings.CutPrefix(authHeader, "Bearer ")
 	if !ok {
-		fmt.Println("cant cut prefix")
 		http.Error(w, "Missing or invalid Authorization header", http.StatusUnauthorized)
+		log.Println("Bad Auth Header")
 		return
 	}
+
+	log.Println("check 1 pass?")
 
 	claims, err := auth.ValidateJWT(token)
 	if err != nil {
-
-		fmt.Println("expired token")
 		http.Error(w, "Invalid or expired token", http.StatusUnauthorized)
+
+		log.Println("Invalid Header")
 		return
+
 	}
 
-	row := db.QueryRow(`
-		SELECT premium 
-		FROM Patient
-		WHERE patientID = $1
-		`, claims.UserID)
+	log.Println("check 2 pass?")
 
+	row := db.QueryRow(`SELECT premium FROM Patient WHERE patientID = $1`, claims.UserID)
 	var premium bool
-
 	err = row.Scan(&premium)
 	if err != nil {
 
-		fmt.Println("cant scan if premium" + err.Error())
+		log.Println("no user")
 		http.Error(w, "failed to scan patient", http.StatusInternalServerError)
 		return
 	}
 
+	log.Println("check 3pass?")
 	if !premium {
+
+		log.Println("not premium user")
 		http.Error(w, "Access not allowed", http.StatusUnauthorized)
+		return
 	}
 
-	var ls LifestyleItem
+	log.Println("check 4pass?")
 
+	var ls LifestyleItem
 	row = db.QueryRow(`
 		SELECT diabetic, alcoholLevel,
 		heartRate, bloodOxygen, bodyTemperature, weight, MRIDelay,
@@ -269,20 +273,22 @@ func HandleAIReviewLifestyle(w http.ResponseWriter, r *http.Request) {
 		sleepQuality, chronicHealthConditions, education
 		FROM Lifestyle 
 		WHERE patientID = $1
-		`, claims.UserID)
+	`, claims.UserID)
 	err = row.Scan(&ls.Diabetic, &ls.AlcoholLevel, &ls.HeartRate, &ls.BloodOxygen, &ls.BodyTemperature, &ls.Weight,
 		&ls.MRIDelay, &ls.Age, &ls.DominantHand, &ls.Gender, &ls.FamilyHistory, &ls.Smoked, &ls.APOE4, &ls.PhysicalActivity,
 		&ls.DepressionStatus, &ls.CognitiveTestScores, &ls.MedicationHistory, &ls.NutritionDiet, &ls.SleepQuality, &ls.ChronicHealthConditions, &ls.Education)
 	if err != nil {
-		fmt.Println("cant scan from db" + err.Error())
 		http.Error(w, "failed to scan lifestyle", http.StatusInternalServerError)
+
+		log.Println("Cant scan lifestyle")
 		return
 	}
+
+	log.Println("check 5pass?")
 
 	cumulativePrimary := "FALSE"
 	cumulativeSecondary := "FALSE"
 	cumulativeDegree := "FALSE"
-
 	switch ls.Education {
 	case "Primary":
 		cumulativePrimary = "TRUE"
@@ -294,14 +300,15 @@ func HandleAIReviewLifestyle(w http.ResponseWriter, r *http.Request) {
 		cumulativeSecondary = "TRUE"
 		cumulativeDegree = "TRUE"
 	default:
-
-		fmt.Println("Education is wrong")
 		http.Error(w, "Incorrect education", http.StatusInternalServerError)
+
+		log.Println("Incorrect education")
 		return
 	}
 
-	var lsAI LifestyleAIAnalyse
+	log.Println("check 6pass?")
 
+	var lsAI LifestyleAIAnalyse
 	lsAI.Diabetic = ls.Diabetic
 	lsAI.AlcoholLevel = ls.AlcoholLevel
 	lsAI.HeartRate = ls.HeartRate
@@ -326,45 +333,75 @@ func HandleAIReviewLifestyle(w http.ResponseWriter, r *http.Request) {
 	lsAI.CumulativeSecondary = cumulativeSecondary
 	lsAI.CumulativeDegree = cumulativeDegree
 
-	payload := AnswersAnalyse{
-		Answers: lsAI,
-	}
-
+	payload := AnswersAnalyse{Answers: lsAI}
 	jsonData, err := json.Marshal(payload)
 	if err != nil {
-		panic(err)
+		log.Println("Cant Marshal:", err)
+		http.Error(w, "Couldn't post to internal ai", http.StatusBadRequest)
+		return
 	}
 
-	url := "http://api.magestle.dev/lifestyle"
+	log.Println("check 7pass?")
 
+	url := "http://ai.magestle.dev/lifestyle"
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
 		http.Error(w, "Couldn't post to internal ai", http.StatusBadRequest)
+		return
 	}
 	defer resp.Body.Close()
 
-	fmt.Println("Response Status:", resp.Status)
+	log.Println("check 8pass?")
 
 	var dementiaResult DementiaResult
-
-	if err := json.NewDecoder(resp.Body).Decode(&dementiaResult); err != nil {
-		fmt.Println("failed to payload" + err.Error())
+	if err = json.NewDecoder(resp.Body).Decode(&dementiaResult); err != nil {
 		http.Error(w, "invalid payload", http.StatusBadRequest)
+		log.Println("Cant input payload:", err)
+		return
+	}
+
+	log.Println("check 9pass?")
+
+	classificationInt, err := strconv.Atoi(dementiaResult.Classification)
+	if err != nil {
+		classificationInt = 0
+	}
+
+	log.Println("check 10pass?")
+
+	if _, err := db.Exec(`UPDATE Lifestyle SET LifestyleStatus=$1 WHERE patientID=$2`, classificationInt+2, claims.UserID); err != nil {
+		http.Error(w, "Failed to update lifestyle", 500)
+		return
+	}
+
+	log.Println("check 11pass?")
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(ls)
+}
+
+func HandleDoctorConfirmLifestyle(w http.ResponseWriter, r *http.Request) {
+	idStr := r.URL.Query().Get("id")
+	if idStr == "" {
+		http.Error(w, "id is required", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
 		return
 	}
 
 	if _, err := db.Exec(`
 		UPDATE Lifestyle
 		SET LifestyleStatus=$1
-		WHERE patientID=$3
-		`, dementiaResult.Classification+2, claims.UserID); err != nil {
+		WHERE patientID=$2
+		`, 5, id); err != nil {
 		http.Error(w, "Failed to update lifestyle", 500)
 		fmt.Printf("failed to update lifestyle")
 		return
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(ls)
 }
 
 // Review Lifestyle

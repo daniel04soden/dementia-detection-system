@@ -131,7 +131,7 @@ type Transcript struct {
 }
 
 type DementiaResult struct {
-	Classification int `json:"classification"`
+	Classification string `json:"classification"`
 }
 
 func HandleAssemblyWebHook(w http.ResponseWriter, r *http.Request) {
@@ -242,15 +242,22 @@ func HandleAssemblyWebHook(w http.ResponseWriter, r *http.Request) {
 
 	date := time.Now().Format("02/01/2006")
 
+	classificationInt, err := strconv.Atoi(dementiaResult.Classification)
+	if err != nil {
+		log.Println("failed to convert classification to int:", err)
+		classificationInt = 0
+	}
+
 	if _, err := db.Exec(`
 		UPDATE SpeechTest
 		SET speechTestStatus=$1,testDate=$2
 		WHERE patientID=$3
-		`, dementiaResult.Classification+2, date, id); err != nil {
+		`, classificationInt+2, date, id); err != nil {
 		http.Error(w, "Failed to update speech clinic", 500)
 		fmt.Printf("failed to add speech")
 		return
 	}
+	log.Println("Speech send and graded")
 }
 
 type AiAnalyseRequest struct {
