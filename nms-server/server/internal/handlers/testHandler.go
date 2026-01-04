@@ -496,21 +496,17 @@ func HandleGetPatientTestStatus(w http.ResponseWriter, r *http.Request) {
 	var ts TestStatus
 
 	err = db.QueryRow(`
-        SELECT 
-            t.stageOneStatus, 
-            t.stageTwoStatus, 
-            COALESCE(l.lifestyleStatus, 0) AS lifestyleStatus, 
-            COALESCE(s.speechTestStatus, 0) AS speechTestStatus
-        FROM Test t
-        LEFT JOIN Lifestyle l ON t.patientID = l.patientID
-        LEFT JOIN SpeechTest s ON t.patientID = s.patientID
-        WHERE t.patientID = $1;
-    `, id).Scan(&ts.StageOneStatus, &ts.StageTwoStatus, &ts.LifestyleStatus, &ts.SpeechStatus)
+		SELECT 
+		COALESCE(t.stageOneStatus, 0),
+		COALESCE(t.stageTwoStatus, 2),
+		COALESCE(l.lifestyleStatus, 0),
+		COALESCE(s.speechTestStatus, 0)
+		FROM (SELECT $1::int AS patientID) AS p
+		LEFT JOIN Test t ON t.patientID = p.patientID
+		LEFT JOIN Lifestyle l ON l.patientID = p.patientID
+		LEFT JOIN SpeechTest s ON s.patientID = p.patientID;
+		`, id).Scan(&ts.StageOneStatus, &ts.StageTwoStatus, &ts.LifestyleStatus, &ts.SpeechStatus)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			http.Error(w, "patient not found", http.StatusNotFound)
-			return
-		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -546,16 +542,16 @@ func HandleGetPatientRisk(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = db.QueryRow(`
-        SELECT 
-            t.stageOneStatus, 
-            t.stageTwoStatus, 
-            l.lifestyleStatus, 
-            s.speechTestStatus
-        FROM Test t
-        LEFT JOIN Lifestyle l ON t.patientID = l.patientID
-        LEFT JOIN SpeechTest s ON t.patientID = s.patientID
-        WHERE t.patientID = $1;
-    `, id).Scan(&rs.StageOneStatus, &rs.StageTwoStatus, &rs.LifestyleStatus, &rs.SpeechStatus)
+		SELECT 
+		t.stageOneStatus, 
+		t.stageTwoStatus, 
+		l.lifestyleStatus, 
+		s.speechTestStatus
+		FROM Test t
+		LEFT JOIN Lifestyle l ON t.patientID = l.patientID
+		LEFT JOIN SpeechTest s ON t.patientID = s.patientID
+		WHERE t.patientID = $1;
+		`, id).Scan(&rs.StageOneStatus, &rs.StageTwoStatus, &rs.LifestyleStatus, &rs.SpeechStatus)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			http.Error(w, "patient not found", http.StatusNotFound)

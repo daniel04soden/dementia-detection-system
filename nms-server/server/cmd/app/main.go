@@ -104,6 +104,7 @@ func main() {
 	http.HandleFunc("GET /api/lifestyle/review", handlers.HandleGetLifestyle)
 	http.HandleFunc("POST /api/lifestyle/update", handlers.HandleDoctorReviewLifestyle)
 	http.HandleFunc("POST /api/lifestyle/ai/review", handlers.HandleAIReviewLifestyle)
+	http.HandleFunc("POST /api/lifestyle/confirm", handlers.HandleDoctorConfirmLifestyle)
 
 	// testing - // AssemblyAI / Speech
 	http.HandleFunc("POST /api/assembly/webhook", handlers.HandleAssemblyWebHook)
