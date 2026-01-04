@@ -45,7 +45,7 @@ func HandleCreatePayment(w http.ResponseWriter, r *http.Request) {
 
 	priceObj, err := price.New(&stripe.PriceParams{
 		Product:    stripe.String(prod.ID),
-		UnitAmount: stripe.Int64(1000),
+		UnitAmount: stripe.Int64(500),
 		Currency:   stripe.String(string(stripe.CurrencyEUR)),
 	})
 	if err != nil {
@@ -72,7 +72,7 @@ func HandleCreatePayment(w http.ResponseWriter, r *http.Request) {
 	_, err = db.Exec(`
 		INSERT INTO Payment (patientID, stripePaymentID, amount, status)
 		VALUES ($1, $2, $3, 'pending')
-		`, req.PatientID, pl.ID, 1000)
+		`, req.PatientID, pl.ID, 500)
 	if err != nil {
 		http.Error(w, "Failed to add payment", http.StatusInternalServerError)
 		return
@@ -135,7 +135,7 @@ func HandleStripeWebhook(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if session.AmountTotal != 1000 {
+		if session.AmountTotal != 500 {
 
 			fmt.Println("wrong amount paid")
 			w.WriteHeader(http.StatusOK)
